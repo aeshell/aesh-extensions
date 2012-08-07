@@ -21,6 +21,7 @@ import org.jboss.jreadline.console.Console;
 import org.jboss.jreadline.console.ConsoleProcess;
 import org.jboss.jreadline.console.settings.Settings;
 import org.jboss.jreadline.edit.actions.Operation;
+import org.jboss.jreadline.extensions.less.Less;
 import org.jboss.jreadline.extensions.manual.Man;
 
 import java.io.File;
@@ -46,6 +47,9 @@ public class ExampleExtension {
 
         Man man = new Man(exampleConsole);
         man.addPage(new File("/tmp/README.md"), "test");
+
+        Less less = new Less(exampleConsole);
+        less.setFile("/tmp/README.md");
 
 
         Completion completer = new Completion() {
@@ -93,6 +97,7 @@ public class ExampleExtension {
 
         exampleConsole.addCompletion(completer);
         exampleConsole.addCompletion(man);
+        exampleConsole.addCompletion(less);
 
         String line;
         //console.pushToConsole(ANSIColors.GREEN_TEXT());
@@ -112,8 +117,12 @@ public class ExampleExtension {
                 exampleConsole.clear();
             if(line.startsWith("man")) {
                 //exampleConsole.attachProcess(test);
-                man.attach();
                 man.setCurrentManPage("test");
+                man.attach();
+            }
+            if(line.startsWith("less")) {
+                //less.setFile("...");
+                less.attach();
             }
         }
         if(line.equals("reset")) {

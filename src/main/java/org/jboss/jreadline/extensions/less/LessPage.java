@@ -14,31 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.jreadline.extensions.manual;
+package org.jboss.jreadline.extensions.less;
 
 import org.jboss.jreadline.extensions.utils.Page;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class ManPage extends Page {
+public class LessPage extends Page {
 
-    private String name;
-
-    public ManPage(File page, String name) {
-        setPage(page);
-        this.name = name;
-    }
-
-    public void evictPage() {
-        getLines().clear();
-    }
-
-    public String getName() {
-        return name;
-    }
 }

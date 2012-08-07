@@ -20,7 +20,7 @@ import org.jboss.jreadline.complete.CompleteOperation;
 import org.jboss.jreadline.complete.Completion;
 import org.jboss.jreadline.console.Config;
 import org.jboss.jreadline.console.Console;
-import org.jboss.jreadline.console.ConsoleProcess;
+import org.jboss.jreadline.console.ConsoleCommand;
 import org.jboss.jreadline.edit.actions.Operation;
 
 import java.io.File;
@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class Man extends ConsoleProcess implements Completion {
+public class Man extends ConsoleCommand implements Completion {
 
     private int rows;
     private int columns;
@@ -57,6 +57,8 @@ public class Man extends ConsoleProcess implements Completion {
 
         rows = console.getTerminalHeight();
         columns = console.getTerminalWidth();
+        current.loadPage(columns);
+        displayMan();
     }
 
     @Override
@@ -70,9 +72,7 @@ public class Man extends ConsoleProcess implements Completion {
             if(name.equals(page.getName()))
                 current = page;
         }
-        current.loadPage();
         topVisibleRow = 0;
-        displayMan();
     }
 
     @Override
