@@ -17,12 +17,12 @@
 
 import org.jboss.jreadline.complete.CompleteOperation;
 import org.jboss.jreadline.complete.Completion;
+import org.jboss.jreadline.console.Config;
 import org.jboss.jreadline.console.Console;
-import org.jboss.jreadline.console.ConsoleProcess;
 import org.jboss.jreadline.console.settings.Settings;
-import org.jboss.jreadline.edit.actions.Operation;
 import org.jboss.jreadline.extensions.less.Less;
 import org.jboss.jreadline.extensions.manual.Man;
+import org.jboss.jreadline.util.ANSI;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,8 +49,6 @@ public class ExampleExtension {
         man.addPage(new File("/tmp/README.md"), "test");
 
         Less less = new Less(exampleConsole);
-        less.setFile("/tmp/README.md");
-
 
         Completion completer = new Completion() {
             @Override
@@ -100,7 +98,7 @@ public class ExampleExtension {
         exampleConsole.addCompletion(less);
 
         String line;
-        //console.pushToConsole(ANSIColors.GREEN_TEXT());
+        //exampleConsole.pushToConsole(ANSI.greenText());
         while ((line = exampleConsole.read("[test@foo.bar]~> ")) != null) {
             exampleConsole.pushToConsole("======>\"" + line + "\"\n");
 
@@ -120,20 +118,19 @@ public class ExampleExtension {
                 man.setCurrentManPage("test");
                 man.attach();
             }
-            if(line.startsWith("less")) {
-                //less.setFile("...");
-                less.attach();
-            }
-        }
-        if(line.equals("reset")) {
-            exampleConsole.stop();
-            exampleConsole = new Console();
-
-            while ((line = exampleConsole.read("> ")) != null) {
-                exampleConsole.pushToConsole("======>\"" + line + "\"\n");
-                if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit") ||
-                        line.equalsIgnoreCase("reset")) {
-                    break;
+            if(line.startsWith("less ")) {
+                File f = new File(line.substring("less ".length()).trim());
+                if(f.isFile()) {
+                    less.setFile(f);
+                    less.attach();
+                }
+                else if(f.isDirectory()) {
+                    exampleConsole.pushToConsole(f.getAbsolutePath()+": is a directory"+
+                            Config.getLineSeparator());
+                }
+                else {
+                    exampleConsole.pushToConsole(f.getAbsolutePath()+": No such file or directory"+
+                            Config.getLineSeparator());
                 }
 
             }

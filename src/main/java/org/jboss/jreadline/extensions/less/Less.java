@@ -23,9 +23,13 @@ import org.jboss.jreadline.console.Config;
 import org.jboss.jreadline.console.Console;
 import org.jboss.jreadline.console.ConsoleCommand;
 import org.jboss.jreadline.edit.actions.Operation;
+import org.jboss.jreadline.extensions.utils.FileUtils;
+import org.jboss.jreadline.util.ANSI;
+import org.jboss.jreadline.util.Parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * A less implementation for JReadline ref: http://en.wikipedia.org/wiki/Less_(Unix)
@@ -60,20 +64,20 @@ public class Less extends ConsoleCommand implements Completion {
 
     @Override
     protected void afterAttach() throws IOException {
-        console.switchToAlternateScreenBuffer();
+        console.pushToConsole(ANSI.getAlternateBufferScreen());
 
         rows = console.getTerminalHeight();
         columns = console.getTerminalWidth();
         this.file.loadPage(columns);
         if(this.file.getFile().isFile())
-            display(Background.INVERSE, this.file.getFile().getAbsolutePath());
+            display(Background.INVERSE, this.file.getFile().getPath());
         else
             display(Background.NORMAL, ":");
     }
 
     @Override
     protected void afterDetach() throws IOException {
-        console.switchToMainScreenBuffer();
+        console.pushToConsole(ANSI.getMainBufferScreen());
     }
 
     @Override
@@ -83,10 +87,13 @@ public class Less extends ConsoleCommand implements Completion {
             detach();
             return "";
         }
-        else if(operation.getInput()[0] == 'j') {
+        else if(operation.getInput()[0] == 'j' ||
+                operation.equals(Operation.HISTORY_NEXT) || operation.equals(Operation.NEW_LINE)) {
             topVisibleRow = topVisibleRow + getNumber();
-            if(topVisibleRow > (file.getLines().size()-rows)) {
-                topVisibleRow = file.getLines().size()-rows;
+            if(topVisibleRow > (file.size()-rows)) {
+                topVisibleRow = file.size()-rows;
+                if(topVisibleRow < 0)
+                    topVisibleRow = 0;
                 display(Background.INVERSE, "(END)");
             }
             else
@@ -94,7 +101,7 @@ public class Less extends ConsoleCommand implements Completion {
             clearNumber();
             return null;
         }
-        else if(operation.getInput()[0] == 'k') {
+        else if(operation.getInput()[0] == 'k' || operation.equals(Operation.HISTORY_PREV)) {
             topVisibleRow = topVisibleRow - getNumber();
             if(topVisibleRow < 0)
                 topVisibleRow = 0;
@@ -102,21 +109,12 @@ public class Less extends ConsoleCommand implements Completion {
             clearNumber();
             return null;
         }
-        else if(operation == Operation.NEW_LINE) {
-            topVisibleRow = topVisibleRow + getNumber();
-            if(topVisibleRow > (file.getLines().size()-rows)) {
-                topVisibleRow = file.getLines().size()-rows;
-                display(Background.INVERSE, "(END)");
-            }
-            else
-                display(Background.NORMAL, ":");
-            clearNumber();
-            return null;
-        }
-        else if(operation.getInput()[0] == 6) { // ctrl-f
+        else if(operation.getInput()[0] == 6 || operation.equals(Operation.PGDOWN)) { // ctrl-f || pgdown
             topVisibleRow = topVisibleRow + rows*getNumber();
-            if(topVisibleRow > (file.getLines().size()-rows)) {
-                topVisibleRow = file.getLines().size()-rows;
+            if(topVisibleRow > (file.size()-rows)) {
+                topVisibleRow = file.size()-rows;
+                if(topVisibleRow < 0)
+                    topVisibleRow = 0;
                 display(Background.INVERSE, "(END)");
             }
             else
@@ -124,7 +122,7 @@ public class Less extends ConsoleCommand implements Completion {
             clearNumber();
             return null;
         }
-        else if(operation.getInput()[0] == 2) { // ctrl-b
+        else if(operation.getInput()[0] == 2 || operation.equals(Operation.PGUP)) { // ctrl-b || pgup
             topVisibleRow = topVisibleRow - rows*getNumber();
             if(topVisibleRow < 0)
                 topVisibleRow = 0;
@@ -134,13 +132,13 @@ public class Less extends ConsoleCommand implements Completion {
         }
         else if(operation.getInput()[0] == 'G') {
             if(number.length() == 0 || getNumber() == 0) {
-                topVisibleRow = file.getLines().size()-rows;
+                topVisibleRow = file.size()-rows;
                 display(Background.INVERSE, "(END)");
             }
             else {
                 topVisibleRow = getNumber()-1;
-                if(topVisibleRow > file.getLines().size()-rows) {
-                    topVisibleRow = file.getLines().size()-rows;
+                if(topVisibleRow > file.size()-rows) {
+                    topVisibleRow = file.size()-rows;
                     display(Background.INVERSE, "(END)");
                 }
                 else {
@@ -162,9 +160,10 @@ public class Less extends ConsoleCommand implements Completion {
     private void display(Background background, String out) throws IOException {
         console.clear();
         for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
-            String line = file.getLine(i);
-            console.pushToConsole(file.getLine(i));
-            console.pushToConsole(Config.getLineSeparator());
+            if(i < file.size()) {
+                console.pushToConsole(file.getLine(i));
+                console.pushToConsole(Config.getLineSeparator());
+            }
         }
         displayBottom(background, out);
     }
@@ -172,7 +171,12 @@ public class Less extends ConsoleCommand implements Completion {
     private void displayBottom(Background background, String out) throws IOException {
         if(background == Background.INVERSE) {
             console.pushToConsole(Buffer.printAnsi("7m"));
-            console.pushToConsole(out);
+            //make sure that we dont display anything longer than columns
+            if(out.length() > columns) {
+                console.pushToConsole(out.substring(out.length()-columns));
+            }
+            else
+                console.pushToConsole(out);
             console.pushToConsole(Buffer.printAnsi("0m"));
         }
         else
@@ -189,13 +193,17 @@ public class Less extends ConsoleCommand implements Completion {
             completeOperation.getCompletionCandidates().add("less");
         else if(completeOperation.getBuffer().equals("less"))
             completeOperation.getCompletionCandidates().add("less");
-        /*
-        else if(completeOperation.getBuffer().equals("less ")) {
-            for(ManPage page : manPages) {
-                completeOperation.getCompletionCandidates().add("man "+page.getName());
-            }
+        else if(completeOperation.getBuffer().startsWith("less ")) {
+            //String rest = s.substring("less ".length());
+
+            String word = Parser.findWordClosestToCursor(completeOperation.getBuffer(),
+                    completeOperation.getCursor());
+            //List<String> out = FileUtils.listMatchingDirectories(word, new File("."));
+            //System.out.print(out);
+            completeOperation.addCompletionCandidates(
+                    FileUtils.listMatchingDirectories(word, new File(System.getProperty("user.dir"))));
+            completeOperation.setOffset(completeOperation.getCursor());
         }
-        */
     }
 
     private int getNumber() {
@@ -211,6 +219,6 @@ public class Less extends ConsoleCommand implements Completion {
 
     private static enum Background {
         NORMAL,
-        INVERSE;
+        INVERSE
     }
 }

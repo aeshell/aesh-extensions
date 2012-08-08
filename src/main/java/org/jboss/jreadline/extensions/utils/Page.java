@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Page parse files or input string and prepare it to be displayed in a term
+ *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 public abstract class Page {
@@ -77,6 +79,10 @@ public abstract class Page {
             return lines.get(num);
         else
             return null;
+    }
+
+    public int size() {
+        return lines.size();
     }
 
     public File getFile() {

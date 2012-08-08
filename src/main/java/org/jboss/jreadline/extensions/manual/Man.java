@@ -22,6 +22,7 @@ import org.jboss.jreadline.console.Config;
 import org.jboss.jreadline.console.Console;
 import org.jboss.jreadline.console.ConsoleCommand;
 import org.jboss.jreadline.edit.actions.Operation;
+import org.jboss.jreadline.util.ANSI;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class Man extends ConsoleCommand implements Completion {
 
     @Override
     protected void afterAttach() throws IOException {
-        console.switchToAlternateScreenBuffer();
+        console.pushToConsole(ANSI.getAlternateBufferScreen());
 
         rows = console.getTerminalHeight();
         columns = console.getTerminalWidth();
@@ -63,7 +64,7 @@ public class Man extends ConsoleCommand implements Completion {
 
     @Override
     protected void afterDetach() throws IOException {
-        console.switchToMainScreenBuffer();
+        console.pushToConsole(ANSI.getMainBufferScreen());
 
     }
 
