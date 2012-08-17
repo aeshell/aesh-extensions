@@ -19,6 +19,7 @@ import org.jboss.jreadline.complete.CompleteOperation;
 import org.jboss.jreadline.complete.Completion;
 import org.jboss.jreadline.console.Config;
 import org.jboss.jreadline.console.Console;
+import org.jboss.jreadline.console.ConsoleOutput;
 import org.jboss.jreadline.console.settings.Settings;
 import org.jboss.jreadline.extensions.less.Less;
 import org.jboss.jreadline.extensions.manual.Man;
@@ -97,18 +98,19 @@ public class ExampleExtension {
         exampleConsole.addCompletion(man);
         exampleConsole.addCompletion(less);
 
-        String line;
+        ConsoleOutput consoleOutput = null;
         //exampleConsole.pushToConsole(ANSI.greenText());
-        while ((line = exampleConsole.read("[test@foo.bar]~> ")) != null) {
-            exampleConsole.pushToConsole("======>\"" + line + "\"\n");
+        while ((consoleOutput = exampleConsole.read("[test@foo.bar]~> ")) != null) {
+            String line = consoleOutput.getBuffer();
+            exampleConsole.pushToStdOut("======>\"" + line + "\"\n");
 
             if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit") ||
                     line.equalsIgnoreCase("reset")) {
                 break;
             }
             if(line.equalsIgnoreCase("password")) {
-                line = exampleConsole.read("password: ", Character.valueOf((char) 0));
-                exampleConsole.pushToConsole("password typed:" + line + "\n");
+                consoleOutput = exampleConsole.read("password: ", Character.valueOf((char) 0));
+                exampleConsole.pushToStdOut("password typed:" + consoleOutput.getBuffer() + "\n");
 
             }
             if(line.equals("clear"))
@@ -116,23 +118,22 @@ public class ExampleExtension {
             if(line.startsWith("man")) {
                 //exampleConsole.attachProcess(test);
                 man.setCurrentManPage("test");
-                man.attach();
+                man.attach(consoleOutput);
             }
             if(line.startsWith("less ")) {
                 File f = new File(line.substring("less ".length()).trim());
                 if(f.isFile()) {
                     less.setFile(f);
-                    less.attach();
+                    less.attach(consoleOutput);
                 }
                 else if(f.isDirectory()) {
-                    exampleConsole.pushToConsole(f.getAbsolutePath()+": is a directory"+
+                    exampleConsole.pushToStdOut(f.getAbsolutePath()+": is a directory"+
                             Config.getLineSeparator());
                 }
                 else {
-                    exampleConsole.pushToConsole(f.getAbsolutePath()+": No such file or directory"+
+                    exampleConsole.pushToStdOut(f.getAbsolutePath()+": No such file or directory"+
                             Config.getLineSeparator());
                 }
-
             }
         }
 

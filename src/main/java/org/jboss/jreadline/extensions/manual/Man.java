@@ -54,7 +54,7 @@ public class Man extends ConsoleCommand implements Completion {
 
     @Override
     protected void afterAttach() throws IOException {
-        console.pushToConsole(ANSI.getAlternateBufferScreen());
+        console.pushToStdOut(ANSI.getAlternateBufferScreen());
 
         rows = console.getTerminalHeight();
         columns = console.getTerminalWidth();
@@ -64,7 +64,7 @@ public class Man extends ConsoleCommand implements Completion {
 
     @Override
     protected void afterDetach() throws IOException {
-        console.pushToConsole(ANSI.getMainBufferScreen());
+        console.pushToStdOut(ANSI.getMainBufferScreen());
 
     }
 
@@ -77,31 +77,26 @@ public class Man extends ConsoleCommand implements Completion {
     }
 
     @Override
-    public java.lang.String processOperation(Operation operation) throws IOException {
+    public void processOperation(Operation operation) throws IOException {
         if(operation.getInput()[0] == 'q') {
             detach();
-            return "";
         }
         else if(operation.getInput()[0] == 'j') {
             topVisibleRow++;
             displayMan();
-            return null;
         }
         else if(operation.getInput()[0] == 'k') {
             if(topVisibleRow > 0)
                 topVisibleRow--;
             displayMan();
-            return null;
         }
-        else
-            return null;
     }
 
     private void displayMan() throws IOException {
         console.clear();
         for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
-            console.pushToConsole(current.getLine(i));
-            console.pushToConsole(Config.getLineSeparator());
+            console.pushToStdOut(current.getLine(i));
+            console.pushToStdOut(Config.getLineSeparator());
         }
     }
 

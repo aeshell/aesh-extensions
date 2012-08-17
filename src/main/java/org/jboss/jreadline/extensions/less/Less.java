@@ -23,13 +23,12 @@ import org.jboss.jreadline.console.Config;
 import org.jboss.jreadline.console.Console;
 import org.jboss.jreadline.console.ConsoleCommand;
 import org.jboss.jreadline.edit.actions.Operation;
-import org.jboss.jreadline.extensions.utils.FileUtils;
 import org.jboss.jreadline.util.ANSI;
+import org.jboss.jreadline.util.FileUtils;
 import org.jboss.jreadline.util.Parser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * A less implementation for JReadline ref: http://en.wikipedia.org/wiki/Less_(Unix)
@@ -64,7 +63,7 @@ public class Less extends ConsoleCommand implements Completion {
 
     @Override
     protected void afterAttach() throws IOException {
-        console.pushToConsole(ANSI.getAlternateBufferScreen());
+        console.pushToStdOut(ANSI.getAlternateBufferScreen());
 
         rows = console.getTerminalHeight();
         columns = console.getTerminalWidth();
@@ -77,15 +76,14 @@ public class Less extends ConsoleCommand implements Completion {
 
     @Override
     protected void afterDetach() throws IOException {
-        console.pushToConsole(ANSI.getMainBufferScreen());
+        console.pushToStdOut(ANSI.getMainBufferScreen());
     }
 
     @Override
-    public String processOperation(Operation operation) throws IOException {
+    public void processOperation(Operation operation) throws IOException {
         if(operation.getInput()[0] == 'q') {
             clearNumber();
             detach();
-            return "";
         }
         else if(operation.getInput()[0] == 'j' ||
                 operation.equals(Operation.HISTORY_NEXT) || operation.equals(Operation.NEW_LINE)) {
@@ -99,7 +97,6 @@ public class Less extends ConsoleCommand implements Completion {
             else
                 display(Background.NORMAL, ":");
             clearNumber();
-            return null;
         }
         else if(operation.getInput()[0] == 'k' || operation.equals(Operation.HISTORY_PREV)) {
             topVisibleRow = topVisibleRow - getNumber();
@@ -107,7 +104,6 @@ public class Less extends ConsoleCommand implements Completion {
                 topVisibleRow = 0;
             display(Background.NORMAL, ":");
             clearNumber();
-            return null;
         }
         else if(operation.getInput()[0] == 6 || operation.equals(Operation.PGDOWN)) { // ctrl-f || pgdown
             topVisibleRow = topVisibleRow + rows*getNumber();
@@ -120,7 +116,6 @@ public class Less extends ConsoleCommand implements Completion {
             else
                 display(Background.NORMAL, ":");
             clearNumber();
-            return null;
         }
         else if(operation.getInput()[0] == 2 || operation.equals(Operation.PGUP)) { // ctrl-b || pgup
             topVisibleRow = topVisibleRow - rows*getNumber();
@@ -128,7 +123,6 @@ public class Less extends ConsoleCommand implements Completion {
                 topVisibleRow = 0;
             display(Background.NORMAL, ":");
             clearNumber();
-            return null;
         }
         else if(operation.getInput()[0] == 'G') {
             if(number.length() == 0 || getNumber() == 0) {
@@ -146,23 +140,19 @@ public class Less extends ConsoleCommand implements Completion {
                 }
             }
             clearNumber();
-            return null;
         }
         else if(Character.isDigit(operation.getInput()[0])) {
             number.append(Character.getNumericValue(operation.getInput()[0]));
             display(Background.NORMAL,":"+number.toString());
-            return null;
         }
-        else
-            return null;
     }
 
     private void display(Background background, String out) throws IOException {
         console.clear();
         for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
             if(i < file.size()) {
-                console.pushToConsole(file.getLine(i));
-                console.pushToConsole(Config.getLineSeparator());
+                console.pushToStdOut(file.getLine(i));
+                console.pushToStdOut(Config.getLineSeparator());
             }
         }
         displayBottom(background, out);
@@ -170,17 +160,17 @@ public class Less extends ConsoleCommand implements Completion {
 
     private void displayBottom(Background background, String out) throws IOException {
         if(background == Background.INVERSE) {
-            console.pushToConsole(Buffer.printAnsi("7m"));
+            console.pushToStdOut(Buffer.printAnsi("7m"));
             //make sure that we dont display anything longer than columns
             if(out.length() > columns) {
-                console.pushToConsole(out.substring(out.length()-columns));
+                console.pushToStdOut(out.substring(out.length()-columns));
             }
             else
-                console.pushToConsole(out);
-            console.pushToConsole(Buffer.printAnsi("0m"));
+                console.pushToStdOut(out);
+            console.pushToStdOut(Buffer.printAnsi("0m"));
         }
         else
-            console.pushToConsole(out);
+            console.pushToStdOut(out);
     }
 
     @Override
@@ -200,9 +190,9 @@ public class Less extends ConsoleCommand implements Completion {
                     completeOperation.getCursor());
             //List<String> out = FileUtils.listMatchingDirectories(word, new File("."));
             //System.out.print(out);
-            completeOperation.addCompletionCandidates(
-                    FileUtils.listMatchingDirectories(word, new File(System.getProperty("user.dir"))));
             completeOperation.setOffset(completeOperation.getCursor());
+            FileUtils.listMatchingDirectories(completeOperation, word,
+                    new File(System.getProperty("user.dir")));
         }
     }
 
