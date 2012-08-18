@@ -63,20 +63,35 @@ public class Less extends ConsoleCommand implements Completion {
 
     @Override
     protected void afterAttach() throws IOException {
-        console.pushToStdOut(ANSI.getAlternateBufferScreen());
-
         rows = console.getTerminalHeight();
         columns = console.getTerminalWidth();
         this.file.loadPage(columns);
-        if(this.file.getFile().isFile())
-            display(Background.INVERSE, this.file.getFile().getPath());
-        else
-            display(Background.NORMAL, ":");
+
+        if(getConsoleOutput().hasRedirectOrPipe()) {
+            int count=0;
+            for(String line : this.file.getLines()) {
+                console.pushToStdOut(line);
+                count++;
+                if(count < this.file.size())
+                    console.pushToStdOut(Config.getLineSeparator());
+            }
+
+            detach();
+        }
+        else {
+            console.pushToStdOut(ANSI.getAlternateBufferScreen());
+
+            if(this.file.getFile().isFile())
+                display(Background.INVERSE, this.file.getFile().getPath());
+            else
+                display(Background.NORMAL, ":");
+        }
     }
 
     @Override
     protected void afterDetach() throws IOException {
-        console.pushToStdOut(ANSI.getMainBufferScreen());
+        if(!getConsoleOutput().hasRedirectOrPipe())
+            console.pushToStdOut(ANSI.getMainBufferScreen());
     }
 
     @Override

@@ -120,19 +120,27 @@ public class ExampleExtension {
                 man.setCurrentManPage("test");
                 man.attach(consoleOutput);
             }
-            if(line.startsWith("less ")) {
-                File f = new File(line.substring("less ".length()).trim());
-                if(f.isFile()) {
-                    less.setFile(f);
+            if(line.startsWith("less")) {
+                if(consoleOutput.getStdOut() != null &&
+                        consoleOutput.getStdOut().length() > 0) {
+                    less.setInput(consoleOutput.getStdOut());
                     less.attach(consoleOutput);
-                }
-                else if(f.isDirectory()) {
-                    exampleConsole.pushToStdOut(f.getAbsolutePath()+": is a directory"+
-                            Config.getLineSeparator());
+
                 }
                 else {
-                    exampleConsole.pushToStdOut(f.getAbsolutePath()+": No such file or directory"+
-                            Config.getLineSeparator());
+                    File f = new File(line.substring("less ".length()).trim());
+                    if(f.isFile()) {
+                        less.setFile(f);
+                        less.attach(consoleOutput);
+                    }
+                    else if(f.isDirectory()) {
+                        exampleConsole.pushToStdOut(f.getAbsolutePath()+": is a directory"+
+                                Config.getLineSeparator());
+                    }
+                    else {
+                        exampleConsole.pushToStdOut(f.getAbsolutePath()+": No such file or directory"+
+                                Config.getLineSeparator());
+                    }
                 }
             }
         }

@@ -69,7 +69,13 @@ public abstract class Page {
             }
         }
         else if(pageAsString != null) {
+            //1. remove line separator
+            //2. split the line in the size of column
+            StringBuilder sb = new StringBuilder();
             for(String s : pageAsString.split(Config.getLineSeparator()))
+                sb.append(s);
+
+            for(String s : sb.toString().split("(?<=\\G.{"+columns+"})"))
                 lines.add(s);
         }
     }
