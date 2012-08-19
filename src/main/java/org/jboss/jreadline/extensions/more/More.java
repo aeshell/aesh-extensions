@@ -1,27 +1,13 @@
-/*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat Middleware LLC, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.jboss.jreadline.extensions.less;
+package org.jboss.jreadline.extensions.more;
 
 import org.jboss.jreadline.complete.CompleteOperation;
 import org.jboss.jreadline.complete.Completion;
+import org.jboss.jreadline.console.Buffer;
 import org.jboss.jreadline.console.Config;
 import org.jboss.jreadline.console.Console;
 import org.jboss.jreadline.console.ConsoleCommand;
 import org.jboss.jreadline.edit.actions.Operation;
+import org.jboss.jreadline.extensions.utils.Page;
 import org.jboss.jreadline.util.ANSI;
 import org.jboss.jreadline.util.FileUtils;
 import org.jboss.jreadline.util.Parser;
@@ -30,21 +16,19 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * A less implementation for JReadline ref: http://en.wikipedia.org/wiki/Less_(Unix)
- *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class Less extends ConsoleCommand implements Completion {
+public class More extends ConsoleCommand implements Completion {
 
     private int rows;
     private int columns;
     private int topVisibleRow;
-    private LessPage file;
     private StringBuilder number;
+    private MorePage file;
 
-    public Less(Console console) {
+    public More(Console console) {
         super(console);
-        file = new LessPage();
+        file = new MorePage();
         number = new StringBuilder();
     }
 
@@ -78,8 +62,6 @@ public class Less extends ConsoleCommand implements Completion {
             detach();
         }
         else {
-            console.pushToStdOut(ANSI.getAlternateBufferScreen());
-
             if(this.file.getFile().isFile())
                 display(Background.INVERSE, this.file.getFile().getPath());
             else
@@ -89,76 +71,48 @@ public class Less extends ConsoleCommand implements Completion {
 
     @Override
     protected void afterDetach() throws IOException {
-        if(!getConsoleOutput().hasRedirectOrPipe())
-            console.pushToStdOut(ANSI.getMainBufferScreen());
+        clearNumber();
     }
 
     @Override
     public void processOperation(Operation operation) throws IOException {
         if(operation.getInput()[0] == 'q') {
-            clearNumber();
             detach();
         }
-        else if(operation.getInput()[0] == 'j' ||
-                operation.equals(Operation.HISTORY_NEXT) || operation.equals(Operation.NEW_LINE)) {
+        else if( operation.equals(Operation.NEW_LINE)) {
             topVisibleRow = topVisibleRow + getNumber();
             if(topVisibleRow > (file.size()-rows)) {
                 topVisibleRow = file.size()-rows;
                 if(topVisibleRow < 0)
                     topVisibleRow = 0;
-                display(Background.INVERSE, "(END)");
+                detach();
             }
             else
-                display(Background.NORMAL, ":");
+                display(Background.INVERSE, ":");
             clearNumber();
         }
-        else if(operation.getInput()[0] == 'k' || operation.equals(Operation.HISTORY_PREV)) {
-            topVisibleRow = topVisibleRow - getNumber();
-            if(topVisibleRow < 0)
-                topVisibleRow = 0;
-            display(Background.NORMAL, ":");
-            clearNumber();
-        }
-        else if(operation.getInput()[0] == 6 || operation.equals(Operation.PGDOWN)
-                || operation.getInput()[0] == 32) { // ctrl-f || pgdown || space
+        // ctrl-f ||  space
+        else if(operation.getInput()[0] == 6 || operation.getInput()[0] == 32) {
             topVisibleRow = topVisibleRow + rows*getNumber();
             if(topVisibleRow > (file.size()-rows)) {
                 topVisibleRow = file.size()-rows;
                 if(topVisibleRow < 0)
                     topVisibleRow = 0;
-                display(Background.INVERSE, "(END)");
+                detach();
             }
             else
-                display(Background.NORMAL, ":");
+                display(Background.INVERSE, ":");
             clearNumber();
         }
-        else if(operation.getInput()[0] == 2 || operation.equals(Operation.PGUP)) { // ctrl-b || pgup
+        else if(operation.getInput()[0] == 2) { // ctrl-b
             topVisibleRow = topVisibleRow - rows*getNumber();
             if(topVisibleRow < 0)
                 topVisibleRow = 0;
-            display(Background.NORMAL, ":");
-            clearNumber();
-        }
-        else if(operation.getInput()[0] == 'G') {
-            if(number.length() == 0 || getNumber() == 0) {
-                topVisibleRow = file.size()-rows;
-                display(Background.INVERSE, "(END)");
-            }
-            else {
-                topVisibleRow = getNumber()-1;
-                if(topVisibleRow > file.size()-rows) {
-                    topVisibleRow = file.size()-rows;
-                    display(Background.INVERSE, "(END)");
-                }
-                else {
-                    display(Background.NORMAL, ":");
-                }
-            }
+            display(Background.INVERSE, ":");
             clearNumber();
         }
         else if(Character.isDigit(operation.getInput()[0])) {
             number.append(Character.getNumericValue(operation.getInput()[0]));
-            display(Background.NORMAL,":"+number.toString());
         }
     }
 
@@ -177,29 +131,34 @@ public class Less extends ConsoleCommand implements Completion {
         if(background == Background.INVERSE) {
             console.pushToStdOut(ANSI.getInvertedBackground());
             //make sure that we dont display anything longer than columns
-            if(out.length() > columns) {
-                console.pushToStdOut(out.substring(out.length()-columns));
-            }
-            else
-                console.pushToStdOut(out);
-            console.pushToStdOut(ANSI.reset());
+            console.pushToStdOut(getPercentDisplayed()+"%");
+
+            //console.pushToStdOut(ANSI.reset());
+            console.pushToStdOut(Buffer.printAnsi("27m"));
         }
         else
             console.pushToStdOut(out);
     }
 
+    private String getPercentDisplayed() {
+        double row = topVisibleRow  + rows;
+        if(row > this.file.size())
+            row  = this.file.size();
+
+        return String.valueOf((int) ((row / this.file.size()) * 100));
+    }
+
     @Override
     public void complete(CompleteOperation completeOperation) {
-        if(completeOperation.getBuffer().equals("l"))
-            completeOperation.getCompletionCandidates().add("less");
-        else if(completeOperation.getBuffer().equals("le"))
-            completeOperation.getCompletionCandidates().add("less");
-        else if(completeOperation.getBuffer().equals("les"))
-            completeOperation.getCompletionCandidates().add("less");
-        else if(completeOperation.getBuffer().equals("less"))
-            completeOperation.getCompletionCandidates().add("less");
-        else if(completeOperation.getBuffer().startsWith("less ")) {
-            //String rest = s.substring("less ".length());
+        if(completeOperation.getBuffer().equals("m"))
+            completeOperation.getCompletionCandidates().add("more");
+        else if(completeOperation.getBuffer().equals("mo"))
+            completeOperation.getCompletionCandidates().add("more");
+        else if(completeOperation.getBuffer().equals("mor"))
+            completeOperation.getCompletionCandidates().add("more");
+        else if(completeOperation.getBuffer().equals("more"))
+            completeOperation.getCompletionCandidates().add("more");
+        else if(completeOperation.getBuffer().startsWith("more ")) {
 
             String word = Parser.findWordClosestToCursor(completeOperation.getBuffer(),
                     completeOperation.getCursor());
@@ -225,5 +184,9 @@ public class Less extends ConsoleCommand implements Completion {
     private static enum Background {
         NORMAL,
         INVERSE
+    }
+
+    private class MorePage extends Page {
+
     }
 }

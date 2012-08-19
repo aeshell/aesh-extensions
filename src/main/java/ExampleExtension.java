@@ -23,6 +23,7 @@ import org.jboss.jreadline.console.ConsoleOutput;
 import org.jboss.jreadline.console.settings.Settings;
 import org.jboss.jreadline.extensions.less.Less;
 import org.jboss.jreadline.extensions.manual.Man;
+import org.jboss.jreadline.extensions.more.More;
 import org.jboss.jreadline.util.ANSI;
 
 import java.io.File;
@@ -50,6 +51,7 @@ public class ExampleExtension {
         man.addPage(new File("/tmp/README.md"), "test");
 
         Less less = new Less(exampleConsole);
+        More more = new More(exampleConsole);
 
         Completion completer = new Completion() {
             @Override
@@ -97,6 +99,7 @@ public class ExampleExtension {
         exampleConsole.addCompletion(completer);
         exampleConsole.addCompletion(man);
         exampleConsole.addCompletion(less);
+        exampleConsole.addCompletion(more);
 
         ConsoleOutput consoleOutput = null;
         //exampleConsole.pushToConsole(ANSI.greenText());
@@ -132,6 +135,30 @@ public class ExampleExtension {
                     if(f.isFile()) {
                         less.setFile(f);
                         less.attach(consoleOutput);
+                    }
+                    else if(f.isDirectory()) {
+                        exampleConsole.pushToStdOut(f.getAbsolutePath()+": is a directory"+
+                                Config.getLineSeparator());
+                    }
+                    else {
+                        exampleConsole.pushToStdOut(f.getAbsolutePath()+": No such file or directory"+
+                                Config.getLineSeparator());
+                    }
+                }
+            }
+
+            if(line.startsWith("more")) {
+                if(consoleOutput.getStdOut() != null &&
+                        consoleOutput.getStdOut().length() > 0) {
+                    more.setInput(consoleOutput.getStdOut());
+                    more.attach(consoleOutput);
+
+                }
+                else {
+                    File f = new File(line.substring("more ".length()).trim());
+                    if(f.isFile()) {
+                        more.setFile(f);
+                        more.attach(consoleOutput);
                     }
                     else if(f.isDirectory()) {
                         exampleConsole.pushToStdOut(f.getAbsolutePath()+": is a directory"+
