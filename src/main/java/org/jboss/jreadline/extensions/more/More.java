@@ -21,57 +21,64 @@ import java.io.IOException;
 public class More extends ConsoleCommand implements Completion {
 
     private int rows;
-    private int columns;
     private int topVisibleRow;
+    private int prevTopVisibleRow;
     private StringBuilder number;
-    private MorePage file;
+    private MorePage page;
 
     public More(Console console) {
         super(console);
-        file = new MorePage();
+        page = new MorePage();
         number = new StringBuilder();
     }
 
-    public void setFile(File file) throws IOException {
-        this.file.setPage(file);
+    public void setPage(File page) throws IOException {
+        this.page.setPage(page);
     }
 
     public void setFile(String filename) throws IOException {
-        this.file.setPage(new File(filename));
+        this.page.setPage(new File(filename));
     }
 
     public void setInput(String input) throws IOException {
-        this.file.setPageAsString(input);
+        this.page.setPageAsString(input);
     }
 
     @Override
     protected void afterAttach() throws IOException {
         rows = console.getTerminalHeight();
-        columns = console.getTerminalWidth();
-        this.file.loadPage(columns);
+        int columns = console.getTerminalWidth();
+        this.page.loadPage(columns);
 
         if(getConsoleOutput().hasRedirectOrPipe()) {
             int count=0;
-            for(String line : this.file.getLines()) {
+            for(String line : this.page.getLines()) {
                 console.pushToStdOut(line);
                 count++;
-                if(count < this.file.size())
+                if(count < this.page.size())
                     console.pushToStdOut(Config.getLineSeparator());
             }
 
             detach();
         }
         else {
-            if(this.file.getFile().isFile())
-                display(Background.INVERSE, this.file.getFile().getPath());
+            if(!page.hasData()) {
+                //display help
+            }
             else
-                display(Background.NORMAL, ":");
+                display(Background.INVERSE);
         }
     }
 
     @Override
     protected void afterDetach() throws IOException {
         clearNumber();
+        topVisibleRow = prevTopVisibleRow = 0;
+        if(!getConsoleOutput().hasRedirectOrPipe()) {
+            console.pushToStdOut(Buffer.printAnsi("K"));
+            console.pushToStdOut(Buffer.printAnsi("1G"));
+        }
+        page.clear();
     }
 
     @Override
@@ -81,34 +88,36 @@ public class More extends ConsoleCommand implements Completion {
         }
         else if( operation.equals(Operation.NEW_LINE)) {
             topVisibleRow = topVisibleRow + getNumber();
-            if(topVisibleRow > (file.size()-rows)) {
-                topVisibleRow = file.size()-rows;
+            if(topVisibleRow > (page.size()-rows)) {
+                topVisibleRow = page.size()-rows;
                 if(topVisibleRow < 0)
                     topVisibleRow = 0;
+                display(Background.INVERSE);
                 detach();
             }
             else
-                display(Background.INVERSE, ":");
+                display(Background.INVERSE);
             clearNumber();
         }
         // ctrl-f ||  space
         else if(operation.getInput()[0] == 6 || operation.getInput()[0] == 32) {
             topVisibleRow = topVisibleRow + rows*getNumber();
-            if(topVisibleRow > (file.size()-rows)) {
-                topVisibleRow = file.size()-rows;
+            if(topVisibleRow > (page.size()-rows)) {
+                topVisibleRow = page.size()-rows;
                 if(topVisibleRow < 0)
                     topVisibleRow = 0;
+                display(Background.INVERSE);
                 detach();
             }
             else
-                display(Background.INVERSE, ":");
+                display(Background.INVERSE);
             clearNumber();
         }
         else if(operation.getInput()[0] == 2) { // ctrl-b
             topVisibleRow = topVisibleRow - rows*getNumber();
             if(topVisibleRow < 0)
                 topVisibleRow = 0;
-            display(Background.INVERSE, ":");
+            display(Background.INVERSE);
             clearNumber();
         }
         else if(Character.isDigit(operation.getInput()[0])) {
@@ -116,36 +125,56 @@ public class More extends ConsoleCommand implements Completion {
         }
     }
 
-    private void display(Background background, String out) throws IOException {
-        console.clear();
-        for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
-            if(i < file.size()) {
-                console.pushToStdOut(file.getLine(i));
-                console.pushToStdOut(Config.getLineSeparator());
+    private void display(Background background) throws IOException {
+        //console.clear();
+        console.pushToStdOut(Buffer.printAnsi("0G"));
+        console.pushToStdOut(Buffer.printAnsi("2K"));
+        if(prevTopVisibleRow == 0 && topVisibleRow == 0) {
+            for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
+                if(i < page.size()) {
+                    console.pushToStdOut(page.getLine(i));
+                    console.pushToStdOut(Config.getLineSeparator());
+                }
             }
         }
-        displayBottom(background, out);
+        else if(prevTopVisibleRow < topVisibleRow) {
+
+            for(int i=prevTopVisibleRow; i < topVisibleRow; i++) {
+                console.pushToStdOut(page.getLine(i + rows));
+                console.pushToStdOut(Config.getLineSeparator());
+
+            }
+            prevTopVisibleRow = topVisibleRow;
+
+        }
+        else if(prevTopVisibleRow > topVisibleRow) {
+            for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
+                if(i < page.size()) {
+                    console.pushToStdOut(page.getLine(i));
+                    console.pushToStdOut(Config.getLineSeparator());
+                }
+            }
+            prevTopVisibleRow = topVisibleRow;
+        }
+        displayBottom(background);
     }
 
-    private void displayBottom(Background background, String out) throws IOException {
+    private void displayBottom(Background background) throws IOException {
         if(background == Background.INVERSE) {
             console.pushToStdOut(ANSI.getInvertedBackground());
-            //make sure that we dont display anything longer than columns
-            console.pushToStdOut(getPercentDisplayed()+"%");
+            console.pushToStdOut("--More--(");
+            console.pushToStdOut(getPercentDisplayed()+"%)");
 
-            //console.pushToStdOut(ANSI.reset());
-            console.pushToStdOut(Buffer.printAnsi("27m"));
+            console.pushToStdOut(ANSI.getNormalBackground());
+            //console.pushToStdOut(ANSI.getBold());
         }
-        else
-            console.pushToStdOut(out);
     }
 
     private String getPercentDisplayed() {
         double row = topVisibleRow  + rows;
-        if(row > this.file.size())
-            row  = this.file.size();
-
-        return String.valueOf((int) ((row / this.file.size()) * 100));
+        if(row > this.page.size())
+            row  = this.page.size();
+        return String.valueOf((int) ((row / this.page.size()) * 100));
     }
 
     @Override
@@ -162,12 +191,16 @@ public class More extends ConsoleCommand implements Completion {
 
             String word = Parser.findWordClosestToCursor(completeOperation.getBuffer(),
                     completeOperation.getCursor());
-            //List<String> out = FileUtils.listMatchingDirectories(word, new File("."));
-            //System.out.print(out);
             completeOperation.setOffset(completeOperation.getCursor());
             FileUtils.listMatchingDirectories(completeOperation, word,
                     new File(System.getProperty("user.dir")));
         }
+    }
+
+    public void displayHelp() throws IOException {
+        console.pushToStdOut(Config.getLineSeparator()
+                +"Usage: more [options] file..."
+                +Config.getLineSeparator());
     }
 
     private int getNumber() {

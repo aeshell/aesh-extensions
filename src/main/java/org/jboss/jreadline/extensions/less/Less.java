@@ -18,16 +18,21 @@ package org.jboss.jreadline.extensions.less;
 
 import org.jboss.jreadline.complete.CompleteOperation;
 import org.jboss.jreadline.complete.Completion;
+import org.jboss.jreadline.console.Buffer;
 import org.jboss.jreadline.console.Config;
 import org.jboss.jreadline.console.Console;
 import org.jboss.jreadline.console.ConsoleCommand;
 import org.jboss.jreadline.edit.actions.Operation;
+import org.jboss.jreadline.extensions.utils.Page.Search;
 import org.jboss.jreadline.util.ANSI;
 import org.jboss.jreadline.util.FileUtils;
+import org.jboss.jreadline.util.LoggerUtil;
 import org.jboss.jreadline.util.Parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * A less implementation for JReadline ref: http://en.wikipedia.org/wiki/Less_(Unix)
@@ -39,51 +44,63 @@ public class Less extends ConsoleCommand implements Completion {
     private int rows;
     private int columns;
     private int topVisibleRow;
-    private LessPage file;
+    private LessPage page;
     private StringBuilder number;
+    private Search search = Search.NO_SEARCH;
+    private StringBuilder searchBuilder;
+    private List<Integer> searchLines;
+    private Logger logger = LoggerUtil.getLogger(getClass().getName());
 
     public Less(Console console) {
         super(console);
-        file = new LessPage();
+        page = new LessPage();
         number = new StringBuilder();
+        searchBuilder = new StringBuilder();
     }
 
-    public void setFile(File file) throws IOException {
-        this.file.setPage(file);
+    public void setPage(File page) throws IOException {
+        this.page.setPage(page);
     }
 
     public void setFile(String filename) throws IOException {
-        this.file.setPage(new File(filename));
+        this.page.setPage(new File(filename));
     }
 
     public void setInput(String input) throws IOException {
-        this.file.setPageAsString(input);
+        this.page.setPageAsString(input);
     }
 
     @Override
     protected void afterAttach() throws IOException {
         rows = console.getTerminalHeight();
         columns = console.getTerminalWidth();
-        this.file.loadPage(columns);
+        this.page.loadPage(columns);
 
         if(getConsoleOutput().hasRedirectOrPipe()) {
             int count=0;
-            for(String line : this.file.getLines()) {
+            for(String line : this.page.getLines()) {
                 console.pushToStdOut(line);
                 count++;
-                if(count < this.file.size())
+                if(count < this.page.size())
                     console.pushToStdOut(Config.getLineSeparator());
             }
 
             detach();
         }
         else {
-            console.pushToStdOut(ANSI.getAlternateBufferScreen());
 
-            if(this.file.getFile().isFile())
-                display(Background.INVERSE, this.file.getFile().getPath());
-            else
-                display(Background.NORMAL, ":");
+            if(!page.hasData()) {
+                console.pushToStdOut("Missing filename (\"less --help\" for help)\n");
+                detach();
+            }
+            else {
+                console.pushToStdOut(ANSI.getAlternateBufferScreen());
+
+                if(this.page.getFile() != null)
+                    display(Background.INVERSE, this.page.getFile().getPath());
+                else
+                    display(Background.NORMAL, ":");
+            }
         }
     }
 
@@ -91,89 +108,205 @@ public class Less extends ConsoleCommand implements Completion {
     protected void afterDetach() throws IOException {
         if(!getConsoleOutput().hasRedirectOrPipe())
             console.pushToStdOut(ANSI.getMainBufferScreen());
+
+        page.clear();
     }
 
     @Override
     public void processOperation(Operation operation) throws IOException {
         if(operation.getInput()[0] == 'q') {
-            clearNumber();
-            detach();
+            if(search == Search.SEARCHING) {
+                searchBuilder.append((char) operation.getInput()[0]);
+                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+            }
+            else {
+                clearNumber();
+                detach();
+            }
         }
         else if(operation.getInput()[0] == 'j' ||
                 operation.equals(Operation.HISTORY_NEXT) || operation.equals(Operation.NEW_LINE)) {
-            topVisibleRow = topVisibleRow + getNumber();
-            if(topVisibleRow > (file.size()-rows)) {
-                topVisibleRow = file.size()-rows;
-                if(topVisibleRow < 0)
-                    topVisibleRow = 0;
-                display(Background.INVERSE, "(END)");
+            if(search == Search.SEARCHING) {
+                if(operation.getInput()[0] == 'j') {
+                    searchBuilder.append((char) operation.getInput()[0]);
+                    displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+                }
+                else if(operation.equals(Operation.NEW_LINE)) {
+                    search = Search.RESULT;
+                    findSearchWord(true);
+                }
             }
-            else
-                display(Background.NORMAL, ":");
-            clearNumber();
+            else {
+                topVisibleRow = topVisibleRow + getNumber();
+                if(topVisibleRow > (page.size()-rows)) {
+                    topVisibleRow = page.size()-rows;
+                    if(topVisibleRow < 0)
+                        topVisibleRow = 0;
+                    display(Background.INVERSE, "(END)");
+                }
+                else
+                    display(Background.NORMAL, ":");
+                clearNumber();
+            }
         }
         else if(operation.getInput()[0] == 'k' || operation.equals(Operation.HISTORY_PREV)) {
-            topVisibleRow = topVisibleRow - getNumber();
-            if(topVisibleRow < 0)
-                topVisibleRow = 0;
-            display(Background.NORMAL, ":");
-            clearNumber();
+            if(search == Search.SEARCHING) {
+                if(operation.getInput()[0] == 'k')
+                searchBuilder.append((char) operation.getInput()[0]);
+                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+            }
+            else {
+                topVisibleRow = topVisibleRow - getNumber();
+                if(topVisibleRow < 0)
+                    topVisibleRow = 0;
+                display(Background.NORMAL, ":");
+                clearNumber();
+            }
         }
         else if(operation.getInput()[0] == 6 || operation.equals(Operation.PGDOWN)
                 || operation.getInput()[0] == 32) { // ctrl-f || pgdown || space
-            topVisibleRow = topVisibleRow + rows*getNumber();
-            if(topVisibleRow > (file.size()-rows)) {
-                topVisibleRow = file.size()-rows;
-                if(topVisibleRow < 0)
-                    topVisibleRow = 0;
-                display(Background.INVERSE, "(END)");
-            }
-            else
-                display(Background.NORMAL, ":");
-            clearNumber();
-        }
-        else if(operation.getInput()[0] == 2 || operation.equals(Operation.PGUP)) { // ctrl-b || pgup
-            topVisibleRow = topVisibleRow - rows*getNumber();
-            if(topVisibleRow < 0)
-                topVisibleRow = 0;
-            display(Background.NORMAL, ":");
-            clearNumber();
-        }
-        else if(operation.getInput()[0] == 'G') {
-            if(number.length() == 0 || getNumber() == 0) {
-                topVisibleRow = file.size()-rows;
-                display(Background.INVERSE, "(END)");
+            if(search == Search.SEARCHING) {
+
             }
             else {
-                topVisibleRow = getNumber()-1;
-                if(topVisibleRow > file.size()-rows) {
-                    topVisibleRow = file.size()-rows;
+                topVisibleRow = topVisibleRow + rows*getNumber();
+                if(topVisibleRow > (page.size()-rows)) {
+                    topVisibleRow = page.size()-rows;
+                    if(topVisibleRow < 0)
+                        topVisibleRow = 0;
+                    display(Background.INVERSE, "(END)");
+                }
+                else
+                    display(Background.NORMAL, ":");
+                clearNumber();
+            }
+        }
+        else if(operation.getInput()[0] == 2 || operation.equals(Operation.PGUP)) { // ctrl-b || pgup
+            if(search != Search.SEARCHING) {
+                topVisibleRow = topVisibleRow - rows*getNumber();
+                if(topVisibleRow < 0)
+                    topVisibleRow = 0;
+                display(Background.NORMAL, ":");
+                clearNumber();
+            }
+        }
+        //search
+        else if(operation.getInput()[0] == '/') {
+            if(search == Search.NO_SEARCH || search == Search.RESULT) {
+                search = Search.SEARCHING;
+                searchBuilder = new StringBuilder();
+                displayBottom(Background.NORMAL, "/", true);
+            }
+            else if(search == Search.SEARCHING) {
+                searchBuilder.append((char) operation.getInput()[0]);
+                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+            }
+
+        }
+        else if(operation.getInput()[0] == 'n') {
+            if(search == Search.SEARCHING) {
+                searchBuilder.append((char) operation.getInput()[0]);
+                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+            }
+            else if(search == Search.RESULT) {
+                if(searchLines.size() > 0) {
+                    for(Integer i : searchLines)
+                        if(i > topVisibleRow+1) {
+                            topVisibleRow = i-1;
+                            display(Background.NORMAL, ":");
+                            return;
+                        }
+                }
+                else {
+                    displayBottom(Background.INVERSE, "Pattern not found  (press RETURN)", true);
+                }
+            }
+        }
+        else if(operation.getInput()[0] == 'G') {
+            if(search == Search.SEARCHING) {
+                searchBuilder.append((char) operation.getInput()[0]);
+                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+            }
+            else {
+                if(number.length() == 0 || getNumber() == 0) {
+                    topVisibleRow = page.size()-rows;
                     display(Background.INVERSE, "(END)");
                 }
                 else {
-                    display(Background.NORMAL, ":");
+                    topVisibleRow = getNumber()-1;
+                    if(topVisibleRow > page.size()-rows) {
+                        topVisibleRow = page.size()-rows;
+                        display(Background.INVERSE, "(END)");
+                    }
+                    else {
+                        display(Background.NORMAL, ":");
+                    }
                 }
+                clearNumber();
             }
-            clearNumber();
         }
         else if(Character.isDigit(operation.getInput()[0])) {
-            number.append(Character.getNumericValue(operation.getInput()[0]));
-            display(Background.NORMAL,":"+number.toString());
+            if(search == Search.SEARCHING) {
+                searchBuilder.append((char) operation.getInput()[0]);
+                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+            }
+            else {
+                number.append(Character.getNumericValue(operation.getInput()[0]));
+                display(Background.NORMAL,":"+number.toString());
+            }
+        }
+        else {
+            if(search == Search.SEARCHING &&
+                    (Character.isAlphabetic(operation.getInput()[0]))) {
+                searchBuilder.append((char) operation.getInput()[0]);
+                displayBottom(Background.NORMAL, "/"+ searchBuilder.toString(), true);
+            }
         }
     }
 
     private void display(Background background, String out) throws IOException {
         console.clear();
-        for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
-            if(i < file.size()) {
-                console.pushToStdOut(file.getLine(i));
-                console.pushToStdOut(Config.getLineSeparator());
+        if(search == Search.RESULT && searchLines.size() > 0) {
+            String searchWord = searchBuilder.toString();
+            for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
+                if(i < page.size()) {
+                    String line = page.getLine(i);
+                    if(line.contains(searchWord))
+                        displaySearchLine(line, searchWord);
+                    else
+                        console.pushToStdOut(line);
+                    console.pushToStdOut(Config.getLineSeparator());
+                }
+            }
+        }
+        else {
+            for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
+                if(i < page.size()) {
+                    console.pushToStdOut(page.getLine(i));
+                    console.pushToStdOut(Config.getLineSeparator());
+                }
             }
         }
         displayBottom(background, out);
     }
 
+    private void displaySearchLine(String line, String searchWord) throws IOException {
+        int start = line.indexOf(searchWord);
+        console.pushToStdOut(line.substring(0,start));
+        console.pushToStdOut(ANSI.getInvertedBackground());
+        console.pushToStdOut(searchWord);
+        console.pushToStdOut(ANSI.reset());
+        console.pushToStdOut(line.substring(start+searchWord.length(),line.length()));
+    }
+
     private void displayBottom(Background background, String out) throws IOException {
+       displayBottom(background, out, false);
+    }
+    private void displayBottom(Background background, String out, boolean clearLine) throws IOException {
+        if(clearLine) {
+            console.pushToStdOut(Buffer.printAnsi("0G"));
+            console.pushToStdOut(Buffer.printAnsi("2K"));
+        }
         if(background == Background.INVERSE) {
             console.pushToStdOut(ANSI.getInvertedBackground());
             //make sure that we dont display anything longer than columns
@@ -186,6 +319,23 @@ public class Less extends ConsoleCommand implements Completion {
         }
         else
             console.pushToStdOut(out);
+    }
+
+    private void findSearchWord(boolean forward) throws IOException {
+        logger.info("searching for: " + searchBuilder.toString());
+        searchLines = page.findWord(searchBuilder.toString());
+        logger.info("found: "+searchLines);
+        if(searchLines.size() > 0) {
+            for(Integer i : searchLines)
+                if(i > topVisibleRow) {
+                    topVisibleRow = i-1;
+                    display(Background.NORMAL, ":");
+                    return;
+                }
+        }
+        else {
+            displayBottom(Background.INVERSE, "Pattern not found  (press RETURN)", true);
+        }
     }
 
     @Override
@@ -226,4 +376,5 @@ public class Less extends ConsoleCommand implements Completion {
         NORMAL,
         INVERSE
     }
+
 }

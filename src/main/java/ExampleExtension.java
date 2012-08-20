@@ -24,7 +24,6 @@ import org.jboss.jreadline.console.settings.Settings;
 import org.jboss.jreadline.extensions.less.Less;
 import org.jboss.jreadline.extensions.manual.Man;
 import org.jboss.jreadline.extensions.more.More;
-import org.jboss.jreadline.util.ANSI;
 
 import java.io.File;
 import java.io.IOException;
@@ -130,10 +129,10 @@ public class ExampleExtension {
                     less.attach(consoleOutput);
 
                 }
-                else {
+                else if(line.length() > "less".length()) {
                     File f = new File(line.substring("less ".length()).trim());
                     if(f.isFile()) {
-                        less.setFile(f);
+                        less.setPage(f);
                         less.attach(consoleOutput);
                     }
                     else if(f.isDirectory()) {
@@ -144,6 +143,9 @@ public class ExampleExtension {
                         exampleConsole.pushToStdOut(f.getAbsolutePath()+": No such file or directory"+
                                 Config.getLineSeparator());
                     }
+                }
+                else {
+                    exampleConsole.pushToStdOut("Missing filename (\"less --help\" for help)\n");
                 }
             }
 
@@ -157,7 +159,7 @@ public class ExampleExtension {
                 else {
                     File f = new File(line.substring("more ".length()).trim());
                     if(f.isFile()) {
-                        more.setFile(f);
+                        more.setPage(f);
                         more.attach(consoleOutput);
                     }
                     else if(f.isDirectory()) {

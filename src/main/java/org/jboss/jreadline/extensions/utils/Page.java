@@ -69,14 +69,10 @@ public abstract class Page {
             }
         }
         else if(pageAsString != null) {
-            //1. remove line separator
-            //2. split the line in the size of column
-            StringBuilder sb = new StringBuilder();
-            for(String s : pageAsString.split(Config.getLineSeparator()))
-                sb.append(s);
-
-            for(String s : sb.toString().split("(?<=\\G.{"+columns+"})"))
-                lines.add(s);
+            for(String s : pageAsString.split("\n")) {
+                for(String s2 : s.split("(?<=\\G.{" + columns + "})"))
+                    lines.add(s2);
+            }
         }
     }
 
@@ -84,7 +80,16 @@ public abstract class Page {
         if(num < lines.size())
             return lines.get(num);
         else
-            return null;
+            return "";
+    }
+
+    public List<Integer> findWord(String word) {
+        List<Integer> wordLines = new ArrayList<Integer>();
+        for(int i=0; i < lines.size();i++) {
+            if(lines.get(i).contains(word))
+                wordLines.add(i);
+        }
+        return wordLines;
     }
 
     public int size() {
@@ -97,6 +102,23 @@ public abstract class Page {
 
     public List<String> getLines() {
         return lines;
+    }
+
+    public boolean hasData() {
+        return (pageAsString != null && pageAsString.length() > 0)
+                || (page != null && page.isFile());
+    }
+
+    public void clear() {
+        page = null;
+        pageAsString = null;
+        lines = new ArrayList<String>();
+    }
+
+    public static enum Search {
+        SEARCHING,
+        RESULT,
+        NO_SEARCH
     }
 
 }
