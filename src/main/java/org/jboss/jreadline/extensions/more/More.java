@@ -32,7 +32,7 @@ public class More extends ConsoleCommand implements Completion {
         number = new StringBuilder();
     }
 
-    public void setPage(File page) throws IOException {
+    public void setFile(File page) throws IOException {
         this.page.setPage(page);
     }
 

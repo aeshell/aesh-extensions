@@ -58,8 +58,8 @@ public class Less extends ConsoleCommand implements Completion {
         searchBuilder = new StringBuilder();
     }
 
-    public void setPage(File page) throws IOException {
-        this.page.setPage(page);
+    public void setFile(File file) throws IOException {
+        this.page.setPage(file);
     }
 
     public void setFile(String filename) throws IOException {
@@ -210,14 +210,38 @@ public class Less extends ConsoleCommand implements Completion {
             }
             else if(search == Search.RESULT) {
                 if(searchLines.size() > 0) {
-                    for(Integer i : searchLines)
+                    for(Integer i : searchLines) {
                         if(i > topVisibleRow+1) {
                             topVisibleRow = i-1;
                             display(Background.NORMAL, ":");
                             return;
                         }
+                    }
+                    //we didnt find any more
+                    displayBottom(Background.INVERSE, "Pattern not found  (press RETURN)", true);
                 }
                 else {
+                    displayBottom(Background.INVERSE, "Pattern not found  (press RETURN)", true);
+                }
+            }
+        }
+        else if(operation.getInput()[0] == 'N') {
+            if(search == Search.SEARCHING) {
+                searchBuilder.append((char) operation.getInput()[0]);
+                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+            }
+            else if(search == Search.RESULT) {
+                if(searchLines.size() > 0) {
+                    for(int i=searchLines.size()-1; i >= 0; i--) {
+                        if(searchLines.get(i) < topVisibleRow) {
+                            topVisibleRow = searchLines.get(i)-1;
+                            if(topVisibleRow < 0)
+                                topVisibleRow = 0;
+                            display(Background.NORMAL, ":");
+                            return;
+                        }
+                    }
+                    //we didnt find any more
                     displayBottom(Background.INVERSE, "Pattern not found  (press RETURN)", true);
                 }
             }

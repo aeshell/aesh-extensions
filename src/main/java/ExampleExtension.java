@@ -24,6 +24,7 @@ import org.jboss.jreadline.console.settings.Settings;
 import org.jboss.jreadline.extensions.less.Less;
 import org.jboss.jreadline.extensions.manual.Man;
 import org.jboss.jreadline.extensions.more.More;
+import org.jboss.jreadline.util.Parser;
 
 import java.io.File;
 import java.io.IOException;
@@ -130,9 +131,10 @@ public class ExampleExtension {
 
                 }
                 else if(line.length() > "less".length()) {
-                    File f = new File(line.substring("less ".length()).trim());
+                    File f = new File(Parser.switchEscapedSpacesToSpacesInWord(line.substring("less ".length())).trim());
                     if(f.isFile()) {
-                        less.setPage(f);
+                        //less.setPage(f);
+                        less.setFile(f);
                         less.attach(consoleOutput);
                     }
                     else if(f.isDirectory()) {
@@ -157,9 +159,9 @@ public class ExampleExtension {
 
                 }
                 else {
-                    File f = new File(line.substring("more ".length()).trim());
+                    File f = new File(Parser.switchEscapedSpacesToSpacesInWord(line.substring("more ".length())).trim());
                     if(f.isFile()) {
-                        more.setPage(f);
+                        more.setFile(f);
                         more.attach(consoleOutput);
                     }
                     else if(f.isDirectory()) {
