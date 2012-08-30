@@ -6,6 +6,7 @@ import org.jboss.jreadline.console.Buffer;
 import org.jboss.jreadline.console.Config;
 import org.jboss.jreadline.console.Console;
 import org.jboss.jreadline.console.ConsoleCommand;
+import org.jboss.jreadline.console.operator.ControlOperator;
 import org.jboss.jreadline.edit.actions.Operation;
 import org.jboss.jreadline.extensions.utils.Page;
 import org.jboss.jreadline.util.ANSI;
@@ -50,7 +51,7 @@ public class More extends ConsoleCommand implements Completion {
         int columns = console.getTerminalWidth();
         this.page.loadPage(columns);
 
-        if(getConsoleOutput().hasRedirectOrPipe()) {
+        if(ControlOperator.isRedirectionOut(getConsoleOutput().getControlOperator())) {
             int count=0;
             for(String line : this.page.getLines()) {
                 console.pushToStdOut(line);
@@ -74,7 +75,7 @@ public class More extends ConsoleCommand implements Completion {
     protected void afterDetach() throws IOException {
         clearNumber();
         topVisibleRow = prevTopVisibleRow = 0;
-        if(!getConsoleOutput().hasRedirectOrPipe()) {
+        if(!ControlOperator.isRedirectionOut(getConsoleOutput().getControlOperator())) {
             console.pushToStdOut(Buffer.printAnsi("K"));
             console.pushToStdOut(Buffer.printAnsi("1G"));
         }
