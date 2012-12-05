@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-import org.jboss.jreadline.complete.CompleteOperation;
-import org.jboss.jreadline.complete.Completion;
-import org.jboss.jreadline.console.Config;
-import org.jboss.jreadline.console.Console;
-import org.jboss.jreadline.console.ConsoleOutput;
-import org.jboss.jreadline.console.settings.Settings;
-import org.jboss.jreadline.extensions.less.Less;
-import org.jboss.jreadline.extensions.manual.Man;
-import org.jboss.jreadline.extensions.more.More;
-import org.jboss.jreadline.util.Parser;
+import org.jboss.aesh.complete.CompleteOperation;
+import org.jboss.aesh.complete.Completion;
+import org.jboss.aesh.console.Config;
+import org.jboss.aesh.console.Console;
+import org.jboss.aesh.console.ConsoleOutput;
+import org.jboss.aesh.console.settings.Settings;
+import org.jboss.aesh.extensions.less.Less;
+import org.jboss.aesh.extensions.manual.Man;
+import org.jboss.aesh.extensions.more.More;
+import org.jboss.aesh.util.Parser;
 
 import java.io.File;
 import java.io.IOException;

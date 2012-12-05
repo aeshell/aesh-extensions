@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.jreadline.extensions.manual;
+package org.jboss.aesh.extensions.manual;
 
-import org.jboss.jreadline.extensions.utils.Page;
+import org.jboss.aesh.extensions.utils.Page;
 
 import java.io.*;
 import java.util.ArrayList;

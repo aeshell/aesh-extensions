@@ -4,12 +4,12 @@ apply plugin: 'idea'
 apply plugin: 'maven'
 
 sourceCompatibility = 1.6
-group = 'org.jboss.jreadline'
-version = '0.1'
+group = 'org.jboss.aesh'
+version = '0.27'
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'JReadline-Extensions', 'Implementation-Version': version
+        attributes 'Implementation-Title': 'Æsh-Extensions', 'Implementation-Version': version
     }
 }
 
@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.jboss.jreadline', name: 'jreadline', version: '0.19'
+    compile group: 'org.jboss.aesh', name: 'aesh', version: '0.26'
     testCompile group: 'junit', name: 'junit', version: '4.+'
 }
 
@@ -41,7 +41,7 @@ idea {
         }
     }
     module {
-        name = "jreadline-extensions"
+        name = "aesh-extensions"
     }
 }
 
