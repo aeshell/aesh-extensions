@@ -10,7 +10,10 @@ import org.jboss.aesh.complete.Completion;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.ConsoleOutput;
+import org.jboss.aesh.console.Prompt;
 import org.jboss.aesh.console.settings.Settings;
+import org.jboss.aesh.extensions.choice.MultipleChoice;
+import org.jboss.aesh.extensions.choice.MultipleChoiceCommand;
 import org.jboss.aesh.extensions.less.Less;
 import org.jboss.aesh.extensions.manual.Man;
 import org.jboss.aesh.extensions.more.More;
@@ -42,6 +45,13 @@ public class ExampleExtension {
 
         Less less = new Less(exampleConsole);
         More more = new More(exampleConsole);
+
+        List<MultipleChoice> choices = new ArrayList<MultipleChoice>();
+        choices.add(new MultipleChoice(1,"Do you want foo?"));
+        choices.add(new MultipleChoice(2,"Do you want bar?"));
+
+        MultipleChoiceCommand choice =
+                new MultipleChoiceCommand(exampleConsole, "choice", choices);
 
         Completion completer = new Completion() {
             @Override
@@ -102,7 +112,7 @@ public class ExampleExtension {
                 break;
             }
             if(line.equalsIgnoreCase("password")) {
-                consoleOutput = exampleConsole.read("password: ", Character.valueOf((char) 0));
+                consoleOutput = exampleConsole.read(new Prompt("password: "), Character.valueOf((char) 0));
                 exampleConsole.pushToStdOut("password typed:" + consoleOutput.getBuffer() + "\n");
 
             }
@@ -112,6 +122,9 @@ public class ExampleExtension {
                 //exampleConsole.attachProcess(test);
                 man.setCurrentManPage("test");
                 man.attach(consoleOutput);
+            }
+            if(line.startsWith("choice")) {
+                choice.attach(consoleOutput);
             }
             if(line.startsWith("less")) {
                 if(consoleOutput.getStdOut() != null &&

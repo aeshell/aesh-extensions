@@ -46,8 +46,8 @@ public class Man extends ConsoleCommand implements Completion {
     protected void afterAttach() throws IOException {
         console.pushToStdOut(ANSI.getAlternateBufferScreen());
 
-        rows = console.getTerminalHeight();
-        columns = console.getTerminalWidth();
+        rows = console.getTerminalSize().getHeight();
+        columns = console.getTerminalSize().getWidth();
         current.loadPage(columns);
         displayMan();
     }

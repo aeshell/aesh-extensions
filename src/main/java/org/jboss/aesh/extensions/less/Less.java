@@ -16,7 +16,7 @@ import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.extensions.utils.Page.Search;
 import org.jboss.aesh.util.ANSI;
-import org.jboss.aesh.util.FileUtils;
+import org.jboss.aesh.util.FileLister;
 import org.jboss.aesh.util.LoggerUtil;
 import org.jboss.aesh.util.Parser;
 
@@ -63,8 +63,8 @@ public class Less extends ConsoleCommand implements Completion {
 
     @Override
     protected void afterAttach() throws IOException {
-        rows = console.getTerminalHeight();
-        columns = console.getTerminalWidth();
+        rows = console.getTerminalSize().getHeight();
+        columns = console.getTerminalSize().getWidth();
         this.page.loadPage(columns);
 
         if(ControlOperator.isRedirectionOut(getConsoleOutput().getControlOperator())) {
@@ -372,8 +372,9 @@ public class Less extends ConsoleCommand implements Completion {
             //List<String> out = FileUtils.listMatchingDirectories(word, new File("."));
             //System.out.print(out);
             completeOperation.setOffset(completeOperation.getCursor());
-            FileUtils.listMatchingDirectories(completeOperation, word,
-                    new File(System.getProperty("user.dir")));
+            //FileUtils.listMatchingDirectories(completeOperation, word,
+            //        new File(System.getProperty("user.dir")));
+            new FileLister(word, new File(System.getProperty("user.dir"))).findMatchingDirectories(completeOperation);
         }
     }
 
