@@ -12,6 +12,8 @@ import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.ConsoleCommand;
 import org.jboss.aesh.edit.actions.Operation;
+import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
+import org.jboss.aesh.extensions.page.FileDisplayCommand;
 import org.jboss.aesh.util.ANSI;
 
 import java.io.File;
@@ -25,69 +27,24 @@ import java.util.List;
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class Man extends ConsoleCommand implements Completion {
+public class Man extends FileDisplayCommand {
 
     private int rows;
     private int columns;
     private int topVisibleRow;
     private List<ManPage> manPages = new ArrayList<ManPage>();
     private ManPage current;
+    private ManPageLoader loader;
 
-    public Man(Console console) {
-        super(console);
+    public Man(Console console, String name, ManPageLoader loader) {
+        super(console, name, loader);
         manPages = new ArrayList<ManPage>();
+        this.loader = loader;
     }
 
-    public void addPage(File file, String name) {
-        manPages.add(new ManPage(file, name));
-    }
-
-    @Override
-    protected void afterAttach() throws IOException {
-        console.pushToStdOut(ANSI.getAlternateBufferScreen());
-
-        rows = console.getTerminalSize().getHeight();
-        columns = console.getTerminalSize().getWidth();
-        current.loadPage(columns);
-        displayMan();
-    }
-
-    @Override
-    protected void afterDetach() throws IOException {
-        console.pushToStdOut(ANSI.getMainBufferScreen());
-
-    }
-
-    public void setCurrentManPage(String name) throws IOException {
-        for(ManPage page : manPages) {
-            if(name.equals(page.getName()))
-                current = page;
-        }
-        topVisibleRow = 0;
-    }
-
-    @Override
-    public void processOperation(Operation operation) throws IOException {
-        if(operation.getInput()[0] == 'q') {
-            detach();
-        }
-        else if(operation.getInput()[0] == 'j') {
-            topVisibleRow++;
-            displayMan();
-        }
-        else if(operation.getInput()[0] == 'k') {
-            if(topVisibleRow > 0)
-                topVisibleRow--;
-            displayMan();
-        }
-    }
-
-    private void displayMan() throws IOException {
-        console.clear();
-        for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
-            console.pushToStdOut(current.getLine(i));
-            console.pushToStdOut(Config.getLineSeparator());
-        }
+    public void setFile(String name) {
+        loader.setFile(name);
+        //manPages.add(new ManPage(file, name));
     }
 
     @Override
@@ -99,6 +56,7 @@ public class Man extends ConsoleCommand implements Completion {
         else if(completeOperation.getBuffer().equals("man"))
             completeOperation.getCompletionCandidates().add("man");
         else if(completeOperation.getBuffer().equals("man ")) {
+
             for(ManPage page : manPages) {
                 completeOperation.getCompletionCandidates().add("man "+page.getName());
             }

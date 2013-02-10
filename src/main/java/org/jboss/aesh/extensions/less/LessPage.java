@@ -6,13 +6,16 @@
  */
 package org.jboss.aesh.extensions.less;
 
-import org.jboss.aesh.extensions.utils.Page;
-
-import java.io.File;
+import org.jboss.aesh.extensions.page.Page;
+import org.jboss.aesh.extensions.page.PageLoader;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 public class LessPage extends Page {
+
+    public LessPage(PageLoader loader, int columns) {
+        super(loader, columns);
+    }
 
 }

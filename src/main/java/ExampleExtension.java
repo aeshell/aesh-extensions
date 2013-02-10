@@ -16,6 +16,7 @@ import org.jboss.aesh.extensions.choice.MultipleChoice;
 import org.jboss.aesh.extensions.choice.MultipleChoiceCommand;
 import org.jboss.aesh.extensions.less.Less;
 import org.jboss.aesh.extensions.manual.Man;
+import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
 import org.jboss.aesh.extensions.more.More;
 import org.jboss.aesh.util.Parser;
 
@@ -40,8 +41,8 @@ public class ExampleExtension {
 
         PrintWriter out = new PrintWriter(System.out);
 
-        Man man = new Man(exampleConsole);
-        man.addPage(new File("/tmp/README.md"), "test");
+        Man man = new Man(exampleConsole, "man", new ManPageLoader());
+        //man.addPage(new File("/tmp/README.md"), "test");
 
         Less less = new Less(exampleConsole);
         More more = new More(exampleConsole);
@@ -120,7 +121,8 @@ public class ExampleExtension {
                 exampleConsole.clear();
             if(line.startsWith("man")) {
                 //exampleConsole.attachProcess(test);
-                man.setCurrentManPage("test");
+                //man.setCurrentManPage("test");
+                man.setFile("/tmp/test.txt");
                 man.attach(consoleOutput);
             }
             if(line.startsWith("choice")) {

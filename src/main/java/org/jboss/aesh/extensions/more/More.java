@@ -14,7 +14,9 @@ import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.ConsoleCommand;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
-import org.jboss.aesh.extensions.utils.Page;
+import org.jboss.aesh.extensions.page.Page;
+import org.jboss.aesh.extensions.page.PageLoader;
+import org.jboss.aesh.extensions.page.SimplePageLoader;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.FileLister;
 import org.jboss.aesh.util.Parser;
@@ -32,30 +34,31 @@ public class More extends ConsoleCommand implements Completion {
     private int prevTopVisibleRow;
     private StringBuilder number;
     private MorePage page;
+    private SimplePageLoader loader;
 
     public More(Console console) {
         super(console);
-        page = new MorePage();
+        loader = new SimplePageLoader();
         number = new StringBuilder();
     }
 
     public void setFile(File page) throws IOException {
-        this.page.setPage(page);
+        loader.readPageFromFile(page);
     }
 
     public void setFile(String filename) throws IOException {
-        this.page.setPage(new File(filename));
+        loader.readPageFromFile(new File(filename));
     }
 
     public void setInput(String input) throws IOException {
-        this.page.setPageAsString(input);
+        loader.readPageAsString(input);
     }
 
     @Override
     protected void afterAttach() throws IOException {
         rows = console.getTerminalSize().getHeight();
         int columns = console.getTerminalSize().getWidth();
-        this.page.loadPage(columns);
+        page = new MorePage(loader, columns);
 
         if(ControlOperator.isRedirectionOut(getConsoleOutput().getControlOperator())) {
             int count=0;
@@ -228,6 +231,10 @@ public class More extends ConsoleCommand implements Completion {
     }
 
     private class MorePage extends Page {
+
+        public MorePage(PageLoader loader, int columns) {
+            super(loader, columns);
+        }
 
     }
 }

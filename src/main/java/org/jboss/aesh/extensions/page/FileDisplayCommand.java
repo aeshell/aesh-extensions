@@ -4,9 +4,8 @@
  * Licensed under the Eclipse Public License version 1.0, available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.jboss.aesh.extensions.less;
+package org.jboss.aesh.extensions.page;
 
-import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.complete.Completion;
 import org.jboss.aesh.console.Buffer;
 import org.jboss.aesh.console.Config;
@@ -14,54 +13,43 @@ import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.ConsoleCommand;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
+import org.jboss.aesh.extensions.less.LessPage;
 import org.jboss.aesh.extensions.page.Page.Search;
-import org.jboss.aesh.extensions.page.SimplePageLoader;
 import org.jboss.aesh.util.ANSI;
-import org.jboss.aesh.util.FileLister;
 import org.jboss.aesh.util.LoggerUtil;
-import org.jboss.aesh.util.Parser;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * A less implementation for Æsh ref: http://en.wikipedia.org/wiki/Less_(Unix)
+ * An abstract command used to display files
+ * Implemented similar to less
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class Less extends ConsoleCommand implements Completion {
+public abstract class FileDisplayCommand extends ConsoleCommand implements Completion {
 
     private int rows;
     private int columns;
     private int topVisibleRow;
+    private String name;
     private LessPage page;
-    private SimplePageLoader loader;
+    private PageLoader loader;
     private StringBuilder number;
     private Search search = Search.NO_SEARCH;
     private StringBuilder searchBuilder;
     private List<Integer> searchLines;
     private Logger logger = LoggerUtil.getLogger(getClass().getName());
 
-    public Less(Console console) {
+    public FileDisplayCommand(Console console, String commandName, PageLoader loader) {
         super(console);
-        loader = new SimplePageLoader();
+        this.name = commandName;
+        this.loader = loader;
         number = new StringBuilder();
         searchBuilder = new StringBuilder();
     }
 
-    public void setFile(File file) throws IOException {
-        loader.readPageFromFile(file);
-    }
-
-    public void setFile(String filename) throws IOException {
-        loader.readPageFromFile(new File(filename));
-    }
-
-    public void setInput(String input) throws IOException {
-        loader.readPageAsString(input);
-    }
 
     @Override
     protected void afterAttach() throws IOException {
@@ -314,7 +302,7 @@ public class Less extends ConsoleCommand implements Completion {
         console.pushToStdOut(ANSI.getInvertedBackground());
         console.pushToStdOut(searchWord);
         console.pushToStdOut(ANSI.reset());
-        console.pushToStdOut(line.substring(start+searchWord.length(),line.length()));
+        console.pushToStdOut(line.substring(start + searchWord.length(), line.length()));
     }
 
     private void displayBottom(Background background, String out) throws IOException {
@@ -356,17 +344,12 @@ public class Less extends ConsoleCommand implements Completion {
         }
     }
 
+    /*
     @Override
     public void complete(CompleteOperation completeOperation) {
-        if(completeOperation.getBuffer().equals("l"))
-            completeOperation.getCompletionCandidates().add("less");
-        else if(completeOperation.getBuffer().equals("le"))
-            completeOperation.getCompletionCandidates().add("less");
-        else if(completeOperation.getBuffer().equals("les"))
-            completeOperation.getCompletionCandidates().add("less");
-        else if(completeOperation.getBuffer().equals("less"))
-            completeOperation.getCompletionCandidates().add("less");
-        else if(completeOperation.getBuffer().startsWith("less ")) {
+        if(name.startsWith(completeOperation.getBuffer()))
+            completeOperation.addCompletionCandidate(name);
+        else if(completeOperation.getBuffer().startsWith(name+" ")) {
             //String rest = s.substring("less ".length());
 
             String word = Parser.findWordClosestToCursor(completeOperation.getBuffer(),
@@ -379,6 +362,7 @@ public class Less extends ConsoleCommand implements Completion {
             new FileLister(word, new File(System.getProperty("user.dir"))).findMatchingDirectories(completeOperation);
         }
     }
+    */
 
     private int getNumber() {
         if(number.length() > 0)

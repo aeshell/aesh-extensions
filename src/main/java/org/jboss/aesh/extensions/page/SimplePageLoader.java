@@ -4,7 +4,7 @@
  * Licensed under the Eclipse Public License version 1.0, available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.jboss.aesh.extensions.utils;
+package org.jboss.aesh.extensions.page;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,27 +14,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Page parse files or input string and prepare it to be displayed in a term
+ * Util method that tries to read a file
+ * and prepare it to be displayed in a terminal
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public abstract class Page {
+public class SimplePageLoader implements PageLoader {
 
     private File page;
     private String pageAsString;
-    private List<String> lines;
 
-    public void setPage(File file) {
+    public SimplePageLoader() {
+    }
+
+    public void readPageFromFile(File file) {
         this.page = file;
-        lines = new ArrayList<String>();
     }
 
-    public void setPageAsString(String pageAsString) {
+    public void readPageAsString(String pageAsString) {
         this.pageAsString = pageAsString;
-        lines = new ArrayList<String>();
     }
 
-    public void loadPage(int columns) throws IOException {
+    @Override
+    public String getResourceName() {
+        if(page != null)
+            return page.getPath();
+        else
+            return "STREAM";
+    }
+
+    @Override
+    public List<String> loadPage(int columns) throws IOException {
+        List<String> lines = new ArrayList<String>();
         //read file and save each line in a list
         if(page != null && page.isFile()) {
             BufferedReader br = new BufferedReader(new FileReader(page));
@@ -62,51 +73,8 @@ public abstract class Page {
                     lines.add(s2);
             }
         }
-    }
 
-    public String getLine(int num) {
-        if(num < lines.size())
-            return lines.get(num);
-        else
-            return "";
-    }
-
-    public List<Integer> findWord(String word) {
-        List<Integer> wordLines = new ArrayList<Integer>();
-        for(int i=0; i < lines.size();i++) {
-            if(lines.get(i).contains(word))
-                wordLines.add(i);
-        }
-        return wordLines;
-    }
-
-    public int size() {
-        return lines.size();
-    }
-
-    public File getFile() {
-        return page;
-    }
-
-    public List<String> getLines() {
         return lines;
-    }
-
-    public boolean hasData() {
-        return (pageAsString != null && pageAsString.length() > 0)
-                || (page != null && page.isFile());
-    }
-
-    public void clear() {
-        page = null;
-        pageAsString = null;
-        lines = new ArrayList<String>();
-    }
-
-    public static enum Search {
-        SEARCHING,
-        RESULT,
-        NO_SEARCH
     }
 
 }

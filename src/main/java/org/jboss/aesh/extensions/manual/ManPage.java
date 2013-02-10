@@ -6,26 +6,27 @@
  */
 package org.jboss.aesh.extensions.manual;
 
-import org.jboss.aesh.extensions.utils.Page;
+import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
+import org.jboss.aesh.extensions.manual.parser.ManSection;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class ManPage extends Page {
+public class ManPage {
 
     private String name;
+    private List<ManSection> sections;
 
-    public ManPage(File page, String name) {
-        setPage(page);
-        this.name = name;
-    }
-
-    public void evictPage() {
-        getLines().clear();
+    public ManPage(String fileName) {
+        ManPageLoader parser = new ManPageLoader();
+        try {
+            parser.loadPage(80);
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     public String getName() {
