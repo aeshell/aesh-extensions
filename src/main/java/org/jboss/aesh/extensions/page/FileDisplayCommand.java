@@ -55,7 +55,7 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
     protected void afterAttach() throws IOException {
         rows = console.getTerminalSize().getHeight();
         columns = console.getTerminalSize().getWidth();
-        page = new LessPage(loader, columns);
+        page = new LessPage(loader, 80);
 
         if(ControlOperator.isRedirectionOut(getConsoleOutput().getControlOperator())) {
             int count=0;

@@ -7,6 +7,7 @@
 package org.jboss.aesh.extensions.manual.parser;
 
 import org.jboss.aesh.console.Config;
+import org.jboss.aesh.util.Parser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +33,17 @@ public class ManParameter {
             StringBuilder builder = new StringBuilder();
             for(String in : input) {
                if(in.trim().length() > 0)
-                   builder.append(in.trim());
+                   builder.append(in.trim()).append(' ');
             }
 
             if(builder.length() > 0) {
-                for(String s : builder.toString().split("(?<=\\G.{"+(columns-padding)+"})")) {
-                    out.add(textPad+ManParserUtil.convertStringToAnsi(s));
-                }
+               for(String s : Parser.splitBySizeKeepWords(builder.toString(), columns+textPad.length())) {
+                  out.add(textPad+ManParserUtil.convertStringToAnsi(s));
+               }
             }
+            //add an empty line at the bottom to create a line separator between params
+            if(out.size() > 0)
+                out.add(" ");
         }
         return this;
     }
@@ -54,5 +58,22 @@ public class ManParameter {
             builder.append(s).append(Config.getLineSeparator());
 
         return builder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ManParameter)) return false;
+
+        ManParameter that = (ManParameter) o;
+
+        if (out != null ? !out.equals(that.out) : that.out != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return out != null ? out.hashCode() : 0;
     }
 }

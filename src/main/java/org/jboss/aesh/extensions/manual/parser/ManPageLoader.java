@@ -26,7 +26,6 @@ public class ManPageLoader implements PageLoader {
     private List<ManSection> sections;
     private File file;
     private String name;
-    private int columns = 80;
 
     public ManPageLoader() {
         sections = new ArrayList<ManSection>();
@@ -64,9 +63,8 @@ public class ManPageLoader implements PageLoader {
                     section.add(line);
                 }
                 else if(line.isEmpty() && foundEmptyLine) {
-                    ManSection manSection = new ManSection().parseSection(section, 80);
-                    if(manSection.getType() != SectionType.IGNORED)
-                        sections.add(manSection);
+                    ManSection manSection = new ManSection().parseSection(section, columns);
+                    sections.add(manSection);
                     foundEmptyLine = false;
                     section.clear();
                 }
@@ -79,16 +77,23 @@ public class ManPageLoader implements PageLoader {
                 line = br.readLine();
             }
             if(!section.isEmpty()) {
-                ManSection manSection = new ManSection().parseSection(section, 80);
-                if(manSection.getType() != SectionType.IGNORED)
-                    sections.add(manSection);
+                ManSection manSection = new ManSection().parseSection(section, columns);
+                sections.add(manSection);
             }
+
+            processHeader(columns);
 
             return getAsList();
         }
         finally {
             br.close();
         }
+    }
+
+    //TODO: create a better column
+    private void processHeader(int columns) {
+        name = sections.get(0).getName();
+        sections.remove(0);
     }
 
     public List<ManSection> getSections() {

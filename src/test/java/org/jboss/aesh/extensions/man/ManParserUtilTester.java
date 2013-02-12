@@ -25,5 +25,12 @@ public class ManParserUtilTester {
         assertEquals("12"+ANSI.getUnderline()+"foo"+ANSI.defaultText()+"34",
                 ManParserUtil.convertStringToAnsi("12'foo'34"));
 
+        assertEquals("Define or delete document attribute. "+
+                ANSI.getUnderline()+
+                "ATTRIBUTE"+
+                ANSI.defaultText()+
+                " is formatted like",
+                ManParserUtil.convertStringToAnsi("Define or delete document attribute. 'ATTRIBUTE' is formatted like"));
+
     }
 }

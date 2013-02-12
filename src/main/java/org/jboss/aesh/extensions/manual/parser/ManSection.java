@@ -18,7 +18,6 @@ import java.util.List;
 public class ManSection {
 
     private String name;
-    private SectionType type;
     private List<ManParameter> parameters;
 
     public ManSection() {
@@ -28,17 +27,11 @@ public class ManSection {
     public ManSection parseSection(List<String> input, int columns) {
         //first line should be the name
         name = input.get(0);
-        type = SectionType.getSectionType(name);
         input.remove(0);
         //the first section, ignoring it for now
-        if(input.get(0).startsWith("=") &&
-                input.get(0).length() == name.length()) {
-           //this is the heading, ignore it
-            type = SectionType.IGNORED;
-        }
         //starting a new section
-        else if(input.get(0).startsWith("-") &&
-                input.get(0).trim().length() == type.getType().length()) {
+        if(input.get(0).startsWith("-") &&
+                input.get(0).trim().length() == name.length()) {
             input.remove(0);
             //a new param
             List<String> newOption = new ArrayList<String>();
@@ -71,21 +64,18 @@ public class ManSection {
 
     public List<String> getAsList() {
         List<String> out = new ArrayList<String>();
-        out.add(ANSI.getBold()+type.getType()+ANSI.defaultText());
+        out.add(ANSI.getBold()+name+ANSI.defaultText());
         for(ManParameter param : parameters)
             out.addAll(param.getAsList());
 
-        out.add(Config.getLineSeparator());
+        // add an empty line as line separator between sections
+        out.add(" ");
         return out;
-    }
-
-    public SectionType getType() {
-        return type;
     }
 
     public String printToTerminal() {
         StringBuilder builder = new StringBuilder();
-        builder.append(ANSI.getBold()).append(type.getType()).append(ANSI.defaultText());
+        builder.append(ANSI.getBold()).append(name).append(ANSI.defaultText());
         builder.append(Config.getLineSeparator());
         for(ManParameter param : parameters)
             builder.append(param.printToTerminal());
@@ -98,15 +88,18 @@ public class ManSection {
         if (this == o) return true;
         if (!(o instanceof ManSection)) return false;
 
-        ManSection section = (ManSection) o;
+        ManSection that = (ManSection) o;
 
-        if (type != section.type) return false;
+        if (!name.equals(that.name)) return false;
+        if (!parameters.equals(that.parameters)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return type != null ? type.hashCode() : 0;
+        int result = name.hashCode();
+        result = 31 * result + parameters.hashCode();
+        return result;
     }
 }

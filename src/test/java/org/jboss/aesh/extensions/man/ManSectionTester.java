@@ -27,13 +27,13 @@ public class ManSectionTester {
         input.add("OPTIONS");
         input.add("-------");
         input.add("*-a, --attribute*='ATTRIBUTE'::");
-        input.add("  Define or delete document attribute.");
+        input.add("  Define or delete document attribute. ");
         input.add("\n");
         input.add("*-b, --backend*='BACKEND'::");
         input.add("  Define or delete document attribute.");
 
         ManSection section = new ManSection().parseSection(input, 80);
-        assertEquals("OPTIONS",section.getType().getType());
+        assertEquals("OPTIONS",section.getName());
 
         assertEquals(ANSI.getBold()+"OPTIONS"+ANSI.defaultText()+
                 Config.getLineSeparator()+
@@ -43,15 +43,16 @@ public class ManSectionTester {
                 "="+ANSI.getUnderline()+
                 "ATTRIBUTE"+
                 ANSI.defaultText()+"::"+ Config.getLineSeparator()+
-                "    Define or delete document attribute."+Config.getLineSeparator()+
-
+                "    Define or delete document attribute. "+Config.getLineSeparator()+
+                " "+Config.getLineSeparator()+
                 "  "+ ANSI.getBold()+
                 "-b, --backend"+
                 ANSI.defaultText()+
                 "="+ANSI.getUnderline()+
                 "BACKEND"+
                 ANSI.defaultText()+"::"+ Config.getLineSeparator()+
-                "    Define or delete document attribute."+Config.getLineSeparator(),
+                "    Define or delete document attribute. "+Config.getLineSeparator()+
+                " "+Config.getLineSeparator(),
                 section.printToTerminal());
 
 
