@@ -32,5 +32,8 @@ public class ManParserUtilTester {
                 " is formatted like",
                 ManParserUtil.convertStringToAnsi("Define or delete document attribute. 'ATTRIBUTE' is formatted like"));
 
+
+        assertEquals(ANSI.getBold()+"ZIP_FILE"+ANSI.defaultText(),
+                ManParserUtil.convertStringToAnsi("*ZIP_FILE*::"));
     }
 }

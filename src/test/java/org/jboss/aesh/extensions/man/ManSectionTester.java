@@ -42,7 +42,7 @@ public class ManSectionTester {
                 ANSI.defaultText()+
                 "="+ANSI.getUnderline()+
                 "ATTRIBUTE"+
-                ANSI.defaultText()+"::"+ Config.getLineSeparator()+
+                ANSI.defaultText()+ Config.getLineSeparator()+
                 "    Define or delete document attribute. "+Config.getLineSeparator()+
                 " "+Config.getLineSeparator()+
                 "  "+ ANSI.getBold()+
@@ -50,7 +50,7 @@ public class ManSectionTester {
                 ANSI.defaultText()+
                 "="+ANSI.getUnderline()+
                 "BACKEND"+
-                ANSI.defaultText()+"::"+ Config.getLineSeparator()+
+                ANSI.defaultText()+ Config.getLineSeparator()+
                 "    Define or delete document attribute. "+Config.getLineSeparator()+
                 " "+Config.getLineSeparator(),
                 section.printToTerminal());

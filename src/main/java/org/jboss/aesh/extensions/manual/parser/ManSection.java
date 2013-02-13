@@ -25,6 +25,9 @@ public class ManSection {
     }
 
     public ManSection parseSection(List<String> input, int columns) {
+        //we ignore the links atm
+        if(input.get(0).startsWith("[["))
+            input.remove(0);
         //first line should be the name
         name = input.get(0);
         input.remove(0);

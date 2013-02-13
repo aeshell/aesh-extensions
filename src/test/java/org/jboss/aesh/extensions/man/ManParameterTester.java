@@ -31,7 +31,7 @@ public class ManParameterTester {
                 ANSI.defaultText()+
                 "="+ANSI.getUnderline()+
                 "ATTRIBUTE"+
-                ANSI.defaultText()+"::"+ Config.getLineSeparator(),
+                ANSI.defaultText()+ Config.getLineSeparator(),
                 new ManParameter().parseParams(input, 80).printToTerminal());
 
         input.clear();
@@ -42,7 +42,7 @@ public class ManParameterTester {
                 ANSI.defaultText()+
                 "="+ANSI.getUnderline()+
                 "ATTRIBUTE"+
-                ANSI.defaultText()+"::"+ Config.getLineSeparator()+
+                ANSI.defaultText()+ Config.getLineSeparator()+
                 "    Backend output file format"+" "+Config.getLineSeparator()+
                 " "+Config.getLineSeparator(),
                 new ManParameter().parseParams(input, 80).printToTerminal());

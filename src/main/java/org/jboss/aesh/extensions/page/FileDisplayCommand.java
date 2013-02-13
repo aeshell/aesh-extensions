@@ -33,6 +33,7 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
     private int rows;
     private int columns;
     private int topVisibleRow;
+    private int topVisibleRowCache; //only rewrite page if rowCache != row
     private String name;
     private LessPage page;
     private PageLoader loader;
@@ -56,6 +57,8 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
         rows = console.getTerminalSize().getHeight();
         columns = console.getTerminalSize().getWidth();
         page = new LessPage(loader, 80);
+        topVisibleRow = 0;
+        topVisibleRowCache = -1;
 
         if(ControlOperator.isRedirectionOut(getConsoleOutput().getControlOperator())) {
             int count=0;
@@ -120,8 +123,8 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
             }
             else {
                 topVisibleRow = topVisibleRow + getNumber();
-                if(topVisibleRow > (page.size()-rows)) {
-                    topVisibleRow = page.size()-rows;
+                if(topVisibleRow > (page.size()-rows-1)) {
+                    topVisibleRow = page.size()-rows-1;
                     if(topVisibleRow < 0)
                         topVisibleRow = 0;
                     display(Background.INVERSE, "(END)");
@@ -151,9 +154,9 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
 
             }
             else {
-                topVisibleRow = topVisibleRow + rows*getNumber();
-                if(topVisibleRow > (page.size()-rows)) {
-                    topVisibleRow = page.size()-rows;
+                topVisibleRow = topVisibleRow + rows*getNumber()-1;
+                if(topVisibleRow > (page.size()-rows-1)) {
+                    topVisibleRow = page.size()-rows-1;
                     if(topVisibleRow < 0)
                         topVisibleRow = 0;
                     display(Background.INVERSE, "(END)");
@@ -165,7 +168,7 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
         }
         else if(operation.getInput()[0] == 2 || operation.equals(Operation.PGUP)) { // ctrl-b || pgup
             if(search != Search.SEARCHING) {
-                topVisibleRow = topVisibleRow - rows*getNumber();
+                topVisibleRow = topVisibleRow - rows*getNumber()-1;
                 if(topVisibleRow < 0)
                     topVisibleRow = 0;
                 display(Background.NORMAL, ":");
@@ -235,13 +238,13 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
             }
             else {
                 if(number.length() == 0 || getNumber() == 0) {
-                    topVisibleRow = page.size()-rows;
+                    topVisibleRow = page.size()-rows-1;
                     display(Background.INVERSE, "(END)");
                 }
                 else {
                     topVisibleRow = getNumber()-1;
-                    if(topVisibleRow > page.size()-rows) {
-                        topVisibleRow = page.size()-rows;
+                    if(topVisibleRow > page.size()-rows-1) {
+                        topVisibleRow = page.size()-rows-1;
                         display(Background.INVERSE, "(END)");
                     }
                     else {
@@ -271,29 +274,33 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
     }
 
     private void display(Background background, String out) throws IOException {
-        console.clear();
-        if(search == Search.RESULT && searchLines.size() > 0) {
-            String searchWord = searchBuilder.toString();
-            for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
-                if(i < page.size()) {
-                    String line = page.getLine(i);
-                    if(line.contains(searchWord))
-                        displaySearchLine(line, searchWord);
-                    else
-                        console.pushToStdOut(line);
-                    console.pushToStdOut(Config.getLineSeparator());
+        if(topVisibleRow != topVisibleRowCache) {
+            console.clear();
+            if(search == Search.RESULT && searchLines.size() > 0) {
+                String searchWord = searchBuilder.toString();
+                for(int i=topVisibleRow; i < (topVisibleRow+rows-1); i++) {
+                    if(i < page.size()) {
+                        String line = page.getLine(i);
+                        if(line.contains(searchWord))
+                            displaySearchLine(line, searchWord);
+                        else
+                            console.pushToStdOut(line);
+                        console.pushToStdOut(Config.getLineSeparator());
+                    }
                 }
+                topVisibleRowCache = topVisibleRow;
             }
-        }
-        else {
-            for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
-                if(i < page.size()) {
-                    console.pushToStdOut(page.getLine(i));
-                    console.pushToStdOut(Config.getLineSeparator());
+            else {
+                for(int i=topVisibleRow; i < (topVisibleRow+rows-1); i++) {
+                    if(i < page.size()) {
+                        console.pushToStdOut(page.getLine(i));
+                        console.pushToStdOut(Config.getLineSeparator());
+                    }
                 }
+                topVisibleRowCache = topVisibleRow;
             }
+            displayBottom(background, out);
         }
-        displayBottom(background, out);
     }
 
     private void displaySearchLine(String line, String searchWord) throws IOException {
@@ -343,26 +350,6 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
             displayBottom(Background.INVERSE, "Pattern not found  (press RETURN)", true);
         }
     }
-
-    /*
-    @Override
-    public void complete(CompleteOperation completeOperation) {
-        if(name.startsWith(completeOperation.getBuffer()))
-            completeOperation.addCompletionCandidate(name);
-        else if(completeOperation.getBuffer().startsWith(name+" ")) {
-            //String rest = s.substring("less ".length());
-
-            String word = Parser.findWordClosestToCursor(completeOperation.getBuffer(),
-                    completeOperation.getCursor());
-            //List<String> out = FileUtils.listMatchingDirectories(word, new File("."));
-            //System.out.print(out);
-            completeOperation.setOffset(completeOperation.getCursor());
-            //FileUtils.listMatchingDirectories(completeOperation, word,
-            //        new File(System.getProperty("user.dir")));
-            new FileLister(word, new File(System.getProperty("user.dir"))).findMatchingDirectories(completeOperation);
-        }
-    }
-    */
 
     private int getNumber() {
         if(number.length() > 0)

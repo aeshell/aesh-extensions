@@ -26,6 +26,7 @@ public class ManPageLoader implements PageLoader {
     private List<ManSection> sections;
     private File file;
     private String name;
+    private String headerText;
 
     public ManPageLoader() {
         sections = new ArrayList<ManSection>();
@@ -35,23 +36,35 @@ public class ManPageLoader implements PageLoader {
         File file = new File(filename);
         if(!file.isFile())
             throw new IllegalArgumentException(filename+" must be a file.");
-        else
+        else {
             this.file = file;
+            sections.clear();
+        }
     }
 
     public void setFile(File file) {
         if(!file.isFile())
             throw new IllegalArgumentException(file+" must be a file.");
-        else
+        else {
             this.file = file;
+            sections.clear();
+        }
     }
 
     public String getResourceName() {
         return file.getName();
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public List<String> loadPage(int columns) throws IOException {
+        //we already have the file loaded
+        if(!sections.isEmpty())
+            return getAsList();
+        //parse the file
         BufferedReader br = new BufferedReader(new FileReader(file));
         try {
             String line = br.readLine();
