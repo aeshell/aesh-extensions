@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public abstract class FileDisplayCommand extends ConsoleCommand implements Completion {
+public abstract class FileDisplayer extends ConsoleCommand implements Completion {
 
     private int rows;
     private int columns;
@@ -43,7 +43,7 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
     private List<Integer> searchLines;
     private Logger logger = LoggerUtil.getLogger(getClass().getName());
 
-    public FileDisplayCommand(Console console, String commandName, PageLoader loader) {
+    public FileDisplayer(Console console, String commandName, PageLoader loader) {
         super(console);
         this.name = commandName;
         this.loader = loader;
@@ -56,7 +56,7 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
     protected void afterAttach() throws IOException {
         rows = console.getTerminalSize().getHeight();
         columns = console.getTerminalSize().getWidth();
-        page = new LessPage(loader, 80);
+        page = new LessPage(loader, columns);
         topVisibleRow = 0;
         topVisibleRowCache = -1;
 
@@ -81,9 +81,9 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
                 console.pushToStdOut(ANSI.getAlternateBufferScreen());
 
                 if(this.page.getFileName() != null)
-                    display(Background.INVERSE, this.page.getFileName());
+                    display();
                 else
-                    display(Background.NORMAL, ":");
+                    display();
             }
         }
     }
@@ -102,7 +102,7 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
         if(operation.getInput()[0] == 'q') {
             if(search == Search.SEARCHING) {
                 searchBuilder.append((char) operation.getInput()[0]);
-                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+                displayBottom();
             }
             else {
                 clearNumber();
@@ -114,7 +114,7 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
             if(search == Search.SEARCHING) {
                 if(operation.getInput()[0] == 'j') {
                     searchBuilder.append((char) operation.getInput()[0]);
-                    displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+                    displayBottom();
                 }
                 else if(operation.equals(Operation.NEW_LINE)) {
                     search = Search.RESULT;
@@ -127,10 +127,10 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
                     topVisibleRow = page.size()-rows-1;
                     if(topVisibleRow < 0)
                         topVisibleRow = 0;
-                    display(Background.INVERSE, "(END)");
+                    display();
                 }
                 else
-                    display(Background.NORMAL, ":");
+                    display();
                 clearNumber();
             }
         }
@@ -138,13 +138,13 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
             if(search == Search.SEARCHING) {
                 if(operation.getInput()[0] == 'k')
                 searchBuilder.append((char) operation.getInput()[0]);
-                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+                displayBottom();
             }
             else {
                 topVisibleRow = topVisibleRow - getNumber();
                 if(topVisibleRow < 0)
                     topVisibleRow = 0;
-                display(Background.NORMAL, ":");
+                display();
                 clearNumber();
             }
         }
@@ -159,10 +159,10 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
                     topVisibleRow = page.size()-rows-1;
                     if(topVisibleRow < 0)
                         topVisibleRow = 0;
-                    display(Background.INVERSE, "(END)");
+                    display();
                 }
                 else
-                    display(Background.NORMAL, ":");
+                    display();
                 clearNumber();
             }
         }
@@ -171,7 +171,7 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
                 topVisibleRow = topVisibleRow - rows*getNumber()-1;
                 if(topVisibleRow < 0)
                     topVisibleRow = 0;
-                display(Background.NORMAL, ":");
+                display();
                 clearNumber();
             }
         }
@@ -180,40 +180,40 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
             if(search == Search.NO_SEARCH || search == Search.RESULT) {
                 search = Search.SEARCHING;
                 searchBuilder = new StringBuilder();
-                displayBottom(Background.NORMAL, "/", true);
+                displayBottom();
             }
             else if(search == Search.SEARCHING) {
                 searchBuilder.append((char) operation.getInput()[0]);
-                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+                displayBottom();
             }
 
         }
         else if(operation.getInput()[0] == 'n') {
             if(search == Search.SEARCHING) {
                 searchBuilder.append((char) operation.getInput()[0]);
-                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+                displayBottom();
             }
             else if(search == Search.RESULT) {
                 if(searchLines.size() > 0) {
                     for(Integer i : searchLines) {
                         if(i > topVisibleRow+1) {
                             topVisibleRow = i-1;
-                            display(Background.NORMAL, ":");
+                            display();
                             return;
                         }
                     }
                     //we didnt find any more
-                    displayBottom(Background.INVERSE, "Pattern not found  (press RETURN)", true);
+                    displayBottom();
                 }
                 else {
-                    displayBottom(Background.INVERSE, "Pattern not found  (press RETURN)", true);
+                    displayBottom();
                 }
             }
         }
         else if(operation.getInput()[0] == 'N') {
             if(search == Search.SEARCHING) {
                 searchBuilder.append((char) operation.getInput()[0]);
-                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+                displayBottom();
             }
             else if(search == Search.RESULT) {
                 if(searchLines.size() > 0) {
@@ -222,33 +222,33 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
                             topVisibleRow = searchLines.get(i)-1;
                             if(topVisibleRow < 0)
                                 topVisibleRow = 0;
-                            display(Background.NORMAL, ":");
+                            display();
                             return;
                         }
                     }
                     //we didnt find any more
-                    displayBottom(Background.INVERSE, "Pattern not found  (press RETURN)", true);
+                    displayBottom();
                 }
             }
         }
         else if(operation.getInput()[0] == 'G') {
             if(search == Search.SEARCHING) {
                 searchBuilder.append((char) operation.getInput()[0]);
-                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+                displayBottom();
             }
             else {
                 if(number.length() == 0 || getNumber() == 0) {
                     topVisibleRow = page.size()-rows-1;
-                    display(Background.INVERSE, "(END)");
+                    display();
                 }
                 else {
                     topVisibleRow = getNumber()-1;
                     if(topVisibleRow > page.size()-rows-1) {
                         topVisibleRow = page.size()-rows-1;
-                        display(Background.INVERSE, "(END)");
+                        display();
                     }
                     else {
-                        display(Background.NORMAL, ":");
+                        display();
                     }
                 }
                 clearNumber();
@@ -257,23 +257,23 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
         else if(Character.isDigit(operation.getInput()[0])) {
             if(search == Search.SEARCHING) {
                 searchBuilder.append((char) operation.getInput()[0]);
-                displayBottom(Background.NORMAL, "/" + searchBuilder.toString(), true);
+                displayBottom();
             }
             else {
                 number.append(Character.getNumericValue(operation.getInput()[0]));
-                display(Background.NORMAL,":"+number.toString());
+                display();
             }
         }
         else {
             if(search == Search.SEARCHING &&
                     (Character.isAlphabetic(operation.getInput()[0]))) {
                 searchBuilder.append((char) operation.getInput()[0]);
-                displayBottom(Background.NORMAL, "/"+ searchBuilder.toString(), true);
+                displayBottom();
             }
         }
     }
 
-    private void display(Background background, String out) throws IOException {
+    private void display() throws IOException {
         if(topVisibleRow != topVisibleRowCache) {
             console.clear();
             if(search == Search.RESULT && searchLines.size() > 0) {
@@ -293,16 +293,18 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
             else {
                 for(int i=topVisibleRow; i < (topVisibleRow+rows-1); i++) {
                     if(i < page.size()) {
-                        console.pushToStdOut(page.getLine(i));
-                        console.pushToStdOut(Config.getLineSeparator());
+                        console.pushToStdOut(page.getLine(i)+Config.getLineSeparator());
                     }
                 }
                 topVisibleRowCache = topVisibleRow;
             }
-            displayBottom(background, out);
+            displayBottom();
         }
     }
 
+    /**
+     * highlight the specific word thats found in the search
+     */
     private void displaySearchLine(String line, String searchWord) throws IOException {
         int start = line.indexOf(searchWord);
         console.pushToStdOut(line.substring(0,start));
@@ -312,26 +314,35 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
         console.pushToStdOut(line.substring(start + searchWord.length(), line.length()));
     }
 
-    private void displayBottom(Background background, String out) throws IOException {
-       displayBottom(background, out, false);
+    public abstract void displayBottom() throws IOException;
+
+    public void writeToConsole(String word) throws IOException {
+        console.pushToStdOut(word);
     }
-    private void displayBottom(Background background, String out, boolean clearLine) throws IOException {
-        if(clearLine) {
-            console.pushToStdOut(Buffer.printAnsi("0G"));
-            console.pushToStdOut(Buffer.printAnsi("2K"));
-        }
-        if(background == Background.INVERSE) {
-            console.pushToStdOut(ANSI.getInvertedBackground());
-            //make sure that we dont display anything longer than columns
-            if(out.length() > columns) {
-                console.pushToStdOut(out.substring(out.length()-columns));
-            }
-            else
-                console.pushToStdOut(out);
-            console.pushToStdOut(ANSI.reset());
-        }
-        else
-            console.pushToStdOut(out);
+
+    public void clearBottomLine() throws IOException {
+        console.pushToStdOut(Buffer.printAnsi("0G"));
+        console.pushToStdOut(Buffer.printAnsi("2K"));
+    }
+
+    public boolean isAtBottom() {
+        return topVisibleRow >= (page.size()-rows-1);
+    }
+
+    public boolean isAtTop() {
+        return topVisibleRow == 0;
+    }
+
+    public Search getSearchStatus() {
+        return search;
+    }
+
+    public String getSearchWord() {
+        return searchBuilder.toString();
+    }
+
+    public int getTopVisibleRow() {
+        return topVisibleRow+1;
     }
 
     private void findSearchWord(boolean forward) throws IOException {
@@ -342,15 +353,19 @@ public abstract class FileDisplayCommand extends ConsoleCommand implements Compl
             for(Integer i : searchLines)
                 if(i > topVisibleRow) {
                     topVisibleRow = i-1;
-                    display(Background.NORMAL, ":");
+                    display();
                     return;
                 }
         }
         else {
-            displayBottom(Background.INVERSE, "Pattern not found  (press RETURN)", true);
+            search = Search.NOT_FOUND;
+            displayBottom();
         }
     }
 
+    /**
+     * number written by the user (used to jump to specific commands)
+     */
     private int getNumber() {
         if(number.length() > 0)
             return Integer.parseInt(number.toString());

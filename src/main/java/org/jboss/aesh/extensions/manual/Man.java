@@ -7,16 +7,11 @@
 package org.jboss.aesh.extensions.manual;
 
 import org.jboss.aesh.complete.CompleteOperation;
-import org.jboss.aesh.complete.Completion;
-import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
-import org.jboss.aesh.console.ConsoleCommand;
-import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
-import org.jboss.aesh.extensions.page.FileDisplayCommand;
+import org.jboss.aesh.extensions.page.FileDisplayer;
 import org.jboss.aesh.util.ANSI;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +22,12 @@ import java.util.List;
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class Man extends FileDisplayCommand {
+public class Man extends FileDisplayer {
 
     private int rows;
     private int columns;
     private int topVisibleRow;
     private List<ManPage> manPages = new ArrayList<ManPage>();
-    private ManPage current;
     private ManPageLoader loader;
 
     public Man(Console console, String name, ManPageLoader loader) {
@@ -61,5 +55,12 @@ public class Man extends FileDisplayCommand {
                 completeOperation.getCompletionCandidates().add("man "+page.getName());
             }
         }
+    }
+
+    @Override
+    public void displayBottom() throws IOException {
+        writeToConsole(ANSI.getInvertedBackground());
+        writeToConsole("Manual page "+loader.getName()+" line "+getTopVisibleRow()+
+        " (press h for help or q to quit)"+ANSI.defaultText());
     }
 }

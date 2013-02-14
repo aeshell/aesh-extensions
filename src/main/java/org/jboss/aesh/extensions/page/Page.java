@@ -70,6 +70,7 @@ public abstract class Page {
     public static enum Search {
         SEARCHING,
         RESULT,
+        NOT_FOUND,
         NO_SEARCH
     }
 

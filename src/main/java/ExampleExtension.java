@@ -18,6 +18,7 @@ import org.jboss.aesh.extensions.less.Less;
 import org.jboss.aesh.extensions.manual.Man;
 import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
 import org.jboss.aesh.extensions.more.More;
+import org.jboss.aesh.extensions.page.SimplePageLoader;
 import org.jboss.aesh.util.Parser;
 
 import java.io.File;
@@ -37,6 +38,8 @@ public class ExampleExtension {
         Settings.getInstance().setReadInputrc(false);
        //Settings.getInstance().setHistoryDisabled(true);
         //Settings.getInstance().setHistoryPersistent(false);
+        Settings.getInstance().setLogFile("aesh_example.log");
+        Settings.getInstance().setLogging(true);
         Console exampleConsole = new Console();
 
         PrintWriter out = new PrintWriter(System.out);
@@ -44,7 +47,7 @@ public class ExampleExtension {
         Man man = new Man(exampleConsole, "man", new ManPageLoader());
         //man.addPage(new File("/tmp/README.md"), "test");
 
-        Less less = new Less(exampleConsole);
+        Less less = new Less(exampleConsole, "less", new SimplePageLoader());
         More more = new More(exampleConsole);
 
         List<MultipleChoice> choices = new ArrayList<MultipleChoice>();

@@ -23,7 +23,7 @@ public class ManPage {
     public ManPage(String fileName) {
         ManPageLoader parser = new ManPageLoader();
         try {
-            parser.loadPage(80);
+            parser.loadPage(800);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }

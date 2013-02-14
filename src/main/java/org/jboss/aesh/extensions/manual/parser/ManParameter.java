@@ -37,7 +37,7 @@ public class ManParameter {
             }
 
             if(builder.length() > 0) {
-               for(String s : Parser.splitBySizeKeepWords(builder.toString(), columns+textPad.length())) {
+               for(String s : Parser.splitBySizeKeepWords(builder.toString(), columns-textPad.length())) {
                   out.add(textPad+ManParserUtil.convertStringToAnsi(s));
                }
             }
