@@ -43,11 +43,11 @@ public class More extends ConsoleCommand implements Completion {
     }
 
     public void setFile(File page) throws IOException {
-        loader.readPageFromFile(page);
+        loader.setFile(page);
     }
 
     public void setFile(String filename) throws IOException {
-        loader.readPageFromFile(new File(filename));
+        loader.setFile(new File(filename));
     }
 
     public void setInput(String input) throws IOException {

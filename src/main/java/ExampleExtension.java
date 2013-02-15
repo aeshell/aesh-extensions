@@ -44,10 +44,10 @@ public class ExampleExtension {
 
         PrintWriter out = new PrintWriter(System.out);
 
-        Man man = new Man(exampleConsole, "man", new ManPageLoader());
+        Man man = new Man(exampleConsole);
         //man.addPage(new File("/tmp/README.md"), "test");
 
-        Less less = new Less(exampleConsole, "less", new SimplePageLoader());
+        Less less = new Less(exampleConsole);
         More more = new More(exampleConsole);
 
         List<MultipleChoice> choices = new ArrayList<MultipleChoice>();
@@ -125,13 +125,14 @@ public class ExampleExtension {
             if(line.startsWith("man")) {
                 //exampleConsole.attachProcess(test);
                 //man.setCurrentManPage("test");
-                man.setFile("/tmp/test.txt");
+                man.setFile("/tmp/test.txt.gz");
                 man.attach(consoleOutput);
             }
             if(line.startsWith("choice")) {
                 choice.attach(consoleOutput);
             }
-            if(line.startsWith("less")) {
+            if(line.trim().startsWith("less")) {
+                //is it getting input from pipe
                 if(consoleOutput.getStdOut() != null &&
                         consoleOutput.getStdOut().length() > 0) {
                     less.setInput(consoleOutput.getStdOut());

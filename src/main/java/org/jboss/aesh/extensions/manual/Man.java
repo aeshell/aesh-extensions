@@ -10,8 +10,10 @@ import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
 import org.jboss.aesh.extensions.page.FileDisplayer;
+import org.jboss.aesh.extensions.page.PageLoader;
 import org.jboss.aesh.util.ANSI;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,19 +26,16 @@ import java.util.List;
  */
 public class Man extends FileDisplayer {
 
-    private int rows;
-    private int columns;
-    private int topVisibleRow;
     private List<ManPage> manPages = new ArrayList<ManPage>();
     private ManPageLoader loader;
 
-    public Man(Console console, String name, ManPageLoader loader) {
-        super(console, name, loader);
+    public Man(Console console) {
+        super(console);
         manPages = new ArrayList<ManPage>();
-        this.loader = loader;
+        loader = new ManPageLoader();
     }
 
-    public void setFile(String name) {
+    public void setFile(String name) throws IOException {
         loader.setFile(name);
         //manPages.add(new ManPage(file, name));
     }
@@ -55,6 +54,11 @@ public class Man extends FileDisplayer {
                 completeOperation.getCompletionCandidates().add("man "+page.getName());
             }
         }
+    }
+
+    @Override
+    public PageLoader getPageLoader() {
+       return loader;
     }
 
     @Override

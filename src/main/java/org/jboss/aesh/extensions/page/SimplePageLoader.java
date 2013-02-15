@@ -8,10 +8,15 @@ package org.jboss.aesh.extensions.page;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Util method that tries to read a file
@@ -21,14 +26,56 @@ import java.util.List;
  */
 public class SimplePageLoader implements PageLoader {
 
-    private File page;
     private String pageAsString;
+    private String fileName;
+    private InputStreamReader reader;
 
     public SimplePageLoader() {
     }
 
-    public void readPageFromFile(File file) {
-        this.page = file;
+    /**
+     * Read from a specified filename. Also supports gzipped files.
+     *
+     * @param filename File
+     * @throws IOException
+     */
+    public void setFile(String filename) throws IOException {
+        setFile(new File(filename));
+    }
+
+    /**
+     * Read from a specified file. Also supports gzipped files.
+     *
+     * @param file File
+     * @throws IOException
+     */
+    public void setFile(File file) throws IOException {
+        if(!file.isFile())
+            throw new IllegalArgumentException(file+" must be a file.");
+        else {
+            if(file.getName().endsWith("gz"))
+                initGzReader(file);
+            else
+                initReader(file);
+        }
+    }
+
+    /**
+     * Read a file resouce located in a jar
+     *
+     * @param fileName name
+     */
+    public void setFileFromAJar(String fileName) {
+        InputStream is = this.getClass().getResourceAsStream(fileName);
+        if(is != null) {
+            this.fileName = fileName;
+            reader = new InputStreamReader(is);
+        }
+    }
+
+    private void initReader(File file) throws FileNotFoundException {
+        fileName = file.getAbsolutePath();
+        reader = new FileReader(file);
     }
 
     public void readPageAsString(String pageAsString) {
@@ -37,18 +84,24 @@ public class SimplePageLoader implements PageLoader {
 
     @Override
     public String getResourceName() {
-        if(page != null)
-            return page.getPath();
+        if(fileName != null)
+            return fileName;
         else
             return "STREAM";
+    }
+
+    private void initGzReader(File file) throws IOException {
+        fileName = file.getAbsolutePath();
+        GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(file));
+        reader = new InputStreamReader(gzip);
     }
 
     @Override
     public List<String> loadPage(int columns) throws IOException {
         List<String> lines = new ArrayList<String>();
         //read file and save each line in a list
-        if(page != null && page.isFile()) {
-            BufferedReader br = new BufferedReader(new FileReader(page));
+        if(reader != null) {
+            BufferedReader br = new BufferedReader(reader);
             try {
                 String line = br.readLine();
 

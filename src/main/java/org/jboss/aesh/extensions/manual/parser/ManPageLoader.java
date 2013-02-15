@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Read a asciidoc file and parse it to something that can be
@@ -24,35 +25,69 @@ import java.util.List;
 public class ManPageLoader implements PageLoader {
 
     private List<ManSection> sections;
-    private File file;
     private String name;
+    private String fileName;
     private String headerText;
+    private InputStreamReader reader;
 
     public ManPageLoader() {
         sections = new ArrayList<ManSection>();
     }
 
-    public void setFile(String filename) {
-        File file = new File(filename);
-        if(!file.isFile())
-            throw new IllegalArgumentException(filename+" must be a file.");
-        else {
-            this.file = file;
-            sections.clear();
-        }
+    /**
+     * Read from a specified filename. Also supports gzipped files.
+     *
+     * @param filename File
+     * @throws IOException
+     */
+    public void setFile(String filename) throws IOException {
+        setFile(new File(filename));
     }
 
-    public void setFile(File file) {
+    /**
+     * Read from a specified file. Also supports gzipped files.
+     *
+     * @param file File
+     * @throws IOException
+     */
+    public void setFile(File file) throws IOException {
         if(!file.isFile())
             throw new IllegalArgumentException(file+" must be a file.");
         else {
-            this.file = file;
+            if(file.getName().endsWith("gz"))
+                initGzReader(file);
+            else
+                initReader(file);
             sections.clear();
         }
     }
 
+    /**
+     * Read a file resouce located in a jar
+     *
+     * @param fileName name
+     */
+    public void setFileFromAJar(String fileName) {
+        InputStream is = this.getClass().getResourceAsStream(fileName);
+        if(is != null) {
+            this.fileName = fileName;
+            reader = new InputStreamReader(is);
+        }
+    }
+
+    private void initReader(File file) throws FileNotFoundException {
+        fileName = file.getAbsolutePath();
+        reader = new FileReader(file);
+    }
+
+    private void initGzReader(File file) throws IOException {
+        fileName = file.getAbsolutePath();
+        GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(file));
+        reader = new InputStreamReader(gzip);
+    }
+
     public String getResourceName() {
-        return file.getName();
+        return fileName;
     }
 
     public String getName() {
@@ -64,8 +99,10 @@ public class ManPageLoader implements PageLoader {
         //we already have the file loaded
         if(!sections.isEmpty())
             return getAsList();
+        if(reader == null)
+            throw new IOException("InputStreamReader is null, cannot read file.");
         //parse the file
-        BufferedReader br = new BufferedReader(new FileReader(file));
+        BufferedReader br = new BufferedReader(reader);
         try {
             String line = br.readLine();
             boolean foundEmptyLine = true;
@@ -103,7 +140,7 @@ public class ManPageLoader implements PageLoader {
         }
     }
 
-    //TODO: create a better column
+    //TODO: create a better header
     private void processHeader(int columns) {
         name = sections.get(0).getName();
         sections.remove(0);

@@ -34,19 +34,15 @@ public abstract class FileDisplayer extends ConsoleCommand implements Completion
     private int columns;
     private int topVisibleRow;
     private int topVisibleRowCache; //only rewrite page if rowCache != row
-    private String name;
     private LessPage page;
-    private PageLoader loader;
     private StringBuilder number;
     private Search search = Search.NO_SEARCH;
     private StringBuilder searchBuilder;
     private List<Integer> searchLines;
     private Logger logger = LoggerUtil.getLogger(getClass().getName());
 
-    public FileDisplayer(Console console, String commandName, PageLoader loader) {
+    public FileDisplayer(Console console) {
         super(console);
-        this.name = commandName;
-        this.loader = loader;
         number = new StringBuilder();
         searchBuilder = new StringBuilder();
     }
@@ -56,12 +52,13 @@ public abstract class FileDisplayer extends ConsoleCommand implements Completion
     protected void afterAttach() throws IOException {
         rows = console.getTerminalSize().getHeight();
         columns = console.getTerminalSize().getWidth();
-        page = new LessPage(loader, columns);
+        page = new LessPage(getPageLoader(), columns);
         topVisibleRow = 0;
         topVisibleRowCache = -1;
 
         if(ControlOperator.isRedirectionOut(getConsoleOutput().getControlOperator())) {
             int count=0;
+            logger.info("REDIRECTION IS OUT");
             for(String line : this.page.getLines()) {
                 console.pushToStdOut(line);
                 count++;
@@ -313,6 +310,8 @@ public abstract class FileDisplayer extends ConsoleCommand implements Completion
         console.pushToStdOut(ANSI.reset());
         console.pushToStdOut(line.substring(start + searchWord.length(), line.length()));
     }
+
+    public abstract PageLoader getPageLoader();
 
     public abstract void displayBottom() throws IOException;
 

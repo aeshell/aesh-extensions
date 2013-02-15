@@ -10,15 +10,14 @@ import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.extensions.page.FileDisplayer;
 import org.jboss.aesh.extensions.page.Page.Search;
+import org.jboss.aesh.extensions.page.PageLoader;
 import org.jboss.aesh.extensions.page.SimplePageLoader;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.FileLister;
-import org.jboss.aesh.util.LoggerUtil;
 import org.jboss.aesh.util.Parser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 /**
  * A less implementation for Æsh ref: http://en.wikipedia.org/wiki/Less_(Unix)
@@ -28,19 +27,18 @@ import java.util.logging.Logger;
 public class Less extends FileDisplayer {
 
     private SimplePageLoader loader;
-    private Logger logger = LoggerUtil.getLogger(getClass().getName());
 
-    public Less(Console console, String name, SimplePageLoader loader) {
-        super(console, name, loader);
-        this.loader = loader;
+    public Less(Console console) {
+        super(console);
+        loader = new SimplePageLoader();
     }
 
     public void setFile(File file) throws IOException {
-        loader.readPageFromFile(file);
+        loader.setFile(file);
     }
 
     public void setFile(String filename) throws IOException {
-        loader.readPageFromFile(new File(filename));
+        loader.setFile(filename);
     }
 
     public void setInput(String input) throws IOException {
@@ -48,25 +46,19 @@ public class Less extends FileDisplayer {
     }
 
     @Override
+    public PageLoader getPageLoader() {
+        return loader;
+    }
+
+    @Override
     public void complete(CompleteOperation completeOperation) {
-        if(completeOperation.getBuffer().equals("l"))
-            completeOperation.getCompletionCandidates().add("less");
-        else if(completeOperation.getBuffer().equals("le"))
-            completeOperation.getCompletionCandidates().add("less");
-        else if(completeOperation.getBuffer().equals("les"))
-            completeOperation.getCompletionCandidates().add("less");
-        else if(completeOperation.getBuffer().equals("less"))
-            completeOperation.getCompletionCandidates().add("less");
+        if("less".startsWith(completeOperation.getBuffer()))
+            completeOperation.addCompletionCandidate("less");
         else if(completeOperation.getBuffer().startsWith("less ")) {
-            //String rest = s.substring("less ".length());
 
             String word = Parser.findWordClosestToCursor(completeOperation.getBuffer(),
                     completeOperation.getCursor());
-            //List<String> out = FileUtils.listMatchingDirectories(word, new File("."));
-            //System.out.print(out);
             completeOperation.setOffset(completeOperation.getCursor());
-            //FileUtils.listMatchingDirectories(completeOperation, word,
-            //        new File(System.getProperty("user.dir")));
             new FileLister(word, new File(System.getProperty("user.dir"))).findMatchingDirectories(completeOperation);
         }
     }
