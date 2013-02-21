@@ -12,6 +12,7 @@ import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.ConsoleCommand;
 import org.jboss.aesh.console.operator.ControlOperator;
+import org.jboss.aesh.console.settings.Settings;
 import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.extensions.less.LessPage;
 import org.jboss.aesh.extensions.page.Page.Search;
@@ -58,7 +59,8 @@ public abstract class FileDisplayer extends ConsoleCommand implements Completion
 
         if(ControlOperator.isRedirectionOut(getConsoleOutput().getControlOperator())) {
             int count=0;
-            logger.info("REDIRECTION IS OUT");
+            if(Settings.getInstance().isLogging())
+                logger.info("REDIRECTION IS OUT");
             for(String line : this.page.getLines()) {
                 console.pushToStdOut(line);
                 count++;

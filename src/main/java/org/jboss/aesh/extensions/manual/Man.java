@@ -15,6 +15,8 @@ import org.jboss.aesh.util.ANSI;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +40,14 @@ public class Man extends FileDisplayer {
     public void setFile(String name) throws IOException {
         loader.setFile(name);
         //manPages.add(new ManPage(file, name));
+    }
+
+    public void setFile(URL url) throws IOException {
+        loader.setUrlFile(url);
+    }
+
+    public void setFile(InputStream input, String fileName) throws IOException {
+        loader.setFile(input, fileName);
     }
 
     @Override

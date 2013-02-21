@@ -9,6 +9,7 @@ import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.complete.Completion;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
+import org.jboss.aesh.console.ConsoleCallback;
 import org.jboss.aesh.console.ConsoleOutput;
 import org.jboss.aesh.console.Prompt;
 import org.jboss.aesh.console.settings.Settings;
@@ -40,21 +41,21 @@ public class ExampleExtension {
         //Settings.getInstance().setHistoryPersistent(false);
         Settings.getInstance().setLogFile("aesh_example.log");
         Settings.getInstance().setLogging(true);
-        Console exampleConsole = new Console();
+        final Console exampleConsole = Console.getInstance();
 
         PrintWriter out = new PrintWriter(System.out);
 
-        Man man = new Man(exampleConsole);
+        final Man man = new Man(exampleConsole);
         //man.addPage(new File("/tmp/README.md"), "test");
 
-        Less less = new Less(exampleConsole);
-        More more = new More(exampleConsole);
+        final Less less = new Less(exampleConsole);
+        final More more = new More(exampleConsole);
 
         List<MultipleChoice> choices = new ArrayList<MultipleChoice>();
         choices.add(new MultipleChoice(1,"Do you want foo?"));
         choices.add(new MultipleChoice(2,"Do you want bar?"));
 
-        MultipleChoiceCommand choice =
+        final MultipleChoiceCommand choice =
                 new MultipleChoiceCommand(exampleConsole, "choice", choices);
 
         Completion completer = new Completion() {
@@ -105,89 +106,92 @@ public class ExampleExtension {
         exampleConsole.addCompletion(less);
         exampleConsole.addCompletion(more);
 
-        ConsoleOutput consoleOutput = null;
+        exampleConsole.setPrompt(new Prompt("[test@foo]~> "));
         //exampleConsole.pushToConsole(ANSI.greenText());
-        while ((consoleOutput = exampleConsole.read("[test@foo.bar]~> ")) != null) {
-            String line = consoleOutput.getBuffer();
-            exampleConsole.pushToStdOut("======>\"" + line + "\"\n");
+        //while ((consoleOutput = exampleConsole.read("[test@foo.bar]~> ")) != null) {
+        exampleConsole.setConsoleCallback(new ConsoleCallback() {
+            @Override
+            public int readConsoleOutput(ConsoleOutput consoleOutput) throws IOException {
 
-            if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit") ||
-                    line.equalsIgnoreCase("reset")) {
-                break;
-            }
-            if(line.equalsIgnoreCase("password")) {
-                consoleOutput = exampleConsole.read(new Prompt("password: "), Character.valueOf((char) 0));
-                exampleConsole.pushToStdOut("password typed:" + consoleOutput.getBuffer() + "\n");
+                String line = consoleOutput.getBuffer();
+                exampleConsole.pushToStdOut("======>\"" + line + "\"\n");
 
-            }
-            if(line.equals("clear"))
-                exampleConsole.clear();
-            if(line.startsWith("man")) {
-                //exampleConsole.attachProcess(test);
-                //man.setCurrentManPage("test");
-                man.setFile("/tmp/test.txt.gz");
-                man.attach(consoleOutput);
-            }
-            if(line.startsWith("choice")) {
-                choice.attach(consoleOutput);
-            }
-            if(line.trim().startsWith("less")) {
-                //is it getting input from pipe
-                if(consoleOutput.getStdOut() != null &&
-                        consoleOutput.getStdOut().length() > 0) {
-                    less.setInput(consoleOutput.getStdOut());
-                    less.attach(consoleOutput);
-
+                if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit") ||
+                        line.equalsIgnoreCase("reset")) {
+                    exampleConsole.stop();
                 }
-                else if(line.length() > "less".length()) {
-                    File f = new File(Parser.switchEscapedSpacesToSpacesInWord(line.substring("less ".length())).trim());
-                    if(f.isFile()) {
-                        //less.setPage(f);
-                        less.setFile(f);
+                if(line.equals("clear"))
+                    exampleConsole.clear();
+                if(line.startsWith("man")) {
+                    //exampleConsole.attachProcess(test);
+                    //man.setCurrentManPage("test");
+                    try {
+                    man.setFile("/tmp/test.txt.gz");
+                    man.attach(consoleOutput);
+                    }
+                    catch (IllegalArgumentException iae) {
+                        exampleConsole.pushToStdOut(iae.getMessage());
+                    }
+                }
+                if(line.startsWith("choice")) {
+                    choice.attach(consoleOutput);
+                }
+                if(line.trim().startsWith("less")) {
+                    //is it getting input from pipe
+                    if(consoleOutput.getStdOut() != null &&
+                            consoleOutput.getStdOut().length() > 0) {
+                        less.setInput(consoleOutput.getStdOut());
                         less.attach(consoleOutput);
+
                     }
-                    else if(f.isDirectory()) {
-                        exampleConsole.pushToStdOut(f.getAbsolutePath()+": is a directory"+
-                                Config.getLineSeparator());
+                    else if(line.length() > "less".length()) {
+                        File f = new File(Parser.switchEscapedSpacesToSpacesInWord(line.substring("less ".length())).trim());
+                        if(f.isFile()) {
+                            //less.setPage(f);
+                            less.setFile(f);
+                            less.attach(consoleOutput);
+                        }
+                        else if(f.isDirectory()) {
+                            exampleConsole.pushToStdOut(f.getAbsolutePath()+": is a directory"+
+                                    Config.getLineSeparator());
+                        }
+                        else {
+                            exampleConsole.pushToStdOut(f.getAbsolutePath()+": No such file or directory"+
+                                    Config.getLineSeparator());
+                        }
                     }
                     else {
-                        exampleConsole.pushToStdOut(f.getAbsolutePath()+": No such file or directory"+
-                                Config.getLineSeparator());
+                        exampleConsole.pushToStdOut("Missing filename (\"less --help\" for help)\n");
                     }
                 }
-                else {
-                    exampleConsole.pushToStdOut("Missing filename (\"less --help\" for help)\n");
-                }
-            }
 
-            if(line.startsWith("more")) {
-                if(consoleOutput.getStdOut() != null &&
-                        consoleOutput.getStdOut().length() > 0) {
-                    more.setInput(consoleOutput.getStdOut());
-                    more.attach(consoleOutput);
-
-                }
-                else {
-                    File f = new File(Parser.switchEscapedSpacesToSpacesInWord(line.substring("more ".length())).trim());
-                    if(f.isFile()) {
-                        more.setFile(f);
+                if(line.startsWith("more")) {
+                    if(consoleOutput.getStdOut() != null &&
+                            consoleOutput.getStdOut().length() > 0) {
+                        more.setInput(consoleOutput.getStdOut());
                         more.attach(consoleOutput);
-                    }
-                    else if(f.isDirectory()) {
-                        exampleConsole.pushToStdOut(f.getAbsolutePath()+": is a directory"+
-                                Config.getLineSeparator());
+
                     }
                     else {
-                        exampleConsole.pushToStdOut(f.getAbsolutePath()+": No such file or directory"+
-                                Config.getLineSeparator());
+                        File f = new File(Parser.switchEscapedSpacesToSpacesInWord(line.substring("more ".length())).trim());
+                        if(f.isFile()) {
+                            more.setFile(f);
+                            more.attach(consoleOutput);
+                        }
+                        else if(f.isDirectory()) {
+                            exampleConsole.pushToStdOut(f.getAbsolutePath()+": is a directory"+
+                                    Config.getLineSeparator());
+                        }
+                        else {
+                            exampleConsole.pushToStdOut(f.getAbsolutePath()+": No such file or directory"+
+                                    Config.getLineSeparator());
+                        }
                     }
                 }
+                return 0;
             }
-        }
+        });
 
-        try {
-            exampleConsole.stop();
-        } catch (Exception e) {
-        }
+        exampleConsole.start();
     }
 }

@@ -11,6 +11,9 @@ import org.jboss.aesh.extensions.manual.ManPage;
 import org.jboss.aesh.extensions.page.PageLoader;
 
 import java.io.*;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -62,6 +65,23 @@ public class ManPageLoader implements PageLoader {
         }
     }
 
+    public void setUrlFile(URL url) throws IOException {
+        setFile(URLDecoder.decode(url.getFile(), Charset.defaultCharset().displayName()));
+    }
+
+    public void setFile(InputStream input, String fileName) throws IOException {
+        if(input != null && fileName != null) {
+            if(fileName.endsWith("gz")) {
+                GZIPInputStream gzip = new GZIPInputStream(input);
+                reader = new InputStreamReader(gzip);
+            }
+            else
+                reader = new InputStreamReader(input);
+
+            this.fileName = fileName;
+        }
+    }
+
     /**
      * Read a file resouce located in a jar
      *
@@ -105,6 +125,7 @@ public class ManPageLoader implements PageLoader {
         BufferedReader br = new BufferedReader(reader);
         try {
             String line = br.readLine();
+            boolean foundHeader = false;
             boolean foundEmptyLine = true;
             List<String> section = new ArrayList<String>();
             while (line != null) {
@@ -112,12 +133,20 @@ public class ManPageLoader implements PageLoader {
                     foundEmptyLine = true;
                     section.add(line);
                 }
+                //found two empty lines create a new section
                 else if(line.isEmpty() && foundEmptyLine) {
-                    ManSection manSection = new ManSection().parseSection(section, columns);
-                    sections.add(manSection);
+                    if(!foundHeader) {
+                        processHeader(section, columns);
+                        foundHeader = true;
+                    }
+                    else {
+                        ManSection manSection = new ManSection().parseSection(section, columns);
+                        sections.add(manSection);
+                    }
                     foundEmptyLine = false;
                     section.clear();
                 }
+                //add line to section
                 else {
                     if(foundEmptyLine)
                         foundEmptyLine = false;
@@ -131,8 +160,6 @@ public class ManPageLoader implements PageLoader {
                 sections.add(manSection);
             }
 
-            processHeader(columns);
-
             return getAsList();
         }
         finally {
@@ -140,10 +167,12 @@ public class ManPageLoader implements PageLoader {
         }
     }
 
-    //TODO: create a better header
-    private void processHeader(int columns) {
-        name = sections.get(0).getName();
-        sections.remove(0);
+    private void processHeader(List<String> header, int columns) throws IOException {
+        if(header.size() != 4)
+            throw new IOException("File did not include the correct header.");
+        name = header.get(0);
+        if(!header.get(2).equals(":doctype: manpage"))
+            throw new IOException("File did not include the correct header: \":doctype: manpage\"");
     }
 
     public List<ManSection> getSections() {

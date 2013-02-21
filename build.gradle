@@ -5,7 +5,7 @@ apply plugin: 'maven'
 
 sourceCompatibility = 1.6
 group = 'org.jboss.aesh'
-version = '0.32'
+version = '0.33'
 
 jar {
     manifest {
