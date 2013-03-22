@@ -15,6 +15,7 @@ import org.jboss.aesh.console.Prompt;
 import org.jboss.aesh.console.settings.Settings;
 import org.jboss.aesh.extensions.choice.MultipleChoice;
 import org.jboss.aesh.extensions.choice.MultipleChoiceCommand;
+import org.jboss.aesh.extensions.harlem.Harlem;
 import org.jboss.aesh.extensions.less.Less;
 import org.jboss.aesh.extensions.manual.Man;
 import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
@@ -47,6 +48,8 @@ public class ExampleExtension {
 
         final Man man = new Man(exampleConsole);
         //man.addPage(new File("/tmp/README.md"), "test");
+
+        final Harlem harlem = new Harlem(exampleConsole);
 
         final Less less = new Less(exampleConsole);
         final More more = new More(exampleConsole);
@@ -105,6 +108,7 @@ public class ExampleExtension {
         exampleConsole.addCompletion(man);
         exampleConsole.addCompletion(less);
         exampleConsole.addCompletion(more);
+        exampleConsole.addCompletion(harlem);
 
         exampleConsole.setPrompt(new Prompt("[test@foo]~> "));
         //exampleConsole.pushToConsole(ANSI.greenText());
@@ -135,6 +139,9 @@ public class ExampleExtension {
                 }
                 if(line.startsWith("choice")) {
                     choice.attach(consoleOutput);
+                }
+                if(line.startsWith("harlem")) {
+                    harlem.attach(consoleOutput);
                 }
                 if(line.trim().startsWith("less")) {
                     //is it getting input from pipe
