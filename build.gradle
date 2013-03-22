@@ -2,10 +2,12 @@
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
+apply plugin: 'application'
 
 sourceCompatibility = 1.6
 group = 'org.jboss.aesh'
 version = '0.36'
+mainClassName = "ExampleExtension"
 
 jar {
     manifest {
