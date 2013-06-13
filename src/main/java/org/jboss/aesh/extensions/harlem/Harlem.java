@@ -77,10 +77,10 @@ public class Harlem extends ConsoleCommand implements Completion {
     }
 
     private void displayIntro() throws IOException {
-        console.pushToStdOut(ANSI.getStart()+"1;1H");
+        console.pushToStdOut(ANSI.getStart() + "1;1H");
         TerminalCharacter startChar = new TerminalCharacter('|', NORMAL);
-        for(int i=0; i < terminalCharacters.length; i++) {
-            for(int j=0; j < terminalCharacters[i].length;j++) {
+        for (int i = 0; i < terminalCharacters.length; i++) {
+            for (int j = 0; j < terminalCharacters[i].length; j++) {
                 terminalCharacters[i][j] = startChar;
             }
         }
@@ -187,8 +187,7 @@ public class Harlem extends ConsoleCommand implements Completion {
     }
 
     private void playHarlem() {
-        try
-        {
+        try {
             if(!harlemWav.isFile() && allowDownload)
                 saveHarlem(harlemWav);
             Clip clip = AudioSystem.getClip();
@@ -200,30 +199,25 @@ public class Harlem extends ConsoleCommand implements Completion {
             }
             clip.start();
         }
-        catch (Exception exc)
-        {
+        catch (Exception exc) {
             exc.printStackTrace(System.out);
         }
     }
 
-    private void saveHarlem(File harlemWav) throws IOException
-    {
+    private void saveHarlem(File harlemWav) throws IOException {
         BufferedInputStream in = null;
         FileOutputStream fout = null;
-        try
-        {
+        try {
             in = new BufferedInputStream(new URL("https://dl.dropbox.com/u/30971563/harlem.wav").openStream());
             fout = new FileOutputStream(harlemWav);
 
             byte data[] = new byte[1024];
             int count;
-            while ((count = in.read(data, 0, 1024)) != -1)
-            {
+            while ((count = in.read(data, 0, 1024)) != -1) {
                 fout.write(data, 0, count);
             }
         }
-        finally
-        {
+        finally {
             if (in != null)
                 in.close();
             if (fout != null)
