@@ -13,6 +13,7 @@ import org.jboss.aesh.console.ConsoleCallback;
 import org.jboss.aesh.console.ConsoleOutput;
 import org.jboss.aesh.console.Prompt;
 import org.jboss.aesh.console.settings.Settings;
+import org.jboss.aesh.console.settings.SettingsBuilder;
 import org.jboss.aesh.extensions.choice.MultipleChoice;
 import org.jboss.aesh.extensions.choice.MultipleChoiceCommand;
 import org.jboss.aesh.extensions.harlem.Harlem;
@@ -37,12 +38,10 @@ public class ExampleExtension {
     public static void main(String[] args) throws IOException {
 
         //Settings.getInstance().setAnsiConsole(false);
-        Settings.getInstance().setReadInputrc(false);
-       //Settings.getInstance().setHistoryDisabled(true);
-        //Settings.getInstance().setHistoryPersistent(false);
-        Settings.getInstance().setLogFile("aesh_example.log");
-        Settings.getInstance().setLogging(true);
-        final Console exampleConsole = Console.getInstance();
+        SettingsBuilder settingsBuilder = new SettingsBuilder();
+        settingsBuilder.readInputrc(false);
+        settingsBuilder.logging(true);
+        final Console exampleConsole = new Console(settingsBuilder.create());
 
         PrintWriter out = new PrintWriter(System.out);
 
@@ -118,7 +117,7 @@ public class ExampleExtension {
             public int readConsoleOutput(ConsoleOutput consoleOutput) throws IOException {
 
                 String line = consoleOutput.getBuffer();
-                exampleConsole.pushToStdOut("======>\"" + line + "\"\n");
+                exampleConsole.out().print("======>\"" + line + "\"\n");
 
                 if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit") ||
                         line.equalsIgnoreCase("reset")) {
@@ -134,7 +133,7 @@ public class ExampleExtension {
                     man.attach(consoleOutput);
                     }
                     catch (IllegalArgumentException iae) {
-                        exampleConsole.pushToStdOut(iae.getMessage());
+                        exampleConsole.out().print(iae.getMessage());
                     }
                 }
                 if(line.startsWith("choice")) {
@@ -159,16 +158,16 @@ public class ExampleExtension {
                             less.attach(consoleOutput);
                         }
                         else if(f.isDirectory()) {
-                            exampleConsole.pushToStdOut(f.getAbsolutePath()+": is a directory"+
+                            exampleConsole.out().print(f.getAbsolutePath()+": is a directory"+
                                     Config.getLineSeparator());
                         }
                         else {
-                            exampleConsole.pushToStdOut(f.getAbsolutePath()+": No such file or directory"+
+                            exampleConsole.out().print(f.getAbsolutePath()+": No such file or directory"+
                                     Config.getLineSeparator());
                         }
                     }
                     else {
-                        exampleConsole.pushToStdOut("Missing filename (\"less --help\" for help)\n");
+                        exampleConsole.out().print("Missing filename (\"less --help\" for help)\n");
                     }
                 }
 
@@ -186,11 +185,11 @@ public class ExampleExtension {
                             more.attach(consoleOutput);
                         }
                         else if(f.isDirectory()) {
-                            exampleConsole.pushToStdOut(f.getAbsolutePath()+": is a directory"+
+                            exampleConsole.out().print(f.getAbsolutePath()+": is a directory"+
                                     Config.getLineSeparator());
                         }
                         else {
-                            exampleConsole.pushToStdOut(f.getAbsolutePath()+": No such file or directory"+
+                            exampleConsole.out().print(f.getAbsolutePath()+": No such file or directory"+
                                     Config.getLineSeparator());
                         }
                     }

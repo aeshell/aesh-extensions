@@ -7,9 +7,11 @@ import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.ConsoleCommand;
 import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.util.ANSI;
+import org.jboss.aesh.util.LoggerUtil;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -19,6 +21,8 @@ public class MultipleChoiceCommand extends ConsoleCommand implements Completion 
     private List<MultipleChoice> choices;
     private String commandName;
     private int rows;
+
+    private Logger logger = LoggerUtil.getLogger(MultipleChoiceCommand.class.getName());
 
     public MultipleChoiceCommand(Console console) {
         super(console);
@@ -44,7 +48,8 @@ public class MultipleChoiceCommand extends ConsoleCommand implements Completion 
     protected void afterAttach() throws IOException {
         rows = console.getTerminalSize().getHeight();
 
-        console.pushToStdOut(ANSI.getAlternateBufferScreen());
+        console.out().write(ANSI.getAlternateBufferScreen());
+        logger.info("printed out alternateBufferScreen");
         displayChoices();
     }
 
@@ -53,30 +58,30 @@ public class MultipleChoiceCommand extends ConsoleCommand implements Completion 
         //move cursor to the correct place
         //hack for now, wait for better api
         for(int i=0; i < rows-choices.size()-1; i++)
-            console.pushToStdOut(Config.getLineSeparator());
+            console.out().print(Config.getLineSeparator());
 
         for(MultipleChoice mc : choices) {
             if(mc.isChosen())
-                console.pushToStdOut(mc.getId()+") "+mc.getDisplayString()+" [X]"+
+                console.out().print(mc.getId() + ") " + mc.getDisplayString() + " [X]" +
                         Config.getLineSeparator());
             else
-                console.pushToStdOut(mc.getId()+") "+mc.getDisplayString()+" [ ]"+
+                console.out().print(mc.getId() + ") " + mc.getDisplayString() + " [ ]" +
                         Config.getLineSeparator());
         }
-        console.pushToStdOut("Choose options: 1-"+choices.size()+": ");
-
+        console.out().print("Choose options: 1-" + choices.size() + ": ");
+        console.out().flush();
     }
 
     @Override
     protected void afterDetach() throws IOException {
-        console.pushToStdOut(ANSI.getMainBufferScreen());
+        console.out().print(ANSI.getMainBufferScreen());
     }
 
     @Override
     public void processOperation(Operation operation) throws IOException {
         if(Character.isDigit(operation.getInput()[0])) {
             int c = Character.getNumericValue(operation.getInput()[0]);
-            //console.pushToStdOut("got "+c+"\n");
+            console.out().print("got "+c+"\n");
             updateChoices(c);
             displayChoices();
         }

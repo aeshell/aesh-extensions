@@ -63,10 +63,10 @@ public class More extends ConsoleCommand implements Completion {
         if(ControlOperator.isRedirectionOut(getConsoleOutput().getControlOperator())) {
             int count=0;
             for(String line : this.page.getLines()) {
-                console.pushToStdOut(line);
+                console.out().print(line);
                 count++;
                 if(count < this.page.size())
-                    console.pushToStdOut(Config.getLineSeparator());
+                    console.out().print(Config.getLineSeparator());
             }
 
             detach();
@@ -85,8 +85,9 @@ public class More extends ConsoleCommand implements Completion {
         clearNumber();
         topVisibleRow = prevTopVisibleRow = 0;
         if(!ControlOperator.isRedirectionOut(getConsoleOutput().getControlOperator())) {
-            console.pushToStdOut(Buffer.printAnsi("K"));
-            console.pushToStdOut(Buffer.printAnsi("1G"));
+            console.out().print(Buffer.printAnsi("K"));
+            console.out().print(Buffer.printAnsi("1G"));
+            console.out().flush();
         }
         page.clear();
     }
@@ -137,21 +138,21 @@ public class More extends ConsoleCommand implements Completion {
 
     private void display(Background background) throws IOException {
         //console.clear();
-        console.pushToStdOut(Buffer.printAnsi("0G"));
-        console.pushToStdOut(Buffer.printAnsi("2K"));
+        console.out().print(Buffer.printAnsi("0G"));
+        console.out().print(Buffer.printAnsi("2K"));
         if(prevTopVisibleRow == 0 && topVisibleRow == 0) {
             for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
                 if(i < page.size()) {
-                    console.pushToStdOut(page.getLine(i));
-                    console.pushToStdOut(Config.getLineSeparator());
+                    console.out().print(page.getLine(i));
+                    console.out().print(Config.getLineSeparator());
                 }
             }
         }
         else if(prevTopVisibleRow < topVisibleRow) {
 
             for(int i=prevTopVisibleRow; i < topVisibleRow; i++) {
-                console.pushToStdOut(page.getLine(i + rows));
-                console.pushToStdOut(Config.getLineSeparator());
+                console.out().print(page.getLine(i + rows));
+                console.out().print(Config.getLineSeparator());
 
             }
             prevTopVisibleRow = topVisibleRow;
@@ -160,8 +161,8 @@ public class More extends ConsoleCommand implements Completion {
         else if(prevTopVisibleRow > topVisibleRow) {
             for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
                 if(i < page.size()) {
-                    console.pushToStdOut(page.getLine(i));
-                    console.pushToStdOut(Config.getLineSeparator());
+                    console.out().print(page.getLine(i));
+                    console.out().print(Config.getLineSeparator());
                 }
             }
             prevTopVisibleRow = topVisibleRow;
@@ -171,12 +172,12 @@ public class More extends ConsoleCommand implements Completion {
 
     private void displayBottom(Background background) throws IOException {
         if(background == Background.INVERSE) {
-            console.pushToStdOut(ANSI.getInvertedBackground());
-            console.pushToStdOut("--More--(");
-            console.pushToStdOut(getPercentDisplayed()+"%)");
+            console.out().print(ANSI.getInvertedBackground());
+            console.out().print("--More--(");
+            console.out().print(getPercentDisplayed()+"%)");
 
-            console.pushToStdOut(ANSI.getNormalBackground());
-            //console.pushToStdOut(ANSI.getBold());
+            console.out().print(ANSI.getNormalBackground());
+            console.out().flush();
         }
     }
 
@@ -209,9 +210,8 @@ public class More extends ConsoleCommand implements Completion {
     }
 
     public void displayHelp() throws IOException {
-        console.pushToStdOut(Config.getLineSeparator()
-                +"Usage: more [options] file..."
-                +Config.getLineSeparator());
+        console.out().println(Config.getLineSeparator()
+                +"Usage: more [options] file...");
     }
 
     private int getNumber() {
