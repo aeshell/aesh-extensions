@@ -7,7 +7,7 @@
 package org.jboss.aesh.extensions.manual.parser;
 
 import org.jboss.aesh.console.Config;
-import org.jboss.aesh.util.Parser;
+import org.jboss.aesh.parser.Parser;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,7 +6,7 @@ apply plugin: 'application'
 
 sourceCompatibility = 1.6
 group = 'org.jboss.aesh'
-version = '0.40'
+version = '0.41-SNAPSHOT'
 mainClassName = "ExampleExtension"
 
 jar {
@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.jboss.aesh', name: 'aesh', version: '0.40'
+    compile group: 'org.jboss.aesh', name: 'aesh', version: '0.41-SNAPSHOT'
     testCompile group: 'junit', name: 'junit', version: '4.+'
 }
 

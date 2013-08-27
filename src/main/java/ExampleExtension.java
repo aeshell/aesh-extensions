@@ -7,22 +7,15 @@
 
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.complete.Completion;
-import org.jboss.aesh.console.Config;
-import org.jboss.aesh.console.Console;
-import org.jboss.aesh.console.ConsoleCallback;
-import org.jboss.aesh.console.ConsoleOutput;
-import org.jboss.aesh.console.Prompt;
-import org.jboss.aesh.console.settings.Settings;
+import org.jboss.aesh.console.*;
 import org.jboss.aesh.console.settings.SettingsBuilder;
 import org.jboss.aesh.extensions.choice.MultipleChoice;
 import org.jboss.aesh.extensions.choice.MultipleChoiceCommand;
 import org.jboss.aesh.extensions.harlem.Harlem;
 import org.jboss.aesh.extensions.less.Less;
 import org.jboss.aesh.extensions.manual.Man;
-import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
 import org.jboss.aesh.extensions.more.More;
-import org.jboss.aesh.extensions.page.SimplePageLoader;
-import org.jboss.aesh.util.Parser;
+import org.jboss.aesh.parser.Parser;
 
 import java.io.File;
 import java.io.IOException;
@@ -114,7 +107,7 @@ public class ExampleExtension {
         //while ((consoleOutput = exampleConsole.read("[test@foo.bar]~> ")) != null) {
         exampleConsole.setConsoleCallback(new ConsoleCallback() {
             @Override
-            public int readConsoleOutput(ConsoleOutput consoleOutput) throws IOException {
+            public int readConsoleOutput(ConsoleOperation consoleOutput) throws IOException {
 
                 String line = consoleOutput.getBuffer();
                 exampleConsole.out().print("======>\"" + line + "\"\n");
@@ -144,9 +137,10 @@ public class ExampleExtension {
                 }
                 if(line.trim().startsWith("less")) {
                     //is it getting input from pipe
-                    if(consoleOutput.getStdOut() != null &&
-                            consoleOutput.getStdOut().length() > 0) {
-                        less.setInput(consoleOutput.getStdOut());
+                    if(exampleConsole.in().getStdIn().available() > 0) {
+                        java.util.Scanner s = new java.util.Scanner(exampleConsole.in().getStdIn()).useDelimiter("\\A");
+                        String fileContent = s.hasNext() ? s.next() : "";
+                        less.setInput(fileContent);
                         less.attach(consoleOutput);
 
                     }
@@ -172,9 +166,10 @@ public class ExampleExtension {
                 }
 
                 if(line.startsWith("more")) {
-                    if(consoleOutput.getStdOut() != null &&
-                            consoleOutput.getStdOut().length() > 0) {
-                        more.setInput(consoleOutput.getStdOut());
+                    if(exampleConsole.in().getStdIn().available() > 0) {
+                        java.util.Scanner s = new java.util.Scanner(exampleConsole.in().getStdIn()).useDelimiter("\\A");
+                        String fileContent = s.hasNext() ? s.next() : "";
+                        more.setInput(fileContent);
                         more.attach(consoleOutput);
 
                     }

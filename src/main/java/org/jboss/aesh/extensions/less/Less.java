@@ -14,7 +14,7 @@ import org.jboss.aesh.extensions.page.PageLoader;
 import org.jboss.aesh.extensions.page.SimplePageLoader;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.FileLister;
-import org.jboss.aesh.util.Parser;
+import org.jboss.aesh.parser.Parser;
 
 import java.io.File;
 import java.io.IOException;

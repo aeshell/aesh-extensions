@@ -19,7 +19,7 @@ import org.jboss.aesh.extensions.page.PageLoader;
 import org.jboss.aesh.extensions.page.SimplePageLoader;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.FileLister;
-import org.jboss.aesh.util.Parser;
+import org.jboss.aesh.parser.Parser;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class More extends ConsoleCommand implements Completion {
         int columns = console.getTerminalSize().getWidth();
         page = new MorePage(loader, columns);
 
-        if(ControlOperator.isRedirectionOut(getConsoleOutput().getControlOperator())) {
+        if(ControlOperator.isRedirectionOut(getConsoleOperation().getControlOperator())) {
             int count=0;
             for(String line : this.page.getLines()) {
                 console.out().print(line);
@@ -84,7 +84,7 @@ public class More extends ConsoleCommand implements Completion {
     protected void afterDetach() throws IOException {
         clearNumber();
         topVisibleRow = prevTopVisibleRow = 0;
-        if(!ControlOperator.isRedirectionOut(getConsoleOutput().getControlOperator())) {
+        if(!ControlOperator.isRedirectionOut(getConsoleOperation().getControlOperator())) {
             console.out().print(Buffer.printAnsi("K"));
             console.out().print(Buffer.printAnsi("1G"));
             console.out().flush();
