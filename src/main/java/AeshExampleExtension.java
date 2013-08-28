@@ -13,6 +13,7 @@ import org.jboss.aesh.console.CommandResult;
 import org.jboss.aesh.console.Prompt;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.console.settings.SettingsBuilder;
+import org.jboss.aesh.extensions.groovy.GroovyCommand;
 import org.jboss.aesh.extensions.harlem.AeshHarlem;
 import org.jboss.aesh.extensions.less.AeshLess;
 import org.jboss.aesh.extensions.manual.AeshMan;
@@ -37,6 +38,7 @@ public class AeshExampleExtension {
                 .command(AeshMore.class)
                 .command(AeshMan.class)
                 .command(AeshHarlem.class)
+                .command(GroovyCommand.class)
                 .create();
 
         aeshConsole.start();

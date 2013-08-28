@@ -12,7 +12,6 @@ import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.CommandResult;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.extensions.page.AeshFileDisplayer;
-import org.jboss.aesh.extensions.page.FileDisplayer;
 import org.jboss.aesh.extensions.page.Page.Search;
 import org.jboss.aesh.extensions.page.PageLoader;
 import org.jboss.aesh.extensions.page.SimplePageLoader;
