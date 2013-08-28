@@ -6,11 +6,13 @@
  */
 package org.jboss.aesh.extensions.more;
 
-import org.jboss.aesh.complete.CompleteOperation;
-import org.jboss.aesh.complete.Completion;
+import org.jboss.aesh.cl.Arguments;
+import org.jboss.aesh.cl.CommandDefinition;
+import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.Buffer;
+import org.jboss.aesh.console.Command;
+import org.jboss.aesh.console.CommandResult;
 import org.jboss.aesh.console.Config;
-import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.ConsoleCommand;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
@@ -18,16 +20,16 @@ import org.jboss.aesh.extensions.page.Page;
 import org.jboss.aesh.extensions.page.PageLoader;
 import org.jboss.aesh.extensions.page.SimplePageLoader;
 import org.jboss.aesh.util.ANSI;
-import org.jboss.aesh.util.FileLister;
-import org.jboss.aesh.parser.Parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class More implements ConsoleCommand, Completion {
+@CommandDefinition(name="more", description = "is more less?")
+public class AeshMore implements ConsoleCommand, Command {
 
     private int rows;
     private int topVisibleRow;
@@ -35,12 +37,15 @@ public class More implements ConsoleCommand, Completion {
     private StringBuilder number;
     private MorePage page;
     private SimplePageLoader loader;
-    private Console console;
-    private ControlOperator controlOperator;
+    private AeshConsole console;
+    private ControlOperator operator;
     private boolean attached = true;
 
-    public More(Console console) {
-        this.console = console;
+    @Arguments
+    private List<File> arguments;
+
+    public AeshMore() {
+        number = new StringBuilder();
     }
 
     public void setFile(File page) throws IOException {
@@ -55,18 +60,12 @@ public class More implements ConsoleCommand, Completion {
         loader.readPageAsString(input);
     }
 
-    public void setControlOperator(ControlOperator controlOperator) {
-        this.controlOperator = controlOperator;
-    }
-
-    public void afterAttach() throws IOException {
-        loader = new SimplePageLoader();
-        number = new StringBuilder();
+    protected void afterAttach() throws IOException {
         rows = console.getTerminalSize().getHeight();
         int columns = console.getTerminalSize().getWidth();
         page = new MorePage(loader, columns);
 
-        if(ControlOperator.isRedirectionOut(controlOperator)) {
+        if(ControlOperator.isRedirectionOut(operator)) {
             int count=0;
             for(String line : this.page.getLines()) {
                 console.out().print(line);
@@ -89,18 +88,14 @@ public class More implements ConsoleCommand, Completion {
     protected void afterDetach() throws IOException {
         clearNumber();
         topVisibleRow = prevTopVisibleRow = 0;
-        if(!ControlOperator.isRedirectionOut(controlOperator)) {
+        if(!ControlOperator.isRedirectionOut(operator)) {
             console.out().print(Buffer.printAnsi("K"));
             console.out().print(Buffer.printAnsi("1G"));
             console.out().flush();
         }
         page.clear();
+        loader = new SimplePageLoader();
         attached = false;
-    }
-
-    @Override
-    public boolean isAttached() {
-        return attached;
     }
 
     @Override
@@ -145,6 +140,11 @@ public class More implements ConsoleCommand, Completion {
         else if(Character.isDigit(operation.getInput()[0])) {
             number.append(Character.getNumericValue(operation.getInput()[0]));
         }
+    }
+
+    @Override
+    public boolean isAttached() {
+        return attached;
     }
 
     private void display(Background background) throws IOException {
@@ -199,29 +199,6 @@ public class More implements ConsoleCommand, Completion {
         return String.valueOf((int) ((row / this.page.size()) * 100));
     }
 
-    @Override
-    public void complete(CompleteOperation completeOperation) {
-        if(completeOperation.getBuffer().equals(""))
-            completeOperation.getCompletionCandidates().add("more");
-        else if(completeOperation.getBuffer().equals("m"))
-            completeOperation.getCompletionCandidates().add("more");
-        else if(completeOperation.getBuffer().equals("mo"))
-            completeOperation.getCompletionCandidates().add("more");
-        else if(completeOperation.getBuffer().equals("mor"))
-            completeOperation.getCompletionCandidates().add("more");
-        else if(completeOperation.getBuffer().equals("more"))
-            completeOperation.getCompletionCandidates().add("more");
-        else if(completeOperation.getBuffer().startsWith("more ")) {
-
-            String word = Parser.findWordClosestToCursor(completeOperation.getBuffer(),
-                    completeOperation.getCursor());
-            completeOperation.setOffset(completeOperation.getCursor());
-            //FileUtils.listMatchingDirectories(completeOperation, word,
-            //        new File(System.getProperty("user.dir")));
-            new FileLister(word, new File(System.getProperty("user.dir"))).findMatchingDirectories(completeOperation);
-        }
-    }
-
     public void displayHelp() throws IOException {
         console.out().println(Config.getLineSeparator()
                 +"Usage: more [options] file...");
@@ -236,6 +213,37 @@ public class More implements ConsoleCommand, Completion {
 
     private void clearNumber() {
         number = new StringBuilder();
+    }
+
+    @Override
+    public CommandResult execute(AeshConsole aeshConsole, ControlOperator operator) throws IOException {
+        this.console = aeshConsole;
+        this.operator = operator;
+        loader = new SimplePageLoader();
+
+        if(aeshConsole.in().getStdIn().available() > 0) {
+            java.util.Scanner s = new java.util.Scanner(aeshConsole.in().getStdIn()).useDelimiter("\\A");
+            String fileContent = s.hasNext() ? s.next() : "";
+            setInput(fileContent);
+            console.attachConsoleCommand(this);
+            afterAttach();
+        }
+        else if(arguments != null && arguments.size() > 0) {
+            File f = arguments.get(0);
+            if(f.isFile()) {
+                setFile(f);
+                console.attachConsoleCommand(this);
+                afterAttach();
+            }
+            else if(f.isDirectory()) {
+                aeshConsole.err().println(f.getAbsolutePath()+": is a directory");
+            }
+            else {
+                aeshConsole.err().println(f.getAbsolutePath() + ": No such file or directory");
+            }
+        }
+
+        return CommandResult.SUCCESS;
     }
 
     private static enum Background {

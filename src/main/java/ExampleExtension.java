@@ -122,18 +122,22 @@ public class ExampleExtension {
                     //exampleConsole.attachProcess(test);
                     //man.setCurrentManPage("test");
                     try {
-                    man.setFile("/tmp/test.txt.gz");
-                    man.attach(consoleOutput);
+                        man.setFile("/tmp/test.txt.gz");
+                        man.setConsole(exampleConsole);
+                        man.setControlOperator(consoleOutput.getControlOperator());
+                        exampleConsole.attachProcess(man);
                     }
                     catch (IllegalArgumentException iae) {
                         exampleConsole.out().print(iae.getMessage());
                     }
                 }
                 if(line.startsWith("choice")) {
-                    choice.attach(consoleOutput);
+
+                    exampleConsole.attachProcess(choice);
                 }
                 if(line.startsWith("harlem")) {
-                    harlem.attach(consoleOutput);
+                    exampleConsole.attachProcess(harlem);
+                    harlem.afterAttach();
                 }
                 if(line.trim().startsWith("less")) {
                     //is it getting input from pipe
@@ -141,7 +145,9 @@ public class ExampleExtension {
                         java.util.Scanner s = new java.util.Scanner(exampleConsole.in().getStdIn()).useDelimiter("\\A");
                         String fileContent = s.hasNext() ? s.next() : "";
                         less.setInput(fileContent);
-                        less.attach(consoleOutput);
+                        less.setControlOperator(consoleOutput.getControlOperator());
+                        exampleConsole.attachProcess(less);
+                        less.afterAttach();
 
                     }
                     else if(line.length() > "less".length()) {
@@ -149,7 +155,9 @@ public class ExampleExtension {
                         if(f.isFile()) {
                             //less.setPage(f);
                             less.setFile(f);
-                            less.attach(consoleOutput);
+                            less.setControlOperator(consoleOutput.getControlOperator());
+                            exampleConsole.attachProcess(less);
+                            less.afterAttach();
                         }
                         else if(f.isDirectory()) {
                             exampleConsole.out().print(f.getAbsolutePath()+": is a directory"+
@@ -170,14 +178,19 @@ public class ExampleExtension {
                         java.util.Scanner s = new java.util.Scanner(exampleConsole.in().getStdIn()).useDelimiter("\\A");
                         String fileContent = s.hasNext() ? s.next() : "";
                         more.setInput(fileContent);
-                        more.attach(consoleOutput);
+                        more.setControlOperator(consoleOutput.getControlOperator());
+                        exampleConsole.attachProcess(more);
+                        more.afterAttach();
 
                     }
                     else {
                         File f = new File(Parser.switchEscapedSpacesToSpacesInWord(line.substring("more ".length())).trim());
                         if(f.isFile()) {
                             more.setFile(f);
-                            more.attach(consoleOutput);
+                            more.setControlOperator(consoleOutput.getControlOperator());
+                            exampleConsole.attachProcess(more);
+                            more.afterAttach();
+
                         }
                         else if(f.isDirectory()) {
                             exampleConsole.out().print(f.getAbsolutePath()+": is a directory"+

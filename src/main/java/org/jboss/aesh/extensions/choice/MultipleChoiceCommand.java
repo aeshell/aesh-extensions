@@ -16,21 +16,23 @@ import java.util.logging.Logger;
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class MultipleChoiceCommand extends ConsoleCommand implements Completion {
+public class MultipleChoiceCommand implements ConsoleCommand, Completion {
 
     private List<MultipleChoice> choices;
     private String commandName;
     private int rows;
+    private Console console;
+    private boolean attached = true;
 
     private Logger logger = LoggerUtil.getLogger(MultipleChoiceCommand.class.getName());
 
     public MultipleChoiceCommand(Console console) {
-        super(console);
+        this.console = console;
     }
 
     public MultipleChoiceCommand(Console console, String commandName,
                                  List<MultipleChoice> choices) {
-        super(console);
+        this.console = console;
         this.commandName = commandName;
         this.choices = choices;
     }
@@ -45,6 +47,10 @@ public class MultipleChoiceCommand extends ConsoleCommand implements Completion 
     }
 
     @Override
+    public boolean isAttached() {
+        return attached;
+    }
+
     protected void afterAttach() throws IOException {
         rows = console.getTerminalSize().getHeight();
 
@@ -72,9 +78,9 @@ public class MultipleChoiceCommand extends ConsoleCommand implements Completion 
         console.out().flush();
     }
 
-    @Override
     protected void afterDetach() throws IOException {
         console.out().print(ANSI.getMainBufferScreen());
+        attached = false;
     }
 
     @Override
@@ -86,7 +92,7 @@ public class MultipleChoiceCommand extends ConsoleCommand implements Completion 
             displayChoices();
         }
         else if(operation.getInput()[0] == 'q') {
-            detach();
+            afterDetach();
         }
 
     }

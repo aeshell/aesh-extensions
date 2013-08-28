@@ -6,11 +6,16 @@
  */
 package org.jboss.aesh.extensions.harlem;
 
+import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.complete.Completion;
+import org.jboss.aesh.console.AeshConsole;
+import org.jboss.aesh.console.Command;
+import org.jboss.aesh.console.CommandResult;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.ConsoleCommand;
+import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.terminal.Color;
 import org.jboss.aesh.terminal.TerminalCharacter;
@@ -30,7 +35,8 @@ import static org.jboss.aesh.terminal.CharacterType.NORMAL;
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class Harlem implements ConsoleCommand, Completion {
+@CommandDefinition(name="harlem", description = "wanna do the harlem..?")
+public class AeshHarlem implements ConsoleCommand, Command {
 
     private int rows;
     private int columns;
@@ -40,11 +46,10 @@ public class Harlem implements ConsoleCommand, Completion {
     private TerminalCharacter[][] terminalCharacters;
     private boolean allowDownload = false;
     private File harlemWav = new File(Config.getTmpDir()+Config.getPathSeparator()+"harlem.wav");
-    private Console console;
+    private AeshConsole console;
     private boolean attached = true;
 
-    public Harlem(Console console) {
-        this.console = console;
+    public AeshHarlem() {
         random = new Random();
     }
 
@@ -191,13 +196,6 @@ public class Harlem implements ConsoleCommand, Completion {
         afterDetach();
     }
 
-    @Override
-    public void complete(CompleteOperation completeOperation) {
-        if("harlem".startsWith(completeOperation.getBuffer()))
-            completeOperation.addCompletionCandidate("harlem");
-
-    }
-
     private void playHarlem() {
         try {
             if(!harlemWav.isFile() && allowDownload)
@@ -237,4 +235,11 @@ public class Harlem implements ConsoleCommand, Completion {
         }
     }
 
+    @Override
+    public CommandResult execute(AeshConsole aeshConsole, ControlOperator operator) throws IOException {
+        this.console = aeshConsole;
+        aeshConsole.attachConsoleCommand(this);
+        afterAttach();
+        return CommandResult.SUCCESS;
+    }
 }

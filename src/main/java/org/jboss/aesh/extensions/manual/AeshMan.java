@@ -7,13 +7,15 @@
 package org.jboss.aesh.extensions.manual;
 
 import org.jboss.aesh.complete.CompleteOperation;
-import org.jboss.aesh.console.Console;
+import org.jboss.aesh.console.AeshConsole;
+import org.jboss.aesh.console.CommandResult;
+import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
+import org.jboss.aesh.extensions.page.AeshFileDisplayer;
 import org.jboss.aesh.extensions.page.FileDisplayer;
 import org.jboss.aesh.extensions.page.PageLoader;
 import org.jboss.aesh.util.ANSI;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -26,13 +28,13 @@ import java.util.List;
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class Man extends FileDisplayer {
+public class AeshMan extends AeshFileDisplayer {
 
     private List<ManPage> manPages = new ArrayList<ManPage>();
     private ManPageLoader loader;
 
-    public Man(Console console) {
-        setConsole(console);
+    public AeshMan() {
+        super();
         manPages = new ArrayList<ManPage>();
         loader = new ManPageLoader();
     }
@@ -50,7 +52,6 @@ public class Man extends FileDisplayer {
         loader.setFile(input, fileName);
     }
 
-    @Override
     public void complete(CompleteOperation completeOperation) {
         if(completeOperation.getBuffer().equals("m"))
             completeOperation.getCompletionCandidates().add("man");
@@ -76,5 +77,13 @@ public class Man extends FileDisplayer {
         writeToConsole(ANSI.getInvertedBackground());
         writeToConsole("Manual page "+loader.getName()+" line "+getTopVisibleRow()+
         " (press h for help or q to quit)"+ANSI.defaultText());
+    }
+
+    @Override
+    public CommandResult execute(AeshConsole aeshConsole, ControlOperator operator) throws IOException {
+        setConsole(aeshConsole);
+        setControlOperator(operator);
+
+        return null;
     }
 }

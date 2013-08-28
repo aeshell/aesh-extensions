@@ -6,10 +6,10 @@
  */
 package org.jboss.aesh.extensions.page;
 
-import org.jboss.aesh.complete.Completion;
+import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.Buffer;
+import org.jboss.aesh.console.Command;
 import org.jboss.aesh.console.Config;
-import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.ConsoleCommand;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public abstract class FileDisplayer  implements ConsoleCommand, Completion {
+public abstract class AeshFileDisplayer implements ConsoleCommand, Command {
 
     private int rows;
     private int columns;
@@ -40,36 +40,36 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
     private StringBuilder searchBuilder;
     private List<Integer> searchLines;
     private Logger logger = LoggerUtil.getLogger(getClass().getName());
-    private Console console;
-    private ControlOperator controlOperator;
+    private AeshConsole console;
+    private ControlOperator operation;
     private boolean attached = true;
 
-    public FileDisplayer() {
-        number = new StringBuilder();
-        searchBuilder = new StringBuilder();
+    public AeshFileDisplayer() {
     }
 
-    public void setConsole(Console console) {
+    protected void setConsole(AeshConsole console) {
         this.console = console;
     }
 
-    public void setControlOperator(ControlOperator controlOperator) {
-        this.controlOperator = controlOperator;
+    protected AeshConsole getConsole() {
+        return console;
     }
 
-    @Override
-    public boolean isAttached() {
-        return attached;
+    protected void setControlOperator(ControlOperator operator) {
+        this.operation = operator;
     }
 
-    public void afterAttach() throws IOException {
+    protected void afterAttach() throws IOException {
+        attached = true;
+        number = new StringBuilder();
+        searchBuilder = new StringBuilder();
         rows = console.getTerminalSize().getHeight();
         columns = console.getTerminalSize().getWidth();
         page = new LessPage(getPageLoader(), columns);
         topVisibleRow = 0;
         topVisibleRowCache = -1;
 
-        if(ControlOperator.isRedirectionOut(controlOperator)) {
+        if(ControlOperator.isRedirectionOut(operation)) {
             int count=0;
             //if(Settings.getInstance().isLogging())
             //    logger.info("REDIRECTION IS OUT");
@@ -84,7 +84,6 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
             afterDetach();
         }
         else {
-
             if(!page.hasData()) {
                 console.out().print("Missing filename (\"less --help\" for help)\n");
                 afterDetach();
@@ -102,12 +101,17 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
     }
 
     protected void afterDetach() throws IOException {
-        if(!ControlOperator.isRedirectionOut(controlOperator))
+        if(!ControlOperator.isRedirectionOut(operation))
             console.out().print(ANSI.getMainBufferScreen());
 
         page.clear();
         topVisibleRow = 0;
         attached = false;
+    }
+
+    @Override
+    public boolean isAttached() {
+        return attached;
     }
 
     @Override
