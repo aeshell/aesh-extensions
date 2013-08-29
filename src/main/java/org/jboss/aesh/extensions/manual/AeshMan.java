@@ -6,6 +6,7 @@
  */
 package org.jboss.aesh.extensions.manual;
 
+import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.CommandResult;
@@ -28,6 +29,7 @@ import java.util.List;
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
+@CommandDefinition(name = "man", description = "manuals")
 public class AeshMan extends AeshFileDisplayer {
 
     private List<ManPage> manPages = new ArrayList<ManPage>();

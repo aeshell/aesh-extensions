@@ -6,6 +6,7 @@ import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.Command;
 import org.jboss.aesh.console.CommandResult;
+import org.jboss.aesh.console.MutableCommandRegistry;
 import org.jboss.aesh.console.operator.ControlOperator;
 
 import java.io.File;
@@ -48,8 +49,11 @@ public class GroovyCommand implements Command {
                     }
                 }
                 if(correctClass) {
-                    aeshConsole.addCommand(groovyClass);
-                    aeshConsole.out().println("Added "+groovyClass.getName()+" to commands");
+                    if(aeshConsole.getCommandRegistry() instanceof MutableCommandRegistry) {
+                        ((MutableCommandRegistry) aeshConsole.getCommandRegistry()).addCommand(groovyClass);
+                        //aeshConsole.addCommand(groovyClass);
+                        aeshConsole.out().println("Added "+groovyClass.getName()+" to commands");
+                    }
                 }
                 else
                     aeshConsole.out().println("Groovy command do not implement Command interface");

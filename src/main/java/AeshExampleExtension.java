@@ -6,9 +6,11 @@
  */
 
 import org.jboss.aesh.cl.CommandDefinition;
+import org.jboss.aesh.console.AeshCommandRegistryBuilder;
 import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.AeshConsoleBuilder;
 import org.jboss.aesh.console.Command;
+import org.jboss.aesh.console.CommandRegistry;
 import org.jboss.aesh.console.CommandResult;
 import org.jboss.aesh.console.Prompt;
 import org.jboss.aesh.console.operator.ControlOperator;
@@ -31,14 +33,19 @@ public class AeshExampleExtension {
         settingsBuilder.readInputrc(false);
         settingsBuilder.logging(true);
 
-        AeshConsole aeshConsole = new AeshConsoleBuilder()
-                .prompt(new Prompt("[aesh@extensions]$ "))
+        CommandRegistry registry = new AeshCommandRegistryBuilder()
                 .command(ExitCommand.class)
                 .command(AeshLess.class)
                 .command(AeshMore.class)
                 .command(AeshMan.class)
                 .command(AeshHarlem.class)
                 .command(GroovyCommand.class)
+                .create();
+
+        AeshConsole aeshConsole = new AeshConsoleBuilder()
+                .commandRegistry(registry)
+                .settings(settingsBuilder.create())
+                .prompt(new Prompt("[aesh@extensions]$ "))
                 .create();
 
         aeshConsole.start();
