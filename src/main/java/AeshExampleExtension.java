@@ -33,14 +33,18 @@ public class AeshExampleExtension {
         settingsBuilder.readInputrc(false);
         settingsBuilder.logging(true);
 
+        AeshMan man = new AeshMan();
+
         CommandRegistry registry = new AeshCommandRegistryBuilder()
                 .command(ExitCommand.class)
                 .command(AeshLess.class)
                 .command(AeshMore.class)
-                .command(AeshMan.class)
+                .command(man)
                 .command(AeshHarlem.class)
                 .command(GroovyCommand.class)
                 .create();
+        //the man command need access to the registry
+        man.setRegistry(registry);
 
         AeshConsole aeshConsole = new AeshConsoleBuilder()
                 .commandRegistry(registry)

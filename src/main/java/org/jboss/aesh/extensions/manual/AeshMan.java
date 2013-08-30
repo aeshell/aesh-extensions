@@ -6,9 +6,17 @@
  */
 package org.jboss.aesh.extensions.manual;
 
+import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
+import org.jboss.aesh.cl.OptionList;
+import org.jboss.aesh.cl.completer.CompleterData;
+import org.jboss.aesh.cl.completer.OptionCompleter;
+import org.jboss.aesh.cl.converter.CLConverter;
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.console.AeshConsole;
+import org.jboss.aesh.console.Command;
+import org.jboss.aesh.console.CommandNotFoundException;
+import org.jboss.aesh.console.CommandRegistry;
 import org.jboss.aesh.console.CommandResult;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
@@ -16,12 +24,14 @@ import org.jboss.aesh.extensions.page.AeshFileDisplayer;
 import org.jboss.aesh.extensions.page.FileDisplayer;
 import org.jboss.aesh.extensions.page.PageLoader;
 import org.jboss.aesh.util.ANSI;
+import org.jboss.aesh.util.LoggerUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * A Man implementation for JReadline. ref: http://en.wikipedia.org/wiki/Man_page
@@ -32,8 +42,10 @@ import java.util.List;
 @CommandDefinition(name = "man", description = "manuals")
 public class AeshMan extends AeshFileDisplayer {
 
-    private List<ManPage> manPages = new ArrayList<ManPage>();
+    @Arguments(converter = ManConverter.class, completer = ManCompleter.class)
+    private List<ManPage> manPages;
     private ManPageLoader loader;
+    private static CommandRegistry registry;
 
     public AeshMan() {
         super();
@@ -41,32 +53,20 @@ public class AeshMan extends AeshFileDisplayer {
         loader = new ManPageLoader();
     }
 
-    public void setFile(String name) throws IOException {
-        loader.setFile(name);
-        //manPages.add(new ManPage(file, name));
+    public void setRegistry(CommandRegistry registry) {
+        this.registry = registry;
     }
 
-    public void setFile(URL url) throws IOException {
+    private void setFile(String name) throws IOException {
+        loader.setFile(name);
+    }
+
+    private void setFile(URL url) throws IOException {
         loader.setUrlFile(url);
     }
 
-    public void setFile(InputStream input, String fileName) throws IOException {
+    private void setFile(InputStream input, String fileName) throws IOException {
         loader.setFile(input, fileName);
-    }
-
-    public void complete(CompleteOperation completeOperation) {
-        if(completeOperation.getBuffer().equals("m"))
-            completeOperation.getCompletionCandidates().add("man");
-        else if(completeOperation.getBuffer().equals("ma"))
-            completeOperation.getCompletionCandidates().add("man");
-        else if(completeOperation.getBuffer().equals("man"))
-            completeOperation.getCompletionCandidates().add("man");
-        else if(completeOperation.getBuffer().equals("man ")) {
-
-            for(ManPage page : manPages) {
-                completeOperation.getCompletionCandidates().add("man "+page.getName());
-            }
-        }
     }
 
     @Override
@@ -85,7 +85,42 @@ public class AeshMan extends AeshFileDisplayer {
     public CommandResult execute(AeshConsole aeshConsole, ControlOperator operator) throws IOException {
         setConsole(aeshConsole);
         setControlOperator(operator);
+        if(manPages != null && manPages.size() > 0) {
+            try {
+                Command manCommand = registry.getCommand(manPages.get(0).getCommand());
+                if(manCommand instanceof ManCommand) {
+                    setFile(((ManCommand) manCommand).getManLocation().toString());
+                    getConsole().attachConsoleCommand(this);
+                    afterAttach();
+                }
+            } catch (CommandNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
 
-        return null;
+        return CommandResult.SUCCESS;
+    }
+
+    public static class ManCompleter implements OptionCompleter {
+        @Override
+        public CompleterData complete(String completeValue) {
+            List<String> completeValues = new ArrayList<>();
+            if(registry != null && registry.asMap() != null) {
+                for(String command : registry.asMap().keySet()) {
+                    if(command.startsWith(completeValue))
+                        completeValues.add(command);
+                }
+            }
+
+            return new CompleterData(completeValues);
+        }
+    }
+
+    public static class ManConverter implements CLConverter<ManPage> {
+
+        @Override
+        public ManPage convert(String location) {
+            return new ManPage(location);
+        }
     }
 }

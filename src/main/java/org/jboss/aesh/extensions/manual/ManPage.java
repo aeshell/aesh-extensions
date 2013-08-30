@@ -17,19 +17,22 @@ import java.util.List;
  */
 public class ManPage {
 
-    private String name;
-    private List<ManSection> sections;
+    private String command;
 
-    public ManPage(String fileName) {
+    public ManPage(String command) {
+        this.command = command;
+    }
+
+    public void init() {
         ManPageLoader parser = new ManPageLoader();
         try {
             parser.loadPage(800);
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
     }
 
-    public String getName() {
-        return name;
+    public String getCommand() {
+        return command;
     }
 }

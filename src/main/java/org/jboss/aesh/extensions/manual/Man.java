@@ -61,7 +61,7 @@ public class Man extends FileDisplayer {
         else if(completeOperation.getBuffer().equals("man ")) {
 
             for(ManPage page : manPages) {
-                completeOperation.getCompletionCandidates().add("man "+page.getName());
+                completeOperation.getCompletionCandidates().add("man "+page.getCommand());
             }
         }
     }

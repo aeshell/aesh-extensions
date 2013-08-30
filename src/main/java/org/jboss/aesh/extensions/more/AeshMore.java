@@ -16,6 +16,7 @@ import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.ConsoleCommand;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
+import org.jboss.aesh.extensions.manual.ManCommand;
 import org.jboss.aesh.extensions.page.Page;
 import org.jboss.aesh.extensions.page.PageLoader;
 import org.jboss.aesh.extensions.page.SimplePageLoader;
@@ -29,7 +30,7 @@ import java.util.List;
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name="more", description = "is more less?")
-public class AeshMore implements ConsoleCommand, Command {
+public class AeshMore implements ConsoleCommand, Command, ManCommand {
 
     private int rows;
     private int topVisibleRow;
@@ -244,6 +245,12 @@ public class AeshMore implements ConsoleCommand, Command {
         }
 
         return CommandResult.SUCCESS;
+    }
+
+    @Override
+    public File getManLocation() {
+        //just a test atm
+        return new File("/tmp/more.txt");
     }
 
     private static enum Background {
