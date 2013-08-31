@@ -104,7 +104,7 @@ public class AeshMan extends AeshFileDisplayer {
     public static class ManCompleter implements OptionCompleter {
         @Override
         public CompleterData complete(String completeValue) {
-            List<String> completeValues = new ArrayList<>();
+            List<String> completeValues = new ArrayList<String>();
             if(registry != null && registry.asMap() != null) {
                 for(String command : registry.asMap().keySet()) {
                     if(command.startsWith(completeValue))
