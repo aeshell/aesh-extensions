@@ -15,6 +15,7 @@ import org.jboss.aesh.cl.converter.CLConverter;
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.Command;
+import org.jboss.aesh.console.CommandContainer;
 import org.jboss.aesh.console.CommandNotFoundException;
 import org.jboss.aesh.console.CommandRegistry;
 import org.jboss.aesh.console.CommandResult;
@@ -87,9 +88,9 @@ public class AeshMan extends AeshFileDisplayer {
         setControlOperator(operator);
         if(manPages != null && manPages.size() > 0) {
             try {
-                Command manCommand = registry.getCommand(manPages.get(0).getCommand());
-                if(manCommand instanceof ManCommand) {
-                    setFile(((ManCommand) manCommand).getManLocation().toString());
+                CommandContainer manCommand = registry.getCommand(manPages.get(0).getCommand(), null);
+                if(manCommand.getCommand() instanceof ManCommand) {
+                    setFile(((ManCommand) manCommand.getCommand()).getManLocation().toString());
                     getConsole().attachConsoleCommand(this);
                     afterAttach();
                 }
@@ -103,16 +104,15 @@ public class AeshMan extends AeshFileDisplayer {
 
     public static class ManCompleter implements OptionCompleter {
         @Override
-        public CompleterData complete(String completeValue) {
+        public void complete(CompleterData completerData) {
             List<String> completeValues = new ArrayList<String>();
-            if(registry != null && registry.asMap() != null) {
-                for(String command : registry.asMap().keySet()) {
-                    if(command.startsWith(completeValue))
+            if(registry != null) {
+                for(String command : registry.getAllCommandNames()) {
+                    if(command.startsWith(completerData.getGivenCompleteValue()))
                         completeValues.add(command);
                 }
+                completerData.setCompleterValues(completeValues);
             }
-
-            return new CompleterData(completeValues);
         }
     }
 
