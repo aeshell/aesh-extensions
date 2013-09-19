@@ -8,31 +8,24 @@ package org.jboss.aesh.extensions.manual;
 
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
-import org.jboss.aesh.cl.OptionList;
 import org.jboss.aesh.cl.completer.CompleterData;
 import org.jboss.aesh.cl.completer.OptionCompleter;
 import org.jboss.aesh.cl.converter.CLConverter;
-import org.jboss.aesh.complete.CompleteOperation;
-import org.jboss.aesh.console.AeshConsole;
-import org.jboss.aesh.console.Command;
-import org.jboss.aesh.console.CommandContainer;
-import org.jboss.aesh.console.CommandNotFoundException;
-import org.jboss.aesh.console.CommandRegistry;
-import org.jboss.aesh.console.CommandResult;
-import org.jboss.aesh.console.operator.ControlOperator;
+import org.jboss.aesh.console.command.CommandContainer;
+import org.jboss.aesh.console.command.CommandInvocation;
+import org.jboss.aesh.console.command.CommandNotFoundException;
+import org.jboss.aesh.console.command.CommandRegistry;
+import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
 import org.jboss.aesh.extensions.page.AeshFileDisplayer;
-import org.jboss.aesh.extensions.page.FileDisplayer;
 import org.jboss.aesh.extensions.page.PageLoader;
 import org.jboss.aesh.util.ANSI;
-import org.jboss.aesh.util.LoggerUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * A Man implementation for JReadline. ref: http://en.wikipedia.org/wiki/Man_page
@@ -83,15 +76,14 @@ public class AeshMan extends AeshFileDisplayer {
     }
 
     @Override
-    public CommandResult execute(AeshConsole aeshConsole, ControlOperator operator) throws IOException {
-        setConsole(aeshConsole);
-        setControlOperator(operator);
+    public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
+        setCommandInvocation(commandInvocation);
         if(manPages != null && manPages.size() > 0) {
             try {
                 CommandContainer manCommand = registry.getCommand(manPages.get(0).getCommand(), null);
                 if(manCommand.getCommand() instanceof ManCommand) {
                     setFile(((ManCommand) manCommand.getCommand()).getManLocation().toString());
-                    getConsole().attachConsoleCommand(this);
+                    getCommandInvocation().attachConsoleCommand(this);
                     afterAttach();
                 }
             } catch (CommandNotFoundException e) {

@@ -6,14 +6,14 @@
  */
 
 import org.jboss.aesh.cl.CommandDefinition;
-import org.jboss.aesh.console.AeshCommandRegistryBuilder;
 import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.AeshConsoleBuilder;
-import org.jboss.aesh.console.Command;
-import org.jboss.aesh.console.CommandRegistry;
-import org.jboss.aesh.console.CommandResult;
 import org.jboss.aesh.console.Prompt;
-import org.jboss.aesh.console.operator.ControlOperator;
+import org.jboss.aesh.console.command.AeshCommandRegistryBuilder;
+import org.jboss.aesh.console.command.Command;
+import org.jboss.aesh.console.command.CommandInvocation;
+import org.jboss.aesh.console.command.CommandRegistry;
+import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.settings.SettingsBuilder;
 import org.jboss.aesh.extensions.groovy.GroovyCommand;
 import org.jboss.aesh.extensions.harlem.AeshHarlem;
@@ -59,9 +59,8 @@ public class AeshExampleExtension {
     public static class ExitCommand implements Command {
 
         @Override
-        public CommandResult execute(AeshConsole console,
-                                     ControlOperator operator) throws IOException {
-            console.stop();
+        public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
+            commandInvocation.stop();
             return CommandResult.SUCCESS;
         }
     }

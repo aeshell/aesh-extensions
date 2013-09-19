@@ -7,17 +7,14 @@
 package org.jboss.aesh.extensions.harlem;
 
 import org.jboss.aesh.cl.CommandDefinition;
-import org.jboss.aesh.complete.CompleteOperation;
-import org.jboss.aesh.complete.Completion;
-import org.jboss.aesh.console.AeshConsole;
-import org.jboss.aesh.console.Command;
-import org.jboss.aesh.console.CommandResult;
 import org.jboss.aesh.console.Config;
-import org.jboss.aesh.console.Console;
-import org.jboss.aesh.console.ConsoleCommand;
-import org.jboss.aesh.console.operator.ControlOperator;
+import org.jboss.aesh.console.command.Command;
+import org.jboss.aesh.console.command.CommandInvocation;
+import org.jboss.aesh.console.command.CommandResult;
+import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.terminal.Color;
+import org.jboss.aesh.terminal.Shell;
 import org.jboss.aesh.terminal.TerminalCharacter;
 import org.jboss.aesh.util.ANSI;
 
@@ -46,7 +43,7 @@ public class AeshHarlem implements ConsoleCommand, Command {
     private TerminalCharacter[][] terminalCharacters;
     private boolean allowDownload = false;
     private File harlemWav = new File(Config.getTmpDir()+Config.getPathSeparator()+"harlem.wav");
-    private AeshConsole console;
+    private CommandInvocation commandInvocation;
     private boolean attached = true;
 
     public AeshHarlem() {
@@ -54,11 +51,11 @@ public class AeshHarlem implements ConsoleCommand, Command {
     }
 
     public void afterAttach() throws IOException {
-        rows = console.getTerminalSize().getHeight();
-        columns = console.getTerminalSize().getWidth();
+        rows = getShell().getSize().getHeight();
+        columns = getShell().getSize().getWidth();
         terminalCharacters = new TerminalCharacter[rows][columns];
 
-        console.out().print(ANSI.getAlternateBufferScreen());
+        getShell().out().print(ANSI.getAlternateBufferScreen());
         if(!harlemWav.isFile())
             displayQuestion();
         else
@@ -70,28 +67,32 @@ public class AeshHarlem implements ConsoleCommand, Command {
         return attached;
     }
 
+    private Shell getShell() {
+        return commandInvocation.getShell();
+    }
+
     private void displayQuestion() throws IOException {
-        console.out().print(ANSI.getStart()+rows+";1H");
-        console.out().print("Allow harlem to save file to \""+Config.getTmpDir()+"? (y or n)");
-        console.out().flush();
+        getShell().out().print(ANSI.getStart()+rows+";1H");
+        getShell().out().print("Allow harlem to save file to \""+Config.getTmpDir()+"? (y or n)");
+        getShell().out().flush();
     }
 
     protected void afterDetach() throws IOException {
-        console.out().print(ANSI.getMainBufferScreen());
-        console.out().print(ANSI.getStart()+"?25h");
-        console.out().flush();
+        getShell().out().print(ANSI.getMainBufferScreen());
+        getShell().out().print(ANSI.getStart()+"?25h");
+        getShell().out().flush();
         attached = false;
     }
 
     private void displayWait() throws IOException {
-        console.out().print(ANSI.getStart()+"?25l");
-        console.out().print(ANSI.getStart()+rows/2+";1H");
-        console.out().print("Buffering....  please wait.....");
-        console.out().flush();
+        getShell().out().print(ANSI.getStart()+"?25l");
+        getShell().out().print(ANSI.getStart()+rows/2+";1H");
+        getShell().out().print("Buffering....  please wait.....");
+        getShell().out().flush();
     }
 
     private void displayIntro() throws IOException {
-        console.out().print(ANSI.getStart() + "1;1H");
+        getShell().out().print(ANSI.getStart() + "1;1H");
         TerminalCharacter startChar = new TerminalCharacter('|', NORMAL);
         for (int i = 0; i < terminalCharacters.length; i++) {
             for (int j = 0; j < terminalCharacters[i].length; j++) {
@@ -107,9 +108,9 @@ public class AeshHarlem implements ConsoleCommand, Command {
                 else
                     sb.append(terminalCharacters[i][j].toString());
             }
-            console.out().print(sb.toString());
+            getShell().out().print(sb.toString());
         }
-        console.out().flush();
+        getShell().out().flush();
 
         int middleRow = rows/2;
         int middleColumn = columns/2;
@@ -121,9 +122,9 @@ public class AeshHarlem implements ConsoleCommand, Command {
             } catch (InterruptedException e) {
                 //ignored
             }
-            console.out().print(ANSI.getStart()+middleRow+";"+middleColumn+"H");
-            console.out().print(middleChar.toString());
-            console.out().flush();
+            getShell().out().print(ANSI.getStart()+middleRow+";"+middleColumn+"H");
+            getShell().out().print(middleChar.toString());
+            getShell().out().flush();
             middleChar = new TerminalCharacter(getNextChar(middleChar.getCharacter()));
         }
 
@@ -161,7 +162,7 @@ public class AeshHarlem implements ConsoleCommand, Command {
     }
 
     private void displayCorus() throws IOException {
-        console.out().print(ANSI.getStart()+"1;1H");
+        getShell().out().print(ANSI.getStart()+"1;1H");
         StringBuilder sb = new StringBuilder();
         for(int i=0; i < terminalCharacters.length; i++) {
             for(int j=0; j < terminalCharacters[i].length;j++) {
@@ -171,8 +172,8 @@ public class AeshHarlem implements ConsoleCommand, Command {
                     sb.append(new TerminalCharacter(getRandomChar(), Color.DEFAULT_BG, getRandomColor()).toString());
             }
         }
-        console.out().print(sb.toString());
-        console.out().flush();
+        getShell().out().print(sb.toString());
+        getShell().out().flush();
     }
 
     @Override
@@ -236,9 +237,9 @@ public class AeshHarlem implements ConsoleCommand, Command {
     }
 
     @Override
-    public CommandResult execute(AeshConsole aeshConsole, ControlOperator operator) throws IOException {
-        this.console = aeshConsole;
-        aeshConsole.attachConsoleCommand(this);
+    public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
+        this.commandInvocation = commandInvocation;
+        commandInvocation.attachConsoleCommand(this);
         afterAttach();
         return CommandResult.SUCCESS;
     }

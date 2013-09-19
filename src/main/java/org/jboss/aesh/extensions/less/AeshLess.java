@@ -8,9 +8,8 @@ package org.jboss.aesh.extensions.less;
 
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
-import org.jboss.aesh.console.AeshConsole;
-import org.jboss.aesh.console.CommandResult;
-import org.jboss.aesh.console.operator.ControlOperator;
+import org.jboss.aesh.console.command.CommandInvocation;
+import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.extensions.page.AeshFileDisplayer;
 import org.jboss.aesh.extensions.page.Page.Search;
 import org.jboss.aesh.extensions.page.PageLoader;
@@ -79,30 +78,29 @@ public class AeshLess extends AeshFileDisplayer {
     }
 
     @Override
-    public CommandResult execute(AeshConsole aeshConsole, ControlOperator operator) throws IOException {
-        setConsole(aeshConsole);
-        setControlOperator(operator);
+    public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
+        setCommandInvocation(commandInvocation);
         //make sure to reset loader on each execute
         loader = new SimplePageLoader();
-        if(aeshConsole.in().getStdIn().available() > 0) {
-            java.util.Scanner s = new java.util.Scanner(aeshConsole.in().getStdIn()).useDelimiter("\\A");
+        if(commandInvocation.in().getStdIn().available() > 0) {
+            java.util.Scanner s = new java.util.Scanner(commandInvocation.in().getStdIn()).useDelimiter("\\A");
             String fileContent = s.hasNext() ? s.next() : "";
             setInput(fileContent);
-            getConsole().attachConsoleCommand(this);
+            getCommandInvocation().attachConsoleCommand(this);
             afterAttach();
         }
         else if(arguments != null && arguments.size() > 0) {
             File f = arguments.get(0);
             if(f.isFile()) {
                 setFile(f);
-                getConsole().attachConsoleCommand(this);
+                getCommandInvocation().attachConsoleCommand(this);
                 afterAttach();
             }
             else if(f.isDirectory()) {
-                aeshConsole.err().println(f.getAbsolutePath()+": is a directory");
+                getShell().err().println(f.getAbsolutePath()+": is a directory");
             }
             else {
-                aeshConsole.err().println(f.getAbsolutePath() + ": No such file or directory");
+                getShell().err().println(f.getAbsolutePath() + ": No such file or directory");
             }
         }
 

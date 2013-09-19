@@ -8,12 +8,12 @@ package org.jboss.aesh.extensions.more;
 
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
-import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.Buffer;
-import org.jboss.aesh.console.Command;
-import org.jboss.aesh.console.CommandResult;
 import org.jboss.aesh.console.Config;
-import org.jboss.aesh.console.ConsoleCommand;
+import org.jboss.aesh.console.command.Command;
+import org.jboss.aesh.console.command.CommandInvocation;
+import org.jboss.aesh.console.command.CommandResult;
+import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.extensions.manual.ManCommand;
@@ -38,7 +38,7 @@ public class AeshMore implements ConsoleCommand, Command, ManCommand {
     private StringBuilder number;
     private MorePage page;
     private SimplePageLoader loader;
-    private AeshConsole console;
+    private CommandInvocation commandInvocation;
     private ControlOperator operator;
     private boolean attached = true;
 
@@ -62,17 +62,17 @@ public class AeshMore implements ConsoleCommand, Command, ManCommand {
     }
 
     protected void afterAttach() throws IOException {
-        rows = console.getTerminalSize().getHeight();
-        int columns = console.getTerminalSize().getWidth();
+        rows = commandInvocation.getShell().getSize().getHeight();
+        int columns = commandInvocation.getShell().getSize().getWidth();
         page = new MorePage(loader, columns);
 
         if(operator.isRedirectionOut()) {
             int count=0;
             for(String line : this.page.getLines()) {
-                console.out().print(line);
+                commandInvocation.getShell().out().print(line);
                 count++;
                 if(count < this.page.size())
-                    console.out().print(Config.getLineSeparator());
+                    commandInvocation.getShell().out().print(Config.getLineSeparator());
             }
 
             afterDetach();
@@ -90,9 +90,9 @@ public class AeshMore implements ConsoleCommand, Command, ManCommand {
         clearNumber();
         topVisibleRow = prevTopVisibleRow = 0;
         if(!operator.isRedirectionOut()) {
-            console.out().print(Buffer.printAnsi("K"));
-            console.out().print(Buffer.printAnsi("1G"));
-            console.out().flush();
+            commandInvocation.getShell().out().print(Buffer.printAnsi("K"));
+            commandInvocation.getShell().out().print(Buffer.printAnsi("1G"));
+            commandInvocation.getShell().out().flush();
         }
         page.clear();
         loader = new SimplePageLoader();
@@ -149,22 +149,22 @@ public class AeshMore implements ConsoleCommand, Command, ManCommand {
     }
 
     private void display(Background background) throws IOException {
-        //console.clear();
-        console.out().print(Buffer.printAnsi("0G"));
-        console.out().print(Buffer.printAnsi("2K"));
+        //commandInvocation.clear();
+        commandInvocation.getShell().out().print(Buffer.printAnsi("0G"));
+        commandInvocation.getShell().out().print(Buffer.printAnsi("2K"));
         if(prevTopVisibleRow == 0 && topVisibleRow == 0) {
             for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
                 if(i < page.size()) {
-                    console.out().print(page.getLine(i));
-                    console.out().print(Config.getLineSeparator());
+                    commandInvocation.getShell().out().print(page.getLine(i));
+                    commandInvocation.getShell().out().print(Config.getLineSeparator());
                 }
             }
         }
         else if(prevTopVisibleRow < topVisibleRow) {
 
             for(int i=prevTopVisibleRow; i < topVisibleRow; i++) {
-                console.out().print(page.getLine(i + rows));
-                console.out().print(Config.getLineSeparator());
+                commandInvocation.getShell().out().print(page.getLine(i + rows));
+                commandInvocation.getShell().out().print(Config.getLineSeparator());
 
             }
             prevTopVisibleRow = topVisibleRow;
@@ -173,8 +173,8 @@ public class AeshMore implements ConsoleCommand, Command, ManCommand {
         else if(prevTopVisibleRow > topVisibleRow) {
             for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
                 if(i < page.size()) {
-                    console.out().print(page.getLine(i));
-                    console.out().print(Config.getLineSeparator());
+                    commandInvocation.getShell().out().print(page.getLine(i));
+                    commandInvocation.getShell().out().print(Config.getLineSeparator());
                 }
             }
             prevTopVisibleRow = topVisibleRow;
@@ -184,12 +184,12 @@ public class AeshMore implements ConsoleCommand, Command, ManCommand {
 
     private void displayBottom(Background background) throws IOException {
         if(background == Background.INVERSE) {
-            console.out().print(ANSI.getInvertedBackground());
-            console.out().print("--More--(");
-            console.out().print(getPercentDisplayed()+"%)");
+            commandInvocation.getShell().out().print(ANSI.getInvertedBackground());
+            commandInvocation.getShell().out().print("--More--(");
+            commandInvocation.getShell().out().print(getPercentDisplayed()+"%)");
 
-            console.out().print(ANSI.getNormalBackground());
-            console.out().flush();
+            commandInvocation.getShell().out().print(ANSI.getNormalBackground());
+            commandInvocation.getShell().out().flush();
         }
     }
 
@@ -201,7 +201,7 @@ public class AeshMore implements ConsoleCommand, Command, ManCommand {
     }
 
     public void displayHelp() throws IOException {
-        console.out().println(Config.getLineSeparator()
+        commandInvocation.getShell().out().println(Config.getLineSeparator()
                 +"Usage: more [options] file...");
     }
 
@@ -217,30 +217,30 @@ public class AeshMore implements ConsoleCommand, Command, ManCommand {
     }
 
     @Override
-    public CommandResult execute(AeshConsole aeshConsole, ControlOperator operator) throws IOException {
-        this.console = aeshConsole;
+    public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
+        this.commandInvocation = commandInvocation;
         this.operator = operator;
         loader = new SimplePageLoader();
 
-        if(aeshConsole.in().getStdIn().available() > 0) {
-            java.util.Scanner s = new java.util.Scanner(aeshConsole.in().getStdIn()).useDelimiter("\\A");
+        if(commandInvocation.in().getStdIn().available() > 0) {
+            java.util.Scanner s = new java.util.Scanner(commandInvocation.in().getStdIn()).useDelimiter("\\A");
             String fileContent = s.hasNext() ? s.next() : "";
             setInput(fileContent);
-            console.attachConsoleCommand(this);
+            this.commandInvocation.attachConsoleCommand(this);
             afterAttach();
         }
         else if(arguments != null && arguments.size() > 0) {
             File f = arguments.get(0);
             if(f.isFile()) {
                 setFile(f);
-                console.attachConsoleCommand(this);
+                this.commandInvocation.attachConsoleCommand(this);
                 afterAttach();
             }
             else if(f.isDirectory()) {
-                aeshConsole.err().println(f.getAbsolutePath()+": is a directory");
+                commandInvocation.getShell().err().println(f.getAbsolutePath()+": is a directory");
             }
             else {
-                aeshConsole.err().println(f.getAbsolutePath() + ": No such file or directory");
+                commandInvocation.getShell().err().println(f.getAbsolutePath() + ": No such file or directory");
             }
         }
 

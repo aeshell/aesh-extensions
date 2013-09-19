@@ -3,11 +3,10 @@ package org.jboss.aesh.extensions.groovy;
 import groovy.lang.GroovyClassLoader;
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
-import org.jboss.aesh.console.AeshConsole;
-import org.jboss.aesh.console.Command;
-import org.jboss.aesh.console.CommandResult;
-import org.jboss.aesh.console.MutableCommandRegistry;
-import org.jboss.aesh.console.operator.ControlOperator;
+import org.jboss.aesh.console.command.Command;
+import org.jboss.aesh.console.command.CommandInvocation;
+import org.jboss.aesh.console.command.CommandResult;
+import org.jboss.aesh.console.command.MutableCommandRegistry;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,14 +19,14 @@ import java.util.List;
         description = "specify a groovy command file ")
 public class GroovyCommand implements Command {
 
-    private AeshConsole aeshConsole;
+    private CommandInvocation commandInvocation;
 
     @Arguments
     private List<File> files;
 
     @Override
-    public CommandResult execute(AeshConsole aeshConsole, ControlOperator operator) throws IOException {
-        this.aeshConsole = aeshConsole;
+    public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
+        this.commandInvocation = commandInvocation;
 
         if(files != null && files.size() > 0)
             loadCommand(files.get(0));
@@ -35,11 +34,12 @@ public class GroovyCommand implements Command {
         return CommandResult.SUCCESS;
     }
 
+    @SuppressWarnings(value = "unchecked")
     private void loadCommand(File file) {
         try {
             ClassLoader parent = getClass().getClassLoader();
             GroovyClassLoader loader = new GroovyClassLoader(parent);
-            Class groovyClass = loader.parseClass(file);
+            Class<? extends Command> groovyClass = (Class<? extends Command>) loader.parseClass(file);
 
             if(groovyClass.isAnnotationPresent(CommandDefinition.class)) {
                 boolean correctClass = false;
@@ -49,17 +49,17 @@ public class GroovyCommand implements Command {
                     }
                 }
                 if(correctClass) {
-                    if(aeshConsole.getCommandRegistry() instanceof MutableCommandRegistry) {
-                        ((MutableCommandRegistry) aeshConsole.getCommandRegistry()).addCommand(groovyClass);
-                        //aeshConsole.addCommand(groovyClass);
-                        aeshConsole.out().println("Added "+groovyClass.getName()+" to commands");
+                    if(commandInvocation.getCommandRegistry() instanceof MutableCommandRegistry) {
+                        ((MutableCommandRegistry) commandInvocation.getCommandRegistry()).addCommand(groovyClass);
+                        //commandInvocation.addCommand(groovyClass);
+                        commandInvocation.getShell().out().println("Added "+groovyClass.getName()+" to commands");
                     }
                 }
                 else
-                    aeshConsole.out().println("Groovy command do not implement Command interface");
+                    commandInvocation.getShell().out().println("Groovy command do not implement Command interface");
             }
             else
-                aeshConsole.out().println("Groovy command do not contain CommandDefinition annotation");
+                commandInvocation.getShell().out().println("Groovy command do not contain CommandDefinition annotation");
 
         } catch (IOException e) {
             e.printStackTrace();

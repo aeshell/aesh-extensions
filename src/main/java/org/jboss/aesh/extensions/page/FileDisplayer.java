@@ -10,7 +10,7 @@ import org.jboss.aesh.complete.Completion;
 import org.jboss.aesh.console.Buffer;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
-import org.jboss.aesh.console.ConsoleCommand;
+import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.extensions.less.LessPage;

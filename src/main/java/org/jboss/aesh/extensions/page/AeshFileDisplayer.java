@@ -6,15 +6,16 @@
  */
 package org.jboss.aesh.extensions.page;
 
-import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.Buffer;
-import org.jboss.aesh.console.Command;
 import org.jboss.aesh.console.Config;
-import org.jboss.aesh.console.ConsoleCommand;
+import org.jboss.aesh.console.command.Command;
+import org.jboss.aesh.console.command.CommandInvocation;
+import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.extensions.less.LessPage;
 import org.jboss.aesh.extensions.page.Page.Search;
+import org.jboss.aesh.terminal.Shell;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.LoggerUtil;
 
@@ -40,31 +41,36 @@ public abstract class AeshFileDisplayer implements ConsoleCommand, Command {
     private StringBuilder searchBuilder;
     private List<Integer> searchLines;
     private Logger logger = LoggerUtil.getLogger(getClass().getName());
-    private AeshConsole console;
+    private CommandInvocation commandInvocation;
     private ControlOperator operation;
     private boolean attached = true;
 
     public AeshFileDisplayer() {
     }
 
-    protected void setConsole(AeshConsole console) {
-        this.console = console;
+    protected void setCommandInvocation(CommandInvocation commandInvocation) {
+        this.commandInvocation = commandInvocation;
+        setControlOperator(commandInvocation.getControlOperator());
     }
 
-    protected AeshConsole getConsole() {
-        return console;
+    protected CommandInvocation getCommandInvocation() {
+        return commandInvocation;
     }
 
     protected void setControlOperator(ControlOperator operator) {
         this.operation = operator;
     }
 
+    protected Shell getShell() {
+        return commandInvocation.getShell();
+    }
+
     protected void afterAttach() throws IOException {
         attached = true;
         number = new StringBuilder();
         searchBuilder = new StringBuilder();
-        rows = console.getTerminalSize().getHeight();
-        columns = console.getTerminalSize().getWidth();
+        rows = getShell().getSize().getHeight();
+        columns = getShell().getSize().getWidth();
         page = new LessPage(getPageLoader(), columns);
         topVisibleRow = 0;
         topVisibleRowCache = -1;
@@ -74,22 +80,22 @@ public abstract class AeshFileDisplayer implements ConsoleCommand, Command {
             //if(Settings.getInstance().isLogging())
             //    logger.info("REDIRECTION IS OUT");
             for(String line : this.page.getLines()) {
-                console.out().print(line);
+                getShell().out().print(line);
                 count++;
                 if(count < this.page.size())
-                    console.out().print(Config.getLineSeparator());
+                    getShell().out().print(Config.getLineSeparator());
             }
-            console.out().flush();
+            getShell().out().flush();
 
             afterDetach();
         }
         else {
             if(!page.hasData()) {
-                console.out().print("Missing filename (\"less --help\" for help)\n");
+                getShell().out().print("Missing filename (\"less --help\" for help)\n");
                 afterDetach();
             }
             else {
-                console.out().print(ANSI.getAlternateBufferScreen());
+                getShell().out().print(ANSI.getAlternateBufferScreen());
 
                 if(this.page.getFileName() != null)
                     display();
@@ -97,12 +103,12 @@ public abstract class AeshFileDisplayer implements ConsoleCommand, Command {
                     display();
             }
         }
-        console.out().flush();
+        getShell().out().flush();
     }
 
     protected void afterDetach() throws IOException {
         if(!operation.isRedirectionOut())
-            console.out().print(ANSI.getMainBufferScreen());
+            getShell().out().print(ANSI.getMainBufferScreen());
 
         page.clear();
         topVisibleRow = 0;
@@ -292,7 +298,7 @@ public abstract class AeshFileDisplayer implements ConsoleCommand, Command {
 
     private void display() throws IOException {
         if(topVisibleRow != topVisibleRowCache) {
-            console.clear();
+            getShell().clear();
             if(search == Search.RESULT && searchLines.size() > 0) {
                 String searchWord = searchBuilder.toString();
                 for(int i=topVisibleRow; i < (topVisibleRow+rows-1); i++) {
@@ -301,8 +307,8 @@ public abstract class AeshFileDisplayer implements ConsoleCommand, Command {
                         if(line.contains(searchWord))
                             displaySearchLine(line, searchWord);
                         else
-                            console.out().print(line);
-                        console.out().print(Config.getLineSeparator());
+                            getShell().out().print(line);
+                        getShell().out().print(Config.getLineSeparator());
                     }
                 }
                 topVisibleRowCache = topVisibleRow;
@@ -310,14 +316,14 @@ public abstract class AeshFileDisplayer implements ConsoleCommand, Command {
             else {
                 for(int i=topVisibleRow; i < (topVisibleRow+rows-1); i++) {
                     if(i < page.size()) {
-                        console.out().print(page.getLine(i)+Config.getLineSeparator());
+                        getShell().out().print(page.getLine(i)+Config.getLineSeparator());
                     }
                 }
                 topVisibleRowCache = topVisibleRow;
             }
             displayBottom();
         }
-        console.out().flush();
+        getShell().out().flush();
     }
 
     /**
@@ -325,12 +331,12 @@ public abstract class AeshFileDisplayer implements ConsoleCommand, Command {
      */
     private void displaySearchLine(String line, String searchWord) throws IOException {
         int start = line.indexOf(searchWord);
-        console.out().print(line.substring(0,start));
-        console.out().print(ANSI.getInvertedBackground());
-        console.out().print(searchWord);
-        console.out().print(ANSI.reset());
-        console.out().print(line.substring(start + searchWord.length(), line.length()));
-        console.out().flush();
+        getShell().out().print(line.substring(0,start));
+        getShell().out().print(ANSI.getInvertedBackground());
+        getShell().out().print(searchWord);
+        getShell().out().print(ANSI.reset());
+        getShell().out().print(line.substring(start + searchWord.length(), line.length()));
+        getShell().out().flush();
     }
 
     public abstract PageLoader getPageLoader();
@@ -338,14 +344,14 @@ public abstract class AeshFileDisplayer implements ConsoleCommand, Command {
     public abstract void displayBottom() throws IOException;
 
     public void writeToConsole(String word) throws IOException {
-        console.out().print(word);
-        console.out().flush();
+        getShell().out().print(word);
+        getShell().out().flush();
     }
 
     public void clearBottomLine() throws IOException {
-        console.out().print(Buffer.printAnsi("0G"));
-        console.out().print(Buffer.printAnsi("2K"));
-        console.out().flush();
+        getShell().out().print(Buffer.printAnsi("0G"));
+        getShell().out().print(Buffer.printAnsi("2K"));
+        getShell().out().flush();
     }
 
     public boolean isAtBottom() {
