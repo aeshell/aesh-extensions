@@ -66,7 +66,7 @@ public class More implements ConsoleCommand, Completion {
         int columns = console.getTerminalSize().getWidth();
         page = new MorePage(loader, columns);
 
-        if(ControlOperator.isRedirectionOut(controlOperator)) {
+        if(controlOperator.isRedirectionOut()) {
             int count=0;
             for(String line : this.page.getLines()) {
                 console.out().print(line);
@@ -89,7 +89,7 @@ public class More implements ConsoleCommand, Completion {
     protected void afterDetach() throws IOException {
         clearNumber();
         topVisibleRow = prevTopVisibleRow = 0;
-        if(!ControlOperator.isRedirectionOut(controlOperator)) {
+        if(!controlOperator.isRedirectionOut()) {
             console.out().print(Buffer.printAnsi("K"));
             console.out().print(Buffer.printAnsi("1G"));
             console.out().flush();

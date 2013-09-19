@@ -69,7 +69,7 @@ public abstract class AeshFileDisplayer implements ConsoleCommand, Command {
         topVisibleRow = 0;
         topVisibleRowCache = -1;
 
-        if(ControlOperator.isRedirectionOut(operation)) {
+        if(operation.isRedirectionOut()) {
             int count=0;
             //if(Settings.getInstance().isLogging())
             //    logger.info("REDIRECTION IS OUT");
@@ -101,7 +101,7 @@ public abstract class AeshFileDisplayer implements ConsoleCommand, Command {
     }
 
     protected void afterDetach() throws IOException {
-        if(!ControlOperator.isRedirectionOut(operation))
+        if(!operation.isRedirectionOut())
             console.out().print(ANSI.getMainBufferScreen());
 
         page.clear();

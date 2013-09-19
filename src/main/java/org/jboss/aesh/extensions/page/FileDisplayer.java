@@ -69,7 +69,7 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
         topVisibleRow = 0;
         topVisibleRowCache = -1;
 
-        if(ControlOperator.isRedirectionOut(controlOperator)) {
+        if(controlOperator.isRedirectionOut()) {
             int count=0;
             //if(Settings.getInstance().isLogging())
             //    logger.info("REDIRECTION IS OUT");
@@ -102,7 +102,7 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
     }
 
     protected void afterDetach() throws IOException {
-        if(!ControlOperator.isRedirectionOut(controlOperator))
+        if(!controlOperator.isRedirectionOut())
             console.out().print(ANSI.getMainBufferScreen());
 
         page.clear();
