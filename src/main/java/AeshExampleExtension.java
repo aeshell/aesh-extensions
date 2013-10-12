@@ -15,11 +15,13 @@ import org.jboss.aesh.console.command.CommandInvocation;
 import org.jboss.aesh.console.command.CommandRegistry;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.settings.SettingsBuilder;
+import org.jboss.aesh.extensions.grep.Grep;
 import org.jboss.aesh.extensions.groovy.GroovyCommand;
-import org.jboss.aesh.extensions.harlem.AeshHarlem;
-import org.jboss.aesh.extensions.less.AeshLess;
-import org.jboss.aesh.extensions.manual.AeshMan;
-import org.jboss.aesh.extensions.more.AeshMore;
+import org.jboss.aesh.extensions.harlem.aesh.Harlem;
+import org.jboss.aesh.extensions.less.aesh.Less;
+import org.jboss.aesh.extensions.ls.Ls;
+import org.jboss.aesh.extensions.manual.aesh.Man;
+import org.jboss.aesh.extensions.more.aesh.More;
 
 import java.io.IOException;
 
@@ -33,15 +35,17 @@ public class AeshExampleExtension {
         settingsBuilder.readInputrc(false);
         settingsBuilder.logging(true);
 
-        AeshMan man = new AeshMan();
+        Man man = new Man();
 
         CommandRegistry registry = new AeshCommandRegistryBuilder()
                 .command(ExitCommand.class)
-                .command(AeshLess.class)
-                .command(AeshMore.class)
+                .command(Less.class)
+                .command(More.class)
                 .command(man)
-                .command(AeshHarlem.class)
+                .command(Harlem.class)
                 .command(GroovyCommand.class)
+                .command(Ls.class)
+                .command(Grep.class)
                 .create();
         //the man command need access to the registry
         man.setRegistry(registry);

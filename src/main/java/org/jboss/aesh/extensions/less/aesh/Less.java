@@ -4,7 +4,7 @@
  * Licensed under the Eclipse Public License version 1.0, available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.jboss.aesh.extensions.less;
+package org.jboss.aesh.extensions.less.aesh;
 
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
@@ -26,14 +26,14 @@ import java.util.List;
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name ="less", description = "less is more")
-public class AeshLess extends AeshFileDisplayer {
+public class Less extends AeshFileDisplayer {
 
     @Arguments
     List<File> arguments;
 
     private SimplePageLoader loader;
 
-    public AeshLess() {
+    public Less() {
         super();
     }
 

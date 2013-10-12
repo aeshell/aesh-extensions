@@ -1,4 +1,4 @@
-package org.jboss.aesh.extensions.choice;
+package org.jboss.aesh.extensions.choice.aesh;
 
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.complete.Completion;
@@ -16,28 +16,28 @@ import java.util.logging.Logger;
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class MultipleChoiceCommand implements ConsoleCommand, Completion {
+public class MultipleChoice implements ConsoleCommand, Completion {
 
-    private List<MultipleChoice> choices;
+    private List<org.jboss.aesh.extensions.choice.console.MultipleChoice> choices;
     private String commandName;
     private int rows;
     private Console console;
     private boolean attached = true;
 
-    private Logger logger = LoggerUtil.getLogger(MultipleChoiceCommand.class.getName());
+    private Logger logger = LoggerUtil.getLogger(MultipleChoice.class.getName());
 
-    public MultipleChoiceCommand(Console console) {
+    public MultipleChoice(Console console) {
         this.console = console;
     }
 
-    public MultipleChoiceCommand(Console console, String commandName,
-                                 List<MultipleChoice> choices) {
+    public MultipleChoice(Console console, String commandName,
+                          List<org.jboss.aesh.extensions.choice.console.MultipleChoice> choices) {
         this.console = console;
         this.commandName = commandName;
         this.choices = choices;
     }
 
-    public List<MultipleChoice> getChoices() {
+    public List<org.jboss.aesh.extensions.choice.console.MultipleChoice> getChoices() {
         return choices;
     }
 
@@ -66,7 +66,7 @@ public class MultipleChoiceCommand implements ConsoleCommand, Completion {
         for(int i=0; i < rows-choices.size()-1; i++)
             console.out().print(Config.getLineSeparator());
 
-        for(MultipleChoice mc : choices) {
+        for(org.jboss.aesh.extensions.choice.console.MultipleChoice mc : choices) {
             if(mc.isChosen())
                 console.out().print(mc.getId() + ") " + mc.getDisplayString() + " [X]" +
                         Config.getLineSeparator());
@@ -98,7 +98,7 @@ public class MultipleChoiceCommand implements ConsoleCommand, Completion {
     }
 
     private void updateChoices(int id) {
-        for(MultipleChoice c : choices)
+        for(org.jboss.aesh.extensions.choice.console.MultipleChoice c : choices)
             if(c.getId() == id)
                 c.selectChoise();
     }

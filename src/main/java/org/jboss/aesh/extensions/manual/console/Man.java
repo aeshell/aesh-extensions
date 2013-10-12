@@ -4,10 +4,11 @@
  * Licensed under the Eclipse Public License version 1.0, available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.jboss.aesh.extensions.manual;
+package org.jboss.aesh.extensions.manual.console;
 
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.console.Console;
+import org.jboss.aesh.extensions.manual.ManPage;
 import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
 import org.jboss.aesh.extensions.page.FileDisplayer;
 import org.jboss.aesh.extensions.page.PageLoader;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Man implementation for JReadline. ref: http://en.wikipedia.org/wiki/Man_page
+ * A Man implementation for Aesh. ref: http://en.wikipedia.org/wiki/Man_page
  *
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>

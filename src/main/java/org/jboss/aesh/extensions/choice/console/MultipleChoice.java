@@ -1,4 +1,4 @@
-package org.jboss.aesh.extensions.choice;
+package org.jboss.aesh.extensions.choice.console;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>

@@ -9,12 +9,11 @@ import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.complete.Completion;
 import org.jboss.aesh.console.*;
 import org.jboss.aesh.console.settings.SettingsBuilder;
-import org.jboss.aesh.extensions.choice.MultipleChoice;
-import org.jboss.aesh.extensions.choice.MultipleChoiceCommand;
-import org.jboss.aesh.extensions.harlem.Harlem;
-import org.jboss.aesh.extensions.less.Less;
-import org.jboss.aesh.extensions.manual.Man;
-import org.jboss.aesh.extensions.more.More;
+import org.jboss.aesh.extensions.choice.aesh.MultipleChoice;
+import org.jboss.aesh.extensions.harlem.console.Harlem;
+import org.jboss.aesh.extensions.less.console.Less;
+import org.jboss.aesh.extensions.manual.console.Man;
+import org.jboss.aesh.extensions.more.console.More;
 import org.jboss.aesh.parser.Parser;
 
 import java.io.File;
@@ -46,12 +45,12 @@ public class ExampleExtension {
         final Less less = new Less(exampleConsole);
         final More more = new More(exampleConsole);
 
-        List<MultipleChoice> choices = new ArrayList<MultipleChoice>();
-        choices.add(new MultipleChoice(1,"Do you want foo?"));
-        choices.add(new MultipleChoice(2,"Do you want bar?"));
+        List<org.jboss.aesh.extensions.choice.console.MultipleChoice> choices = new ArrayList<org.jboss.aesh.extensions.choice.console.MultipleChoice>();
+        choices.add(new org.jboss.aesh.extensions.choice.console.MultipleChoice(1,"Do you want foo?"));
+        choices.add(new org.jboss.aesh.extensions.choice.console.MultipleChoice(2,"Do you want bar?"));
 
-        final MultipleChoiceCommand choice =
-                new MultipleChoiceCommand(exampleConsole, "choice", choices);
+        final MultipleChoice choice =
+                new MultipleChoice(exampleConsole, "choice", choices);
 
         Completion completer = new Completion() {
             @Override

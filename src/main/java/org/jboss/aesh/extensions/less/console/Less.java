@@ -4,7 +4,7 @@
  * Licensed under the Eclipse Public License version 1.0, available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.jboss.aesh.extensions.less;
+package org.jboss.aesh.extensions.less.console;
 
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.console.Console;

@@ -4,7 +4,7 @@
  * Licensed under the Eclipse Public License version 1.0, available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.jboss.aesh.extensions.more;
+package org.jboss.aesh.extensions.more.aesh;
 
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
@@ -30,7 +30,7 @@ import java.util.List;
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name="more", description = "is more less?")
-public class AeshMore implements ConsoleCommand, Command, ManCommand {
+public class More implements ConsoleCommand, Command, ManCommand {
 
     private int rows;
     private int topVisibleRow;
@@ -45,7 +45,7 @@ public class AeshMore implements ConsoleCommand, Command, ManCommand {
     @Arguments
     private List<File> arguments;
 
-    public AeshMore() {
+    public More() {
         number = new StringBuilder();
     }
 
@@ -66,7 +66,7 @@ public class AeshMore implements ConsoleCommand, Command, ManCommand {
         int columns = commandInvocation.getShell().getSize().getWidth();
         page = new MorePage(loader, columns);
 
-        if(operator.isRedirectionOut()) {
+        if(operator.isRedirectionOut() || operator.isPipe()) {
             int count=0;
             for(String line : this.page.getLines()) {
                 commandInvocation.getShell().out().print(line);
@@ -219,7 +219,7 @@ public class AeshMore implements ConsoleCommand, Command, ManCommand {
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
         this.commandInvocation = commandInvocation;
-        this.operator = operator;
+        this.operator = commandInvocation.getControlOperator();
         loader = new SimplePageLoader();
 
         if(commandInvocation.in().getStdIn().available() > 0) {

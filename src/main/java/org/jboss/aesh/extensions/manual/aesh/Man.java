@@ -4,7 +4,7 @@
  * Licensed under the Eclipse Public License version 1.0, available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.jboss.aesh.extensions.manual;
+package org.jboss.aesh.extensions.manual.aesh;
 
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
@@ -16,6 +16,8 @@ import org.jboss.aesh.console.command.CommandInvocation;
 import org.jboss.aesh.console.command.CommandNotFoundException;
 import org.jboss.aesh.console.command.CommandRegistry;
 import org.jboss.aesh.console.command.CommandResult;
+import org.jboss.aesh.extensions.manual.ManCommand;
+import org.jboss.aesh.extensions.manual.ManPage;
 import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
 import org.jboss.aesh.extensions.page.AeshFileDisplayer;
 import org.jboss.aesh.extensions.page.PageLoader;
@@ -28,20 +30,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Man implementation for JReadline. ref: http://en.wikipedia.org/wiki/Man_page
+ * A Man implementation for Aesh. ref: http://en.wikipedia.org/wiki/Man_page
  *
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name = "man", description = "manuals")
-public class AeshMan extends AeshFileDisplayer {
+public class Man extends AeshFileDisplayer {
 
     @Arguments(converter = ManConverter.class, completer = ManCompleter.class)
     private List<ManPage> manPages;
     private ManPageLoader loader;
     private static CommandRegistry registry;
 
-    public AeshMan() {
+    public Man() {
         super();
         manPages = new ArrayList<ManPage>();
         loader = new ManPageLoader();

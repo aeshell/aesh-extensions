@@ -4,17 +4,15 @@
  * Licensed under the Eclipse Public License version 1.0, available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.jboss.aesh.extensions.harlem;
+package org.jboss.aesh.extensions.harlem.console;
 
-import org.jboss.aesh.cl.CommandDefinition;
+import org.jboss.aesh.complete.CompleteOperation;
+import org.jboss.aesh.complete.Completion;
 import org.jboss.aesh.console.Config;
-import org.jboss.aesh.console.command.Command;
-import org.jboss.aesh.console.command.CommandInvocation;
-import org.jboss.aesh.console.command.CommandResult;
+import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.terminal.Color;
-import org.jboss.aesh.terminal.Shell;
 import org.jboss.aesh.terminal.TerminalCharacter;
 import org.jboss.aesh.util.ANSI;
 
@@ -32,8 +30,7 @@ import static org.jboss.aesh.terminal.CharacterType.NORMAL;
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-@CommandDefinition(name="harlem", description = "wanna do the harlem..?")
-public class AeshHarlem implements ConsoleCommand, Command {
+public class Harlem implements ConsoleCommand, Completion {
 
     private int rows;
     private int columns;
@@ -43,19 +40,20 @@ public class AeshHarlem implements ConsoleCommand, Command {
     private TerminalCharacter[][] terminalCharacters;
     private boolean allowDownload = false;
     private File harlemWav = new File(Config.getTmpDir()+Config.getPathSeparator()+"harlem.wav");
-    private CommandInvocation commandInvocation;
+    private Console console;
     private boolean attached = true;
 
-    public AeshHarlem() {
+    public Harlem(Console console) {
+        this.console = console;
         random = new Random();
     }
 
     public void afterAttach() throws IOException {
-        rows = getShell().getSize().getHeight();
-        columns = getShell().getSize().getWidth();
+        rows = console.getTerminalSize().getHeight();
+        columns = console.getTerminalSize().getWidth();
         terminalCharacters = new TerminalCharacter[rows][columns];
 
-        getShell().out().print(ANSI.getAlternateBufferScreen());
+        console.out().print(ANSI.getAlternateBufferScreen());
         if(!harlemWav.isFile())
             displayQuestion();
         else
@@ -67,32 +65,28 @@ public class AeshHarlem implements ConsoleCommand, Command {
         return attached;
     }
 
-    private Shell getShell() {
-        return commandInvocation.getShell();
-    }
-
     private void displayQuestion() throws IOException {
-        getShell().out().print(ANSI.getStart()+rows+";1H");
-        getShell().out().print("Allow harlem to save file to \""+Config.getTmpDir()+"? (y or n)");
-        getShell().out().flush();
+        console.out().print(ANSI.getStart()+rows+";1H");
+        console.out().print("Allow harlem to save file to \""+Config.getTmpDir()+"? (y or n)");
+        console.out().flush();
     }
 
     protected void afterDetach() throws IOException {
-        getShell().out().print(ANSI.getMainBufferScreen());
-        getShell().out().print(ANSI.getStart()+"?25h");
-        getShell().out().flush();
+        console.out().print(ANSI.getMainBufferScreen());
+        console.out().print(ANSI.getStart()+"?25h");
+        console.out().flush();
         attached = false;
     }
 
     private void displayWait() throws IOException {
-        getShell().out().print(ANSI.getStart()+"?25l");
-        getShell().out().print(ANSI.getStart()+rows/2+";1H");
-        getShell().out().print("Buffering....  please wait.....");
-        getShell().out().flush();
+        console.out().print(ANSI.getStart()+"?25l");
+        console.out().print(ANSI.getStart()+rows/2+";1H");
+        console.out().print("Buffering....  please wait.....");
+        console.out().flush();
     }
 
     private void displayIntro() throws IOException {
-        getShell().out().print(ANSI.getStart() + "1;1H");
+        console.out().print(ANSI.getStart() + "1;1H");
         TerminalCharacter startChar = new TerminalCharacter('|', NORMAL);
         for (int i = 0; i < terminalCharacters.length; i++) {
             for (int j = 0; j < terminalCharacters[i].length; j++) {
@@ -108,9 +102,9 @@ public class AeshHarlem implements ConsoleCommand, Command {
                 else
                     sb.append(terminalCharacters[i][j].toString());
             }
-            getShell().out().print(sb.toString());
+            console.out().print(sb.toString());
         }
-        getShell().out().flush();
+        console.out().flush();
 
         int middleRow = rows/2;
         int middleColumn = columns/2;
@@ -122,9 +116,9 @@ public class AeshHarlem implements ConsoleCommand, Command {
             } catch (InterruptedException e) {
                 //ignored
             }
-            getShell().out().print(ANSI.getStart()+middleRow+";"+middleColumn+"H");
-            getShell().out().print(middleChar.toString());
-            getShell().out().flush();
+            console.out().print(ANSI.getStart()+middleRow+";"+middleColumn+"H");
+            console.out().print(middleChar.toString());
+            console.out().flush();
             middleChar = new TerminalCharacter(getNextChar(middleChar.getCharacter()));
         }
 
@@ -162,7 +156,7 @@ public class AeshHarlem implements ConsoleCommand, Command {
     }
 
     private void displayCorus() throws IOException {
-        getShell().out().print(ANSI.getStart()+"1;1H");
+        console.out().print(ANSI.getStart()+"1;1H");
         StringBuilder sb = new StringBuilder();
         for(int i=0; i < terminalCharacters.length; i++) {
             for(int j=0; j < terminalCharacters[i].length;j++) {
@@ -172,8 +166,8 @@ public class AeshHarlem implements ConsoleCommand, Command {
                     sb.append(new TerminalCharacter(getRandomChar(), Color.DEFAULT_BG, getRandomColor()).toString());
             }
         }
-        getShell().out().print(sb.toString());
-        getShell().out().flush();
+        console.out().print(sb.toString());
+        console.out().flush();
     }
 
     @Override
@@ -195,6 +189,13 @@ public class AeshHarlem implements ConsoleCommand, Command {
         playHarlem();
         displayIntro();
         afterDetach();
+    }
+
+    @Override
+    public void complete(CompleteOperation completeOperation) {
+        if("harlem".startsWith(completeOperation.getBuffer()))
+            completeOperation.addCompletionCandidate("harlem");
+
     }
 
     private void playHarlem() {
@@ -236,11 +237,4 @@ public class AeshHarlem implements ConsoleCommand, Command {
         }
     }
 
-    @Override
-    public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
-        this.commandInvocation = commandInvocation;
-        commandInvocation.attachConsoleCommand(this);
-        afterAttach();
-        return CommandResult.SUCCESS;
-    }
 }
