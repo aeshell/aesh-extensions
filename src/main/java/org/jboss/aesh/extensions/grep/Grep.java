@@ -83,16 +83,20 @@ public class Grep implements Command {
         //do we have data from a pipe/redirect?
         if(commandInvocation.in().getStdIn().available() > 0) {
             java.util.Scanner s = new java.util.Scanner(commandInvocation.in().getStdIn()).useDelimiter("\\A");
+            String input = s.hasNext() ? s.next() : "";
             List<String> inputLines = new ArrayList<String>();
-            while(s.hasNext())
-                inputLines.add(s.next());
+            for(String i : input.split("\n"))
+                inputLines.add(i);
+
+            if(arguments != null && arguments.size() > 0)
+                pattern = arguments.remove(0);
 
             doGrep(inputLines, commandInvocation.getShell());
         }
         //find argument files and build regex..
         else {
-            if(arguments.size() > 0)
-            pattern = arguments.remove(0);
+            if(arguments != null && arguments.size() > 0)
+                pattern = arguments.remove(0);
             if(arguments != null && arguments.size() > 0) {
                 for(String s : arguments)
                     doGrep(new File(s), commandInvocation.getShell());
@@ -136,11 +140,16 @@ public class Grep implements Command {
     }
 
     private void doGrep(List<String> inputLines, Shell shell) {
-
-        for(String line : inputLines) {
-            if(line.contains(pattern))
-                shell.out().println(line);
+        if(pattern != null) {
+            for(String line : inputLines) {
+                if(line != null && line.contains(pattern)) {
+                    shell.out().println(line);
+                }
+            }
         }
+        else
+            shell.out().println("No pattern given");
+
     }
 
     /**
