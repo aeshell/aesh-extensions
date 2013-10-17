@@ -54,7 +54,7 @@ public class MultipleChoice implements ConsoleCommand, Completion {
     protected void afterAttach() throws IOException {
         rows = console.getTerminalSize().getHeight();
 
-        console.out().write(ANSI.getAlternateBufferScreen());
+        console.out().print(ANSI.getAlternateBufferScreen());
         logger.info("printed out alternateBufferScreen");
         displayChoices();
     }
