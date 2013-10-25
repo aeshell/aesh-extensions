@@ -11,12 +11,14 @@ import org.jboss.aesh.complete.Completion;
 import org.jboss.aesh.console.Buffer;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
+import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.extensions.page.Page;
 import org.jboss.aesh.extensions.page.PageLoader;
 import org.jboss.aesh.extensions.page.SimplePageLoader;
+import org.jboss.aesh.terminal.TerminalString;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.FileLister;
 import org.jboss.aesh.parser.Parser;
@@ -104,7 +106,7 @@ public class More implements ConsoleCommand, Completion {
     }
 
     @Override
-    public void processOperation(Operation operation) throws IOException {
+    public void processOperation(CommandOperation operation) throws IOException {
         if(operation.getInput()[0] == 'q') {
             afterDetach();
         }
@@ -202,15 +204,15 @@ public class More implements ConsoleCommand, Completion {
     @Override
     public void complete(CompleteOperation completeOperation) {
         if(completeOperation.getBuffer().equals(""))
-            completeOperation.getCompletionCandidates().add("more");
+            completeOperation.getCompletionCandidates().add(new TerminalString("more"));
         else if(completeOperation.getBuffer().equals("m"))
-            completeOperation.getCompletionCandidates().add("more");
+            completeOperation.getCompletionCandidates().add(new TerminalString("more"));
         else if(completeOperation.getBuffer().equals("mo"))
-            completeOperation.getCompletionCandidates().add("more");
+            completeOperation.getCompletionCandidates().add(new TerminalString("more"));
         else if(completeOperation.getBuffer().equals("mor"))
-            completeOperation.getCompletionCandidates().add("more");
+            completeOperation.getCompletionCandidates().add(new TerminalString("more"));
         else if(completeOperation.getBuffer().equals("more"))
-            completeOperation.getCompletionCandidates().add("more");
+            completeOperation.getCompletionCandidates().add(new TerminalString("more"));
         else if(completeOperation.getBuffer().startsWith("more ")) {
 
             String word = Parser.findWordClosestToCursor(completeOperation.getBuffer(),

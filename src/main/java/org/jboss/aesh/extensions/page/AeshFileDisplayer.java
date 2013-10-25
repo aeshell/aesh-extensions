@@ -10,6 +10,7 @@ import org.jboss.aesh.console.Buffer;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandInvocation;
+import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
@@ -121,7 +122,7 @@ public abstract class AeshFileDisplayer implements ConsoleCommand, Command {
     }
 
     @Override
-    public void processOperation(Operation operation) throws IOException {
+    public void processOperation(CommandOperation operation) throws IOException {
         if(operation.getInput()[0] == 'q') {
             if(search == Search.SEARCHING) {
                 searchBuilder.append((char) operation.getInput()[0]);

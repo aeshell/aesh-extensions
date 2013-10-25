@@ -10,10 +10,11 @@ import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.complete.Completion;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
+import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.ConsoleCommand;
-import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.terminal.Color;
 import org.jboss.aesh.terminal.TerminalCharacter;
+import org.jboss.aesh.terminal.TerminalColor;
 import org.jboss.aesh.util.ANSI;
 
 import javax.sound.sampled.AudioSystem;
@@ -25,7 +26,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Random;
 
-import static org.jboss.aesh.terminal.CharacterType.NORMAL;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -35,7 +35,7 @@ public class Harlem implements ConsoleCommand, Completion {
     private int rows;
     private int columns;
     private char[] randomChars = {'@','#','$','%','&','{','}','?','-','/','\\'};
-    private Color[] randomColors = {Color.GREEN_TEXT, Color.BLUE_TEXT, Color.RED_TEXT, Color.YELLOW_TEXT, Color.DEFAULT_TEXT};
+    private Color[] randomColors = {Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW, Color.DEFAULT};
     private Random random;
     private TerminalCharacter[][] terminalCharacters;
     private boolean allowDownload = false;
@@ -87,7 +87,7 @@ public class Harlem implements ConsoleCommand, Completion {
 
     private void displayIntro() throws IOException {
         console.out().print(ANSI.getStart() + "1;1H");
-        TerminalCharacter startChar = new TerminalCharacter('|', NORMAL);
+        TerminalCharacter startChar = new TerminalCharacter('|');
         for (int i = 0; i < terminalCharacters.length; i++) {
             for (int j = 0; j < terminalCharacters[i].length; j++) {
                 terminalCharacters[i][j] = startChar;
@@ -163,7 +163,7 @@ public class Harlem implements ConsoleCommand, Completion {
                 if(j % 2 == 0)
                     sb.append(new TerminalCharacter(' ').toString());
                 else
-                    sb.append(new TerminalCharacter(getRandomChar(), Color.DEFAULT_BG, getRandomColor()).toString());
+                    sb.append(new TerminalCharacter(getRandomChar(),  new TerminalColor( getRandomColor(), Color.DEFAULT)).toString());
             }
         }
         console.out().print(sb.toString());
@@ -171,7 +171,7 @@ public class Harlem implements ConsoleCommand, Completion {
     }
 
     @Override
-    public void processOperation(Operation operation) throws IOException {
+    public void processOperation(CommandOperation operation) throws IOException {
         if(operation.getInput()[0] == 'y') {
            allowDownload = true;
             startHarlem();

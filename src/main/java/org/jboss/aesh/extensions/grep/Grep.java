@@ -178,7 +178,7 @@ public class Grep implements Command {
                     completeOperation.removeEscapedSpacesFromCompletionCandidates();
                 }
 
-                completerData.setCompleterValues(completeOperation.getCompletionCandidates());
+                completerData.setCompleterValuesTerminalString(completeOperation.getCompletionCandidates());
                 if (completerData.getGivenCompleteValue() != null && completerData.getCompleterValues().size() == 1) {
                     completerData.setAppendSpace(completeOperation.hasAppendSeparator());
                 }

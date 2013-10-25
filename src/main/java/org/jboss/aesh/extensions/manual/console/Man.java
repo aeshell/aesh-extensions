@@ -12,6 +12,7 @@ import org.jboss.aesh.extensions.manual.ManPage;
 import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
 import org.jboss.aesh.extensions.page.FileDisplayer;
 import org.jboss.aesh.extensions.page.PageLoader;
+import org.jboss.aesh.terminal.TerminalString;
 import org.jboss.aesh.util.ANSI;
 
 import java.io.FileNotFoundException;
@@ -54,15 +55,15 @@ public class Man extends FileDisplayer {
     @Override
     public void complete(CompleteOperation completeOperation) {
         if(completeOperation.getBuffer().equals("m"))
-            completeOperation.getCompletionCandidates().add("man");
+            completeOperation.getCompletionCandidates().add(new TerminalString("man"));
         else if(completeOperation.getBuffer().equals("ma"))
-            completeOperation.getCompletionCandidates().add("man");
+            completeOperation.getCompletionCandidates().add(new TerminalString("man"));
         else if(completeOperation.getBuffer().equals("man"))
-            completeOperation.getCompletionCandidates().add("man");
+            completeOperation.getCompletionCandidates().add(new TerminalString("man"));
         else if(completeOperation.getBuffer().equals("man ")) {
 
             for(ManPage page : manPages) {
-                completeOperation.getCompletionCandidates().add("man "+page.getCommand());
+                completeOperation.getCompletionCandidates().add(new TerminalString("man "+page.getCommand()));
             }
         }
     }

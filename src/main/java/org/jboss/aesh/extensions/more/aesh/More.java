@@ -12,6 +12,7 @@ import org.jboss.aesh.console.Buffer;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandInvocation;
+import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.console.operator.ControlOperator;
@@ -100,7 +101,7 @@ public class More implements ConsoleCommand, Command, ManCommand {
     }
 
     @Override
-    public void processOperation(Operation operation) throws IOException {
+    public void processOperation(CommandOperation operation) throws IOException {
         if(operation.getInput()[0] == 'q') {
             afterDetach();
         }
