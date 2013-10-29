@@ -14,11 +14,17 @@ import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandInvocation;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.parser.Parser;
+import org.jboss.aesh.terminal.Color;
 import org.jboss.aesh.terminal.Shell;
+import org.jboss.aesh.terminal.TerminalColor;
+import org.jboss.aesh.terminal.TerminalString;
+import org.jboss.aesh.util.FileLister;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -50,6 +56,19 @@ public class Ls implements Command {
     @Arguments
     private List<File> arguments;
 
+    private File cwd;
+
+    public Ls() {
+        cwd = new File(Config.getUserDir());
+    }
+
+    public Ls(File cwd) {
+        if(cwd != null && cwd.isDirectory())
+            this.cwd = cwd;
+        else
+            cwd = new File(Config.getUserDir());
+    }
+
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
         //just display help and return
@@ -60,8 +79,7 @@ public class Ls implements Command {
 
         if(arguments == null) {
             arguments = new ArrayList<File>(1);
-            arguments.add(new File("/tmp"));
-            //arguments.add(new File(Config.getUserDir()));
+            arguments.add(cwd);
         }
 
         for(File f : arguments) {
@@ -78,16 +96,44 @@ public class Ls implements Command {
         return CommandResult.SUCCESS;
     }
 
+    public void setCwd(File cwd) {
+        if(cwd.isDirectory())
+            this.cwd = cwd;
+    }
+
     private void displayDirectory(File input, Shell shell) {
         if(longListing) {
-            shell.out().println(
-                    displayLongListing(input.listFiles()));
+            if(all)
+                shell.out().println(
+                        displayLongListing(input.listFiles()));
+            else
+                shell.out().println(
+                        displayLongListing(input.listFiles(new FileLister.FileAndDirectoryNoDotNamesFilter())));
         }
         else {
-            shell.out().println(Parser.formatDisplayList(input.list(),
-                    shell.getSize().getHeight(), shell.getSize().getWidth()));
+            if(all)
+                shell.out().println(Parser.formatDisplayListTerminalString(
+                        formatFileList(input.listFiles()),
+                        shell.getSize().getHeight(), shell.getSize().getWidth()));
+            else
+                shell.out().println(Parser.formatDisplayListTerminalString(
+                        formatFileList(input.listFiles(new FileLister.FileAndDirectoryNoDotNamesFilter())),
+                        shell.getSize().getHeight(), shell.getSize().getWidth()));
 
         }
+    }
+
+    private List<TerminalString> formatFileList(File[] fileList) {
+        ArrayList<TerminalString> list = new ArrayList<TerminalString>(fileList.length);
+        for(File file : fileList) {
+            if(file.isDirectory())
+                list.add(new TerminalString(file.getName(),
+                        new TerminalColor(Color.BLUE, Color.DEFAULT)));
+            else
+                list.add(new TerminalString(file.getName()));
+        }
+        Collections.sort(list, new PosixFileNameComparator());
+        return list;
     }
 
     private void displayFile(File input, Shell shell) {
@@ -189,8 +235,6 @@ public class Ls implements Command {
         StringGroup modified = new StringGroup(files.length);
         int counter = 0;
         for(File file : files) {
-            //StringBuilder builder = new StringBuilder();
-
             modified.addString(new Date(file.lastModified()).toString(), counter++);
         }
         modified.formatStringsBasedOnMaxLength();
@@ -198,4 +242,27 @@ public class Ls implements Command {
         return modified;
     }
 
+    class PosixFileNameComparator implements Comparator<TerminalString> {
+        private static final char DOT = '.';
+
+        @Override
+        public int compare(TerminalString o1, TerminalString o2) {
+            if(o1.getCharacters().length() > 1 && o2.getCharacters().length() > 1) {
+                if(o1.getCharacters().indexOf(DOT) == 0) {
+                    if(o2.getCharacters().indexOf(DOT) == 0)
+                        return o1.getCharacters().substring(1).compareToIgnoreCase(o2.getCharacters().substring(1));
+                    else
+                        return o1.getCharacters().substring(1).compareToIgnoreCase(o2.getCharacters());
+                }
+                else {
+                    if(o2.getCharacters().indexOf(DOT) == 0)
+                        return o1.getCharacters().compareToIgnoreCase(o2.getCharacters().substring(1));
+                    else
+                        return o1.getCharacters().compareToIgnoreCase(o2.getCharacters());
+                }
+            }
+            else
+                return 0;
+        }
+    }
 }

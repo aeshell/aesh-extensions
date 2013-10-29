@@ -6,7 +6,6 @@ import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.ConsoleCommand;
-import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.LoggerUtil;
 
