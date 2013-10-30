@@ -71,10 +71,10 @@ public class More implements ConsoleCommand, Completion {
         if(controlOperator.isRedirectionOut()) {
             int count=0;
             for(String line : this.page.getLines()) {
-                console.out().print(line);
+                console.getShell().out().print(line);
                 count++;
                 if(count < this.page.size())
-                    console.out().print(Config.getLineSeparator());
+                    console.getShell().out().print(Config.getLineSeparator());
             }
 
             afterDetach();
@@ -92,9 +92,9 @@ public class More implements ConsoleCommand, Completion {
         clearNumber();
         topVisibleRow = prevTopVisibleRow = 0;
         if(!controlOperator.isRedirectionOut()) {
-            console.out().print(Buffer.printAnsi("K"));
-            console.out().print(Buffer.printAnsi("1G"));
-            console.out().flush();
+            console.getShell().out().print(Buffer.printAnsi("K"));
+            console.getShell().out().print(Buffer.printAnsi("1G"));
+            console.getShell().out().flush();
         }
         page.clear();
         attached = false;
@@ -151,21 +151,21 @@ public class More implements ConsoleCommand, Completion {
 
     private void display(Background background) throws IOException {
         //console.clear();
-        console.out().print(Buffer.printAnsi("0G"));
-        console.out().print(Buffer.printAnsi("2K"));
+        console.getShell().out().print(Buffer.printAnsi("0G"));
+        console.getShell().out().print(Buffer.printAnsi("2K"));
         if(prevTopVisibleRow == 0 && topVisibleRow == 0) {
             for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
                 if(i < page.size()) {
-                    console.out().print(page.getLine(i));
-                    console.out().print(Config.getLineSeparator());
+                    console.getShell().out().print(page.getLine(i));
+                    console.getShell().out().print(Config.getLineSeparator());
                 }
             }
         }
         else if(prevTopVisibleRow < topVisibleRow) {
 
             for(int i=prevTopVisibleRow; i < topVisibleRow; i++) {
-                console.out().print(page.getLine(i + rows));
-                console.out().print(Config.getLineSeparator());
+                console.getShell().out().print(page.getLine(i + rows));
+                console.getShell().out().print(Config.getLineSeparator());
 
             }
             prevTopVisibleRow = topVisibleRow;
@@ -174,8 +174,8 @@ public class More implements ConsoleCommand, Completion {
         else if(prevTopVisibleRow > topVisibleRow) {
             for(int i=topVisibleRow; i < (topVisibleRow+rows); i++) {
                 if(i < page.size()) {
-                    console.out().print(page.getLine(i));
-                    console.out().print(Config.getLineSeparator());
+                    console.getShell().out().print(page.getLine(i));
+                    console.getShell().out().print(Config.getLineSeparator());
                 }
             }
             prevTopVisibleRow = topVisibleRow;
@@ -185,12 +185,12 @@ public class More implements ConsoleCommand, Completion {
 
     private void displayBottom(Background background) throws IOException {
         if(background == Background.INVERSE) {
-            console.out().print(ANSI.getInvertedBackground());
-            console.out().print("--More--(");
-            console.out().print(getPercentDisplayed()+"%)");
+            console.getShell().out().print(ANSI.getInvertedBackground());
+            console.getShell().out().print("--More--(");
+            console.getShell().out().print(getPercentDisplayed()+"%)");
 
-            console.out().print(ANSI.getNormalBackground());
-            console.out().flush();
+            console.getShell().out().print(ANSI.getNormalBackground());
+            console.getShell().out().flush();
         }
     }
 
@@ -225,7 +225,7 @@ public class More implements ConsoleCommand, Completion {
     }
 
     public void displayHelp() throws IOException {
-        console.out().println(Config.getLineSeparator()
+        console.getShell().out().println(Config.getLineSeparator()
                 +"Usage: more [options] file...");
     }
 

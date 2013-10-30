@@ -109,7 +109,7 @@ public class ExampleExtension {
             public int readConsoleOutput(ConsoleOperation consoleOutput) throws IOException {
 
                 String line = consoleOutput.getBuffer();
-                exampleConsole.out().print("======>\"" + line + "\"\n");
+                exampleConsole.getShell().out().print("======>\"" + line + "\"\n");
 
                 if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit") ||
                         line.equalsIgnoreCase("reset")) {
@@ -127,7 +127,7 @@ public class ExampleExtension {
                         exampleConsole.attachProcess(man);
                     }
                     catch (IllegalArgumentException iae) {
-                        exampleConsole.out().print(iae.getMessage());
+                        exampleConsole.getShell().out().print(iae.getMessage());
                     }
                 }
                 if(line.startsWith("choice")) {
@@ -140,8 +140,8 @@ public class ExampleExtension {
                 }
                 if(line.trim().startsWith("less")) {
                     //is it getting input from pipe
-                    if(exampleConsole.in().getStdIn().available() > 0) {
-                        java.util.Scanner s = new java.util.Scanner(exampleConsole.in().getStdIn()).useDelimiter("\\A");
+                    if(exampleConsole.getShell().in().getStdIn().available() > 0) {
+                        java.util.Scanner s = new java.util.Scanner(exampleConsole.getShell().in().getStdIn()).useDelimiter("\\A");
                         String fileContent = s.hasNext() ? s.next() : "";
                         less.setInput(fileContent);
                         less.setControlOperator(consoleOutput.getControlOperator());
@@ -159,22 +159,22 @@ public class ExampleExtension {
                             less.afterAttach();
                         }
                         else if(f.isDirectory()) {
-                            exampleConsole.out().print(f.getAbsolutePath()+": is a directory"+
+                            exampleConsole.getShell().out().print(f.getAbsolutePath()+": is a directory"+
                                     Config.getLineSeparator());
                         }
                         else {
-                            exampleConsole.out().print(f.getAbsolutePath()+": No such file or directory"+
+                            exampleConsole.getShell().out().print(f.getAbsolutePath()+": No such file or directory"+
                                     Config.getLineSeparator());
                         }
                     }
                     else {
-                        exampleConsole.out().print("Missing filename (\"less --help\" for help)\n");
+                        exampleConsole.getShell().out().print("Missing filename (\"less --help\" for help)\n");
                     }
                 }
 
                 if(line.startsWith("more")) {
-                    if(exampleConsole.in().getStdIn().available() > 0) {
-                        java.util.Scanner s = new java.util.Scanner(exampleConsole.in().getStdIn()).useDelimiter("\\A");
+                    if(exampleConsole.getShell().in().getStdIn().available() > 0) {
+                        java.util.Scanner s = new java.util.Scanner(exampleConsole.getShell().in().getStdIn()).useDelimiter("\\A");
                         String fileContent = s.hasNext() ? s.next() : "";
                         more.setInput(fileContent);
                         more.setControlOperator(consoleOutput.getControlOperator());
@@ -192,11 +192,11 @@ public class ExampleExtension {
 
                         }
                         else if(f.isDirectory()) {
-                            exampleConsole.out().print(f.getAbsolutePath()+": is a directory"+
+                            exampleConsole.getShell().out().print(f.getAbsolutePath()+": is a directory"+
                                     Config.getLineSeparator());
                         }
                         else {
-                            exampleConsole.out().print(f.getAbsolutePath()+": No such file or directory"+
+                            exampleConsole.getShell().out().print(f.getAbsolutePath()+": No such file or directory"+
                                     Config.getLineSeparator());
                         }
                     }

@@ -82,8 +82,8 @@ public class Less extends AeshFileDisplayer {
         setCommandInvocation(commandInvocation);
         //make sure to reset loader on each execute
         loader = new SimplePageLoader();
-        if(commandInvocation.in().getStdIn().available() > 0) {
-            java.util.Scanner s = new java.util.Scanner(commandInvocation.in().getStdIn()).useDelimiter("\\A");
+        if(commandInvocation.getShell().in().getStdIn().available() > 0) {
+            java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
             String fileContent = s.hasNext() ? s.next() : "";
             setInput(fileContent);
             getCommandInvocation().attachConsoleCommand(this);

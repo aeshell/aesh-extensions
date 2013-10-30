@@ -54,7 +54,7 @@ public class MultipleChoice implements ConsoleCommand, Completion {
     protected void afterAttach() throws IOException {
         rows = console.getTerminalSize().getHeight();
 
-        console.out().print(ANSI.getAlternateBufferScreen());
+        console.getShell().out().print(ANSI.getAlternateBufferScreen());
         logger.info("printed out alternateBufferScreen");
         displayChoices();
     }
@@ -64,22 +64,22 @@ public class MultipleChoice implements ConsoleCommand, Completion {
         //move cursor to the correct place
         //hack for now, wait for better api
         for(int i=0; i < rows-choices.size()-1; i++)
-            console.out().print(Config.getLineSeparator());
+            console.getShell().out().print(Config.getLineSeparator());
 
         for(org.jboss.aesh.extensions.choice.console.MultipleChoice mc : choices) {
             if(mc.isChosen())
-                console.out().print(mc.getId() + ") " + mc.getDisplayString() + " [X]" +
+                console.getShell().out().print(mc.getId() + ") " + mc.getDisplayString() + " [X]" +
                         Config.getLineSeparator());
             else
-                console.out().print(mc.getId() + ") " + mc.getDisplayString() + " [ ]" +
+                console.getShell().out().print(mc.getId() + ") " + mc.getDisplayString() + " [ ]" +
                         Config.getLineSeparator());
         }
-        console.out().print("Choose options: 1-" + choices.size() + ": ");
-        console.out().flush();
+        console.getShell().out().print("Choose options: 1-" + choices.size() + ": ");
+        console.getShell().out().flush();
     }
 
     protected void afterDetach() throws IOException {
-        console.out().print(ANSI.getMainBufferScreen());
+        console.getShell().out().print(ANSI.getMainBufferScreen());
         attached = false;
     }
 
@@ -87,7 +87,7 @@ public class MultipleChoice implements ConsoleCommand, Completion {
     public void processOperation(CommandOperation operation) throws IOException {
         if(Character.isDigit(operation.getInput()[0])) {
             int c = Character.getNumericValue(operation.getInput()[0]);
-            console.out().print("got "+c+"\n");
+            console.getShell().out().print("got "+c+"\n");
             updateChoices(c);
             displayChoices();
         }

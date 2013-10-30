@@ -53,7 +53,7 @@ public class Harlem implements ConsoleCommand, Completion {
         columns = console.getTerminalSize().getWidth();
         terminalCharacters = new TerminalCharacter[rows][columns];
 
-        console.out().print(ANSI.getAlternateBufferScreen());
+        console.getShell().out().print(ANSI.getAlternateBufferScreen());
         if(!harlemWav.isFile())
             displayQuestion();
         else
@@ -66,27 +66,27 @@ public class Harlem implements ConsoleCommand, Completion {
     }
 
     private void displayQuestion() throws IOException {
-        console.out().print(ANSI.getStart()+rows+";1H");
-        console.out().print("Allow harlem to save file to \""+Config.getTmpDir()+"? (y or n)");
-        console.out().flush();
+        console.getShell().out().print(ANSI.getStart()+rows+";1H");
+        console.getShell().out().print("Allow harlem to save file to \""+Config.getTmpDir()+"? (y or n)");
+        console.getShell().out().flush();
     }
 
     protected void afterDetach() throws IOException {
-        console.out().print(ANSI.getMainBufferScreen());
-        console.out().print(ANSI.getStart()+"?25h");
-        console.out().flush();
+        console.getShell().out().print(ANSI.getMainBufferScreen());
+        console.getShell().out().print(ANSI.getStart()+"?25h");
+        console.getShell().out().flush();
         attached = false;
     }
 
     private void displayWait() throws IOException {
-        console.out().print(ANSI.getStart()+"?25l");
-        console.out().print(ANSI.getStart()+rows/2+";1H");
-        console.out().print("Buffering....  please wait.....");
-        console.out().flush();
+        console.getShell().out().print(ANSI.getStart()+"?25l");
+        console.getShell().out().print(ANSI.getStart()+rows/2+";1H");
+        console.getShell().out().print("Buffering....  please wait.....");
+        console.getShell().out().flush();
     }
 
     private void displayIntro() throws IOException {
-        console.out().print(ANSI.getStart() + "1;1H");
+        console.getShell().out().print(ANSI.getStart() + "1;1H");
         TerminalCharacter startChar = new TerminalCharacter('|');
         for (int i = 0; i < terminalCharacters.length; i++) {
             for (int j = 0; j < terminalCharacters[i].length; j++) {
@@ -102,9 +102,9 @@ public class Harlem implements ConsoleCommand, Completion {
                 else
                     sb.append(terminalCharacters[i][j].toString());
             }
-            console.out().print(sb.toString());
+            console.getShell().out().print(sb.toString());
         }
-        console.out().flush();
+        console.getShell().out().flush();
 
         int middleRow = rows/2;
         int middleColumn = columns/2;
@@ -116,9 +116,9 @@ public class Harlem implements ConsoleCommand, Completion {
             } catch (InterruptedException e) {
                 //ignored
             }
-            console.out().print(ANSI.getStart()+middleRow+";"+middleColumn+"H");
-            console.out().print(middleChar.toString());
-            console.out().flush();
+            console.getShell().out().print(ANSI.getStart()+middleRow+";"+middleColumn+"H");
+            console.getShell().out().print(middleChar.toString());
+            console.getShell().out().flush();
             middleChar = new TerminalCharacter(getNextChar(middleChar.getCharacter()));
         }
 
@@ -156,7 +156,7 @@ public class Harlem implements ConsoleCommand, Completion {
     }
 
     private void displayCorus() throws IOException {
-        console.out().print(ANSI.getStart()+"1;1H");
+        console.getShell().out().print(ANSI.getStart()+"1;1H");
         StringBuilder sb = new StringBuilder();
         for(int i=0; i < terminalCharacters.length; i++) {
             for(int j=0; j < terminalCharacters[i].length;j++) {
@@ -166,8 +166,8 @@ public class Harlem implements ConsoleCommand, Completion {
                     sb.append(new TerminalCharacter(getRandomChar(),  new TerminalColor( getRandomColor(), Color.DEFAULT)).toString());
             }
         }
-        console.out().print(sb.toString());
-        console.out().flush();
+        console.getShell().out().print(sb.toString());
+        console.getShell().out().flush();
     }
 
     @Override

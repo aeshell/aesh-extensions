@@ -81,8 +81,8 @@ public class Grep implements Command {
             return CommandResult.SUCCESS;
         }
         //do we have data from a pipe/redirect?
-        if(commandInvocation.in().getStdIn().available() > 0) {
-            java.util.Scanner s = new java.util.Scanner(commandInvocation.in().getStdIn()).useDelimiter("\\A");
+        if(commandInvocation.getShell().in().getStdIn().available() > 0) {
+            java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
             String input = s.hasNext() ? s.next() : "";
             List<String> inputLines = new ArrayList<String>();
             for(String i : input.split("\n"))

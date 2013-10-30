@@ -75,23 +75,23 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
             //if(Settings.getInstance().isLogging())
             //    logger.info("REDIRECTION IS OUT");
             for(String line : this.page.getLines()) {
-                console.out().print(line);
+                console.getShell().out().print(line);
                 count++;
                 if(count < this.page.size())
-                    console.out().print(Config.getLineSeparator());
+                    console.getShell().out().print(Config.getLineSeparator());
             }
-            console.out().flush();
+            console.getShell().out().flush();
 
             afterDetach();
         }
         else {
 
             if(!page.hasData()) {
-                console.out().print("Missing filename (\"less --help\" for help)\n");
+                console.getShell().out().print("Missing filename (\"less --help\" for help)\n");
                 afterDetach();
             }
             else {
-                console.out().print(ANSI.getAlternateBufferScreen());
+                console.getShell().out().print(ANSI.getAlternateBufferScreen());
 
                 if(this.page.getFileName() != null)
                     display();
@@ -99,12 +99,12 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
                     display();
             }
         }
-        console.out().flush();
+        console.getShell().out().flush();
     }
 
     protected void afterDetach() throws IOException {
         if(!controlOperator.isRedirectionOut())
-            console.out().print(ANSI.getMainBufferScreen());
+            console.getShell().out().print(ANSI.getMainBufferScreen());
 
         page.clear();
         topVisibleRow = 0;
@@ -298,8 +298,8 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
                         if(line.contains(searchWord))
                             displaySearchLine(line, searchWord);
                         else
-                            console.out().print(line);
-                        console.out().print(Config.getLineSeparator());
+                            console.getShell().out().print(line);
+                        console.getShell().out().print(Config.getLineSeparator());
                     }
                 }
                 topVisibleRowCache = topVisibleRow;
@@ -307,14 +307,14 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
             else {
                 for(int i=topVisibleRow; i < (topVisibleRow+rows-1); i++) {
                     if(i < page.size()) {
-                        console.out().print(page.getLine(i)+Config.getLineSeparator());
+                        console.getShell().out().print(page.getLine(i)+Config.getLineSeparator());
                     }
                 }
                 topVisibleRowCache = topVisibleRow;
             }
             displayBottom();
         }
-        console.out().flush();
+        console.getShell().out().flush();
     }
 
     /**
@@ -322,12 +322,12 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
      */
     private void displaySearchLine(String line, String searchWord) throws IOException {
         int start = line.indexOf(searchWord);
-        console.out().print(line.substring(0,start));
-        console.out().print(ANSI.getInvertedBackground());
-        console.out().print(searchWord);
-        console.out().print(ANSI.reset());
-        console.out().print(line.substring(start + searchWord.length(), line.length()));
-        console.out().flush();
+        console.getShell().out().print(line.substring(0,start));
+        console.getShell().out().print(ANSI.getInvertedBackground());
+        console.getShell().out().print(searchWord);
+        console.getShell().out().print(ANSI.reset());
+        console.getShell().out().print(line.substring(start + searchWord.length(), line.length()));
+        console.getShell().out().flush();
     }
 
     public abstract PageLoader getPageLoader();
@@ -335,14 +335,14 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
     public abstract void displayBottom() throws IOException;
 
     public void writeToConsole(String word) throws IOException {
-        console.out().print(word);
-        console.out().flush();
+        console.getShell().out().print(word);
+        console.getShell().out().flush();
     }
 
     public void clearBottomLine() throws IOException {
-        console.out().print(Buffer.printAnsi("0G"));
-        console.out().print(Buffer.printAnsi("2K"));
-        console.out().flush();
+        console.getShell().out().print(Buffer.printAnsi("0G"));
+        console.getShell().out().print(Buffer.printAnsi("2K"));
+        console.getShell().out().flush();
     }
 
     public boolean isAtBottom() {
