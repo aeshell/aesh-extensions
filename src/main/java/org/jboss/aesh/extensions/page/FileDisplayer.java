@@ -12,16 +12,18 @@ import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.ConsoleCommand;
+import org.jboss.aesh.console.man.FileParser;
+import org.jboss.aesh.console.man.TerminalPage;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
-import org.jboss.aesh.extensions.less.LessPage;
-import org.jboss.aesh.extensions.page.Page.Search;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.LoggerUtil;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
+
+import static org.jboss.aesh.console.man.TerminalPage.Search;
 
 /**
  * An abstract command used to display files
@@ -35,7 +37,7 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
     private int columns;
     private int topVisibleRow;
     private int topVisibleRowCache; //only rewrite page if rowCache != row
-    private LessPage page;
+    private TerminalPage page;
     private StringBuilder number;
     private Search search = Search.NO_SEARCH;
     private StringBuilder searchBuilder;
@@ -66,7 +68,7 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
     public void afterAttach() throws IOException {
         rows = console.getTerminalSize().getHeight();
         columns = console.getTerminalSize().getWidth();
-        page = new LessPage(getPageLoader(), columns);
+        page = new TerminalPage(getFileParser(), columns);
         topVisibleRow = 0;
         topVisibleRowCache = -1;
 
@@ -330,7 +332,7 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
         console.getShell().out().flush();
     }
 
-    public abstract PageLoader getPageLoader();
+    public abstract FileParser getFileParser();
 
     public abstract void displayBottom() throws IOException;
 

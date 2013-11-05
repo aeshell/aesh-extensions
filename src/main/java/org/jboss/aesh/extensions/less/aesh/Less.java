@@ -8,12 +8,12 @@ package org.jboss.aesh.extensions.less.aesh;
 
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
-import org.jboss.aesh.console.command.CommandInvocation;
 import org.jboss.aesh.console.command.CommandResult;
-import org.jboss.aesh.extensions.page.AeshFileDisplayer;
-import org.jboss.aesh.extensions.page.Page.Search;
-import org.jboss.aesh.extensions.page.PageLoader;
-import org.jboss.aesh.extensions.page.SimplePageLoader;
+import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.console.man.AeshFileDisplayer;
+import org.jboss.aesh.console.man.FileParser;
+import org.jboss.aesh.console.man.TerminalPage;
+import org.jboss.aesh.extensions.page.SimpleFileParser;
 import org.jboss.aesh.util.ANSI;
 
 import java.io.File;
@@ -31,7 +31,7 @@ public class Less extends AeshFileDisplayer {
     @Arguments
     List<File> arguments;
 
-    private SimplePageLoader loader;
+    private SimpleFileParser loader;
 
     public Less() {
         super();
@@ -50,26 +50,26 @@ public class Less extends AeshFileDisplayer {
     }
 
     @Override
-    public PageLoader getPageLoader() {
+    public FileParser getFileParser() {
         return loader;
     }
 
     @Override
     public void displayBottom() throws IOException {
-        if(getSearchStatus() == Search.SEARCHING) {
+        if(getSearchStatus() == TerminalPage.Search.SEARCHING) {
             clearBottomLine();
            writeToConsole("/"+getSearchWord());
         }
-        else if(getSearchStatus() == Search.NOT_FOUND) {
+        else if(getSearchStatus() == TerminalPage.Search.NOT_FOUND) {
             clearBottomLine();
             writeToConsole(ANSI.getInvertedBackground()+
                     "Pattern not found (press RETURN)"+
                     ANSI.defaultText());
         }
-        else if(getSearchStatus() == Search.RESULT) {
+        else if(getSearchStatus() == TerminalPage.Search.RESULT) {
             writeToConsole(":");
         }
-        else if(getSearchStatus() == Search.NO_SEARCH) {
+        else if(getSearchStatus() == TerminalPage.Search.NO_SEARCH) {
             if(isAtBottom())
                 writeToConsole(ANSI.getInvertedBackground()+"(END)"+ANSI.defaultText());
             else
@@ -81,7 +81,7 @@ public class Less extends AeshFileDisplayer {
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
         setCommandInvocation(commandInvocation);
         //make sure to reset loader on each execute
-        loader = new SimplePageLoader();
+        loader = new SimpleFileParser();
         if(commandInvocation.getShell().in().getStdIn().available() > 0) {
             java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
             String fileContent = s.hasNext() ? s.next() : "";

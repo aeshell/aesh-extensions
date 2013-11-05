@@ -3,8 +3,8 @@ package org.jboss.aesh.extensions.cd;
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.console.command.Command;
-import org.jboss.aesh.console.command.CommandInvocation;
 import org.jboss.aesh.console.command.CommandResult;
+import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.extensions.ls.Ls;
 
 import java.io.File;

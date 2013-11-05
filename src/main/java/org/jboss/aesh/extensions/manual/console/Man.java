@@ -8,10 +8,12 @@ package org.jboss.aesh.extensions.manual.console;
 
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.console.Console;
+import org.jboss.aesh.console.man.FileParser;
 import org.jboss.aesh.extensions.manual.ManPage;
 import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
 import org.jboss.aesh.extensions.page.FileDisplayer;
 import org.jboss.aesh.extensions.page.PageLoader;
+import org.jboss.aesh.extensions.page.SimpleFileParser;
 import org.jboss.aesh.terminal.TerminalString;
 import org.jboss.aesh.util.ANSI;
 
@@ -31,12 +33,12 @@ import java.util.List;
 public class Man extends FileDisplayer {
 
     private List<ManPage> manPages = new ArrayList<ManPage>();
-    private ManPageLoader loader;
+    private SimpleFileParser loader;
 
     public Man(Console console) {
         setConsole(console);
         manPages = new ArrayList<ManPage>();
-        loader = new ManPageLoader();
+        loader = new SimpleFileParser();
     }
 
     public void setFile(String name) throws IOException {
@@ -45,11 +47,11 @@ public class Man extends FileDisplayer {
     }
 
     public void setFile(URL url) throws IOException {
-        loader.setUrlFile(url);
+        //loader.se(url);
     }
 
-    public void setFile(InputStream input, String fileName) throws IOException {
-        loader.setFile(input, fileName);
+    public void setFile(InputStream input) throws IOException {
+        loader.setFile(input);
     }
 
     @Override
@@ -69,7 +71,7 @@ public class Man extends FileDisplayer {
     }
 
     @Override
-    public PageLoader getPageLoader() {
+    public FileParser getFileParser() {
        return loader;
     }
 

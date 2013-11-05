@@ -13,11 +13,11 @@ import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.ConsoleCommand;
+import org.jboss.aesh.console.man.FileParser;
+import org.jboss.aesh.console.man.TerminalPage;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
-import org.jboss.aesh.extensions.page.Page;
-import org.jboss.aesh.extensions.page.PageLoader;
-import org.jboss.aesh.extensions.page.SimplePageLoader;
+import org.jboss.aesh.extensions.page.SimpleFileParser;
 import org.jboss.aesh.terminal.TerminalString;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.FileLister;
@@ -36,7 +36,7 @@ public class More implements ConsoleCommand, Completion {
     private int prevTopVisibleRow;
     private StringBuilder number;
     private MorePage page;
-    private SimplePageLoader loader;
+    private SimpleFileParser loader;
     private Console console;
     private ControlOperator controlOperator;
     private boolean attached = true;
@@ -62,7 +62,7 @@ public class More implements ConsoleCommand, Completion {
     }
 
     public void afterAttach() throws IOException {
-        loader = new SimplePageLoader();
+        loader = new SimpleFileParser();
         number = new StringBuilder();
         rows = console.getTerminalSize().getHeight();
         int columns = console.getTerminalSize().getWidth();
@@ -245,10 +245,10 @@ public class More implements ConsoleCommand, Completion {
         INVERSE
     }
 
-    private class MorePage extends Page {
+    private class MorePage extends TerminalPage {
 
-        public MorePage(PageLoader loader, int columns) {
-            super(loader, columns);
+        public MorePage(FileParser fileParser, int columns) throws IOException {
+            super(fileParser, columns);
         }
 
     }

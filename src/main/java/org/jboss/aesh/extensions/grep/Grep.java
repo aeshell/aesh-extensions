@@ -8,8 +8,8 @@ import org.jboss.aesh.cl.completer.OptionCompleter;
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
-import org.jboss.aesh.console.command.CommandInvocation;
 import org.jboss.aesh.console.command.CommandResult;
+import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.terminal.Shell;
 import org.jboss.aesh.util.FileLister;
 

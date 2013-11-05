@@ -6,6 +6,8 @@
  */
 package org.jboss.aesh.extensions.page;
 
+import org.jboss.aesh.console.man.FileParser;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,13 +26,13 @@ import java.util.zip.GZIPInputStream;
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class SimplePageLoader implements PageLoader {
+public class SimpleFileParser implements FileParser {
 
     private String pageAsString;
     private String fileName;
     private InputStreamReader reader;
 
-    public SimplePageLoader() {
+    public SimpleFileParser() {
     }
 
     /**
@@ -60,6 +62,10 @@ public class SimplePageLoader implements PageLoader {
         }
     }
 
+    public void setFile(InputStream inputStream) {
+        reader = new InputStreamReader(inputStream);
+    }
+
     /**
      * Read a file resouce located in a jar
      *
@@ -83,7 +89,7 @@ public class SimplePageLoader implements PageLoader {
     }
 
     @Override
-    public String getResourceName() {
+    public String getName() {
         if(fileName != null)
             return fileName;
         else

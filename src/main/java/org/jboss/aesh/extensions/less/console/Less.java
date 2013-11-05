@@ -8,13 +8,14 @@ package org.jboss.aesh.extensions.less.console;
 
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.console.Console;
+import org.jboss.aesh.console.man.FileParser;
 import org.jboss.aesh.extensions.page.FileDisplayer;
-import org.jboss.aesh.extensions.page.Page.Search;
-import org.jboss.aesh.extensions.page.PageLoader;
-import org.jboss.aesh.extensions.page.SimplePageLoader;
+import org.jboss.aesh.extensions.page.SimpleFileParser;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.FileLister;
 import org.jboss.aesh.parser.Parser;
+
+import static org.jboss.aesh.console.man.TerminalPage.Search;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,12 +27,12 @@ import java.io.IOException;
  */
 public class Less extends FileDisplayer {
 
-    private SimplePageLoader loader;
+    private SimpleFileParser loader;
 
     public Less(Console console) {
         super();
         setConsole(console);
-        loader = new SimplePageLoader();
+        loader = new SimpleFileParser();
     }
 
     public void setFile(File file) throws IOException {
@@ -47,7 +48,7 @@ public class Less extends FileDisplayer {
     }
 
     @Override
-    public PageLoader getPageLoader() {
+    public FileParser getFileParser() {
         return loader;
     }
 

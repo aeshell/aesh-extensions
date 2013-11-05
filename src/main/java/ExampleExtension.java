@@ -106,102 +106,106 @@ public class ExampleExtension {
         //while ((consoleOutput = exampleConsole.read("[test@foo.bar]~> ")) != null) {
         exampleConsole.setConsoleCallback(new ConsoleCallback() {
             @Override
-            public int readConsoleOutput(ConsoleOperation consoleOutput) throws IOException {
+            public int readConsoleOutput(ConsoleOperation consoleOutput) {
+                try {
+                    String line = consoleOutput.getBuffer();
+                    exampleConsole.getShell().out().print("======>\"" + line + "\"\n");
 
-                String line = consoleOutput.getBuffer();
-                exampleConsole.getShell().out().print("======>\"" + line + "\"\n");
-
-                if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit") ||
-                        line.equalsIgnoreCase("reset")) {
-                    exampleConsole.stop();
-                }
-                if(line.equals("clear"))
-                    exampleConsole.clear();
-                if(line.startsWith("man")) {
-                    //exampleConsole.attachProcess(test);
-                    //man.setCurrentManPage("test");
-                    try {
-                        man.setFile("/tmp/test.txt.gz");
-                        man.setConsole(exampleConsole);
-                        man.setControlOperator(consoleOutput.getControlOperator());
-                        exampleConsole.attachProcess(man);
+                    if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit") ||
+                            line.equalsIgnoreCase("reset")) {
+                        exampleConsole.stop();
                     }
-                    catch (IllegalArgumentException iae) {
-                        exampleConsole.getShell().out().print(iae.getMessage());
+                    if(line.equals("clear"))
+                        exampleConsole.clear();
+                    if(line.startsWith("man")) {
+                        //exampleConsole.attachProcess(test);
+                        //man.setCurrentManPage("test");
+                        try {
+                            man.setFile("/tmp/test.txt.gz");
+                            man.setConsole(exampleConsole);
+                            man.setControlOperator(consoleOutput.getControlOperator());
+                            exampleConsole.attachProcess(man);
+                        }
+                        catch (IllegalArgumentException iae) {
+                            exampleConsole.getShell().out().print(iae.getMessage());
+                        }
                     }
-                }
-                if(line.startsWith("choice")) {
+                    if(line.startsWith("choice")) {
 
-                    exampleConsole.attachProcess(choice);
-                }
-                if(line.startsWith("harlem")) {
-                    exampleConsole.attachProcess(harlem);
-                    harlem.afterAttach();
-                }
-                if(line.trim().startsWith("less")) {
-                    //is it getting input from pipe
-                    if(exampleConsole.getShell().in().getStdIn().available() > 0) {
-                        java.util.Scanner s = new java.util.Scanner(exampleConsole.getShell().in().getStdIn()).useDelimiter("\\A");
-                        String fileContent = s.hasNext() ? s.next() : "";
-                        less.setInput(fileContent);
-                        less.setControlOperator(consoleOutput.getControlOperator());
-                        exampleConsole.attachProcess(less);
-                        less.afterAttach();
-
+                        exampleConsole.attachProcess(choice);
                     }
-                    else if(line.length() > "less".length()) {
-                        File f = new File(Parser.switchEscapedSpacesToSpacesInWord(line.substring("less ".length())).trim());
-                        if(f.isFile()) {
-                            //less.setPage(f);
-                            less.setFile(f);
+                    if(line.startsWith("harlem")) {
+                        exampleConsole.attachProcess(harlem);
+                        harlem.afterAttach();
+                    }
+                    if(line.trim().startsWith("less")) {
+                        //is it getting input from pipe
+                        if(exampleConsole.getShell().in().getStdIn().available() > 0) {
+                            java.util.Scanner s = new java.util.Scanner(exampleConsole.getShell().in().getStdIn()).useDelimiter("\\A");
+                            String fileContent = s.hasNext() ? s.next() : "";
+                            less.setInput(fileContent);
                             less.setControlOperator(consoleOutput.getControlOperator());
                             exampleConsole.attachProcess(less);
                             less.afterAttach();
+
                         }
-                        else if(f.isDirectory()) {
-                            exampleConsole.getShell().out().print(f.getAbsolutePath()+": is a directory"+
-                                    Config.getLineSeparator());
+                        else if(line.length() > "less".length()) {
+                            File f = new File(Parser.switchEscapedSpacesToSpacesInWord(line.substring("less ".length())).trim());
+                            if(f.isFile()) {
+                                //less.setPage(f);
+                                less.setFile(f);
+                                less.setControlOperator(consoleOutput.getControlOperator());
+                                exampleConsole.attachProcess(less);
+                                less.afterAttach();
+                            }
+                            else if(f.isDirectory()) {
+                                exampleConsole.getShell().out().print(f.getAbsolutePath()+": is a directory"+
+                                        Config.getLineSeparator());
+                            }
+                            else {
+                                exampleConsole.getShell().out().print(f.getAbsolutePath()+": No such file or directory"+
+                                        Config.getLineSeparator());
+                            }
                         }
                         else {
-                            exampleConsole.getShell().out().print(f.getAbsolutePath()+": No such file or directory"+
-                                    Config.getLineSeparator());
+                            exampleConsole.getShell().out().print("Missing filename (\"less --help\" for help)\n");
                         }
                     }
-                    else {
-                        exampleConsole.getShell().out().print("Missing filename (\"less --help\" for help)\n");
-                    }
-                }
 
-                if(line.startsWith("more")) {
-                    if(exampleConsole.getShell().in().getStdIn().available() > 0) {
-                        java.util.Scanner s = new java.util.Scanner(exampleConsole.getShell().in().getStdIn()).useDelimiter("\\A");
-                        String fileContent = s.hasNext() ? s.next() : "";
-                        more.setInput(fileContent);
-                        more.setControlOperator(consoleOutput.getControlOperator());
-                        exampleConsole.attachProcess(more);
-                        more.afterAttach();
-
-                    }
-                    else {
-                        File f = new File(Parser.switchEscapedSpacesToSpacesInWord(line.substring("more ".length())).trim());
-                        if(f.isFile()) {
-                            more.setFile(f);
+                    if(line.startsWith("more")) {
+                        if(exampleConsole.getShell().in().getStdIn().available() > 0) {
+                            java.util.Scanner s = new java.util.Scanner(exampleConsole.getShell().in().getStdIn()).useDelimiter("\\A");
+                            String fileContent = s.hasNext() ? s.next() : "";
+                            more.setInput(fileContent);
                             more.setControlOperator(consoleOutput.getControlOperator());
                             exampleConsole.attachProcess(more);
                             more.afterAttach();
 
                         }
-                        else if(f.isDirectory()) {
-                            exampleConsole.getShell().out().print(f.getAbsolutePath()+": is a directory"+
-                                    Config.getLineSeparator());
-                        }
                         else {
-                            exampleConsole.getShell().out().print(f.getAbsolutePath()+": No such file or directory"+
-                                    Config.getLineSeparator());
+                            File f = new File(Parser.switchEscapedSpacesToSpacesInWord(line.substring("more ".length())).trim());
+                            if(f.isFile()) {
+                                more.setFile(f);
+                                more.setControlOperator(consoleOutput.getControlOperator());
+                                exampleConsole.attachProcess(more);
+                                more.afterAttach();
+
+                            }
+                            else if(f.isDirectory()) {
+                                exampleConsole.getShell().out().print(f.getAbsolutePath()+": is a directory"+
+                                        Config.getLineSeparator());
+                            }
+                            else {
+                                exampleConsole.getShell().out().print(f.getAbsolutePath()+": No such file or directory"+
+                                        Config.getLineSeparator());
+                            }
                         }
                     }
+                    return 0;
                 }
-                return 0;
+                catch(IOException ioe) {
+                    return -1;
+                }
             }
         });
 

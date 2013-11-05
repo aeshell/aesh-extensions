@@ -4,9 +4,9 @@ import groovy.lang.GroovyClassLoader;
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.console.command.Command;
-import org.jboss.aesh.console.command.CommandInvocation;
 import org.jboss.aesh.console.command.CommandResult;
-import org.jboss.aesh.console.command.MutableCommandRegistry;
+import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.console.command.registry.MutableCommandRegistry;
 
 import java.io.File;
 import java.io.IOException;

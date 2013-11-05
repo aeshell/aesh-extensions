@@ -11,16 +11,16 @@ import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.console.Buffer;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
-import org.jboss.aesh.console.command.CommandInvocation;
 import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.ConsoleCommand;
+import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.console.man.FileParser;
+import org.jboss.aesh.console.man.TerminalPage;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.extensions.manual.ManCommand;
-import org.jboss.aesh.extensions.page.Page;
-import org.jboss.aesh.extensions.page.PageLoader;
-import org.jboss.aesh.extensions.page.SimplePageLoader;
+import org.jboss.aesh.extensions.page.SimpleFileParser;
 import org.jboss.aesh.util.ANSI;
 
 import java.io.File;
@@ -38,7 +38,7 @@ public class More implements ConsoleCommand, Command, ManCommand {
     private int prevTopVisibleRow;
     private StringBuilder number;
     private MorePage page;
-    private SimplePageLoader loader;
+    private SimpleFileParser loader;
     private CommandInvocation commandInvocation;
     private ControlOperator operator;
     private boolean attached = true;
@@ -96,7 +96,7 @@ public class More implements ConsoleCommand, Command, ManCommand {
             commandInvocation.getShell().out().flush();
         }
         page.clear();
-        loader = new SimplePageLoader();
+        loader = new SimpleFileParser();
         attached = false;
     }
 
@@ -221,7 +221,7 @@ public class More implements ConsoleCommand, Command, ManCommand {
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
         this.commandInvocation = commandInvocation;
         this.operator = commandInvocation.getControlOperator();
-        loader = new SimplePageLoader();
+        loader = new SimpleFileParser();
 
         if(commandInvocation.getShell().in().getStdIn().available() > 0) {
             java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
@@ -259,10 +259,10 @@ public class More implements ConsoleCommand, Command, ManCommand {
         INVERSE
     }
 
-    private class MorePage extends Page {
+    private class MorePage extends TerminalPage {
 
-        public MorePage(PageLoader loader, int columns) {
-            super(loader, columns);
+        public MorePage(FileParser fileParser, int columns) throws IOException {
+            super(fileParser, columns);
         }
 
     }
