@@ -13,6 +13,7 @@ import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.extensions.grep.AeshPosixFilePermissions;
 import org.jboss.aesh.parser.Parser;
 import org.jboss.aesh.terminal.Color;
 import org.jboss.aesh.terminal.Shell;
@@ -22,7 +23,14 @@ import org.jboss.aesh.util.FileLister;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.DosFileAttributes;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -58,6 +66,14 @@ public class Ls implements Command {
 
     private File cwd;
 
+    private Shell shell;
+    private long start;
+    private static final char SPACE = ' ';
+
+    private static final Class<? extends BasicFileAttributes> fileAttributes =
+            Config.isOSPOSIXCompatible() ? PosixFileAttributes.class : DosFileAttributes.class;
+
+    private static DateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd hh:mm");
     public Ls() {
         cwd = new File(Config.getUserDir());
     }
@@ -76,6 +92,8 @@ public class Ls implements Command {
             commandInvocation.getShell().out().println(commandInvocation.getHelpInfo("ls"));
             return CommandResult.SUCCESS;
         }
+
+        shell = commandInvocation.getShell();
 
         if(arguments == null) {
             arguments = new ArrayList<File>(1);
@@ -102,13 +120,20 @@ public class Ls implements Command {
     }
 
     private void displayDirectory(File input, Shell shell) {
+        start = System.currentTimeMillis();
         if(longListing) {
-            if(all)
+            if(all) {
+                File[] files = input.listFiles();
+                Arrays.sort(files, new PosixFileNameComparator());
                 shell.out().println(
-                        displayLongListing(input.listFiles()));
-            else
+                        displayLongListing(files));
+            }
+            else {
+                File[] files = input.listFiles(new FileLister.FileAndDirectoryNoDotNamesFilter());
+                Arrays.sort(files, new PosixFileNameComparator());
                 shell.out().println(
-                        displayLongListing(input.listFiles(new FileLister.FileAndDirectoryNoDotNamesFilter())));
+                        displayLongListing(files));
+            }
         }
         else {
             if(all)
@@ -121,6 +146,7 @@ public class Ls implements Command {
                         shell.getSize().getHeight(), shell.getSize().getWidth()));
 
         }
+        shell.out().println("display too: "+(System.currentTimeMillis()-start));
     }
 
     private List<TerminalString> formatFileList(File[] fileList) {
@@ -132,7 +158,7 @@ public class Ls implements Command {
             else
                 list.add(new TerminalString(file.getName()));
         }
-        Collections.sort(list, new PosixFileNameComparator());
+        Collections.sort(list, new PosixTerminalStringNameComparator());
         return list;
     }
 
@@ -142,107 +168,78 @@ public class Ls implements Command {
 
     private String displayLongListing(File[] files) {
 
-        StringGroup access = getAccessString(files);
-        StringGroup size = getSize(files);
-        StringGroup owner = getOwner(files);
-        StringGroup group = getGroup(files);
-        StringGroup modified = getModified(files);
+        StringGroup access = new StringGroup(files.length);
+        StringGroup size = new StringGroup(files.length);
+        StringGroup owner = new StringGroup(files.length);
+        StringGroup group = new StringGroup(files.length);
+        StringGroup modified = new StringGroup(files.length);
 
-        StringBuilder builder = new StringBuilder();
-        for(int i=0; i < files.length; i++) {
-            builder.append(access.getString(i))
-                    .append(size.getString(i))
-                    .append(owner.getString(i))
-                    .append(group.getString(i))
-                    .append(modified.getString(i))
-                    .append(" ")
-                    .append(files[i].getName())
-                    .append(Config.getLineSeparator());
+        try {
+            int counter = 0;
+            for(File file : files) {
+                BasicFileAttributes attr = Files.readAttributes(file.toPath(), fileAttributes);
+
+                access.addString(AeshPosixFilePermissions.toString(((PosixFileAttributes) attr)), counter);
+                size.addString(String.valueOf(attr.size()), counter);
+                if(Config.isOSPOSIXCompatible())
+                    owner.addString(((PosixFileAttributes) attr).owner().getName(), counter);
+                else
+                    owner.addString("", counter);
+                if(Config.isOSPOSIXCompatible())
+                    group.addString(((PosixFileAttributes) attr).group().getName(), counter);
+                else
+                    owner.addString("", counter);
+                modified.addString(DATE_FORMAT.format(new Date(attr.lastModifiedTime().toMillis())), counter);
+
+                counter++;
+            }
+            shell.out().println("Getting attributes took: "+(System.currentTimeMillis()-start));
+
+            //access.formatStringsBasedOnMaxLength();
+            //size.formatStringsBasedOnMaxLength();
+            //owner.formatStringsBasedOnMaxLength();
+            //group.formatStringsBasedOnMaxLength();
+            //modified.formatStringsBasedOnMaxLength();
+            shell.out().println("Formatting took: "+(System.currentTimeMillis()-start));
+        }
+        catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
+        StringBuilder builder = new StringBuilder();
+        TerminalColor directoryColor = new TerminalColor(Color.BLUE, Color.DEFAULT, Color.Intensity.BRIGHT);
+        for(int i=0; i < files.length; i++) {
+            if(files[i].isDirectory()) {
+                builder.append(access.getString(i))
+                        .append(owner.getFormattedString(i))
+                        .append(group.getFormattedString(i))
+                        .append(size.getFormattedString(i))
+                        .append(SPACE)
+                        .append(modified.getString(i))
+                        .append(SPACE);
+                builder.append(new TerminalString(files[i].getName(), directoryColor))
+                        .append(Config.getLineSeparator());
+
+            }
+            else {
+                builder.append(access.getString(i))
+                        .append(owner.getFormattedString(i))
+                        .append(group.getFormattedString(i))
+                        .append(SPACE)
+                        .append(size.getFormattedString(i))
+                        .append(modified.getString(i))
+                        .append(SPACE)
+                        .append(files[i].getName())
+                        .append(Config.getLineSeparator());
+            }
+        }
+
+
+        shell.out().println("Creating String took: "+(System.currentTimeMillis()-start));
         return builder.toString();
     }
 
-    private StringGroup getAccessString(File[] files) {
-        StringGroup access = new StringGroup(files.length);
-        int counter = 0;
-        for(File file : files) {
-            StringBuilder builder = new StringBuilder();
-            if(file.isDirectory())
-                builder.append("d");
-            else
-                builder.append("-");
-            if(file.canRead())
-                builder.append("r");
-            else
-                builder.append("-");
-            if(file.canWrite())
-                builder.append("w");
-            else
-                builder.append("-");
-            if(file.canExecute())
-                builder.append("x");
-            else
-                builder.append("-");
-
-           access.addString(builder.toString(), counter++);
-        }
-        access.formatStringsBasedOnMaxLength();
-
-        return access;
-    }
-
-    private StringGroup getSize(File[] files) {
-        StringGroup size = new StringGroup(files.length);
-        int counter = 0;
-        for(File file : files) {
-            //StringBuilder builder = new StringBuilder();
-
-            size.addString("1", counter++);
-        }
-        size.formatStringsBasedOnMaxLength();
-
-        return size;
-    }
-
-    private StringGroup getOwner(File[] files) {
-        StringGroup owner = new StringGroup(files.length);
-        int counter = 0;
-        for(File file : files) {
-            //StringBuilder builder = new StringBuilder();
-
-            owner.addString("owner", counter++);
-        }
-        owner.formatStringsBasedOnMaxLength();
-
-        return owner;
-    }
-
-    private StringGroup getGroup(File[] files) {
-        StringGroup group = new StringGroup(files.length);
-        int counter = 0;
-        for(File file : files) {
-            //StringBuilder builder = new StringBuilder();
-
-            group.addString("group", counter++);
-        }
-        group.formatStringsBasedOnMaxLength();
-
-        return group;
-    }
-
-    private StringGroup getModified(File[] files) {
-        StringGroup modified = new StringGroup(files.length);
-        int counter = 0;
-        for(File file : files) {
-            modified.addString(new Date(file.lastModified()).toString(), counter++);
-        }
-        modified.formatStringsBasedOnMaxLength();
-
-        return modified;
-    }
-
-    class PosixFileNameComparator implements Comparator<TerminalString> {
+    class PosixTerminalStringNameComparator implements Comparator<TerminalString> {
         private static final char DOT = '.';
 
         @Override
@@ -265,4 +262,32 @@ public class Ls implements Command {
                 return 0;
         }
     }
+
+
+    class PosixFileNameComparator implements Comparator<File> {
+        private static final char DOT = '.';
+
+        @Override
+        public int compare(File o1, File o2) {
+            if(o1.getName().length() > 1 && o2.getName().length() > 1) {
+                if(o1.getName().indexOf(DOT) == 0) {
+                    if(o2.getName().indexOf(DOT) == 0)
+                        return o1.getName().substring(1).compareToIgnoreCase(o2.getName().substring(1));
+                    else
+                        return o1.getName().substring(1).compareToIgnoreCase(o2.getName());
+                }
+                else {
+                    if(o2.getName().indexOf(DOT) == 0)
+                        return o1.getName().compareToIgnoreCase(o2.getName().substring(1));
+                    else
+                        return o1.getName().compareToIgnoreCase(o2.getName());
+                }
+            }
+            else
+                return 0;
+        }
+    }
+
+
+
 }

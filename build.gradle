@@ -4,7 +4,7 @@ apply plugin: 'idea'
 apply plugin: 'maven'
 apply plugin: 'application'
 
-sourceCompatibility = 1.6
+sourceCompatibility = 1.7
 group = 'org.jboss.aesh'
 version = '0.43-SNAPSHOT'
 mainClassName = "ExampleExtension"
@@ -30,7 +30,7 @@ dependencies {
 
 idea {
     project {
-        jdkName = "1.6"
+        jdkName = "1.7"
         ipr {
             withXml { provider ->
                 provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'

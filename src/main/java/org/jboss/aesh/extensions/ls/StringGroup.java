@@ -13,38 +13,35 @@ import org.jboss.aesh.parser.Parser;
  */
 public class StringGroup {
     private String[] strings;
+    private int maxLength = 0;
 
     public StringGroup(int size) {
         strings = new String[size];
     }
 
     public int largestString() {
-        int length = 0;
-        for(String s : strings)
-            if(s.length() > length)
-                length = s.length();
-
-        return length;
+       return maxLength;
     }
 
     public String[] getStrings() {
         return strings;
     }
 
-    public void setStrings(String[] strings) {
-        this.strings = strings;
-    }
-
     public void addString(String s, int place) {
         strings[place] = s;
+        if(s.length() > maxLength)
+            maxLength = s.length();
     }
 
     public String getString(int place) {
         return strings[place];
     }
 
+    public String getFormattedString(int place) {
+        return Parser.padLeft(maxLength+1, strings[place]);
+    }
+
     public void formatStringsBasedOnMaxLength() {
-        int maxLength = largestString()+1;
         for(int i=0; i<strings.length;i++)
             strings[i] = Parser.padLeft(maxLength, strings[i]);
     }
