@@ -66,8 +66,6 @@ public class Ls implements Command {
 
     private File cwd;
 
-    private Shell shell;
-    private long start;
     private static final char SPACE = ' ';
 
     private static final Class<? extends BasicFileAttributes> fileAttributes =
@@ -92,8 +90,6 @@ public class Ls implements Command {
             commandInvocation.getShell().out().println(commandInvocation.getHelpInfo("ls"));
             return CommandResult.SUCCESS;
         }
-
-        shell = commandInvocation.getShell();
 
         if(arguments == null) {
             arguments = new ArrayList<File>(1);
@@ -120,7 +116,6 @@ public class Ls implements Command {
     }
 
     private void displayDirectory(File input, Shell shell) {
-        start = System.currentTimeMillis();
         if(longListing) {
             if(all) {
                 File[] files = input.listFiles();
@@ -146,7 +141,6 @@ public class Ls implements Command {
                         shell.getSize().getHeight(), shell.getSize().getWidth()));
 
         }
-        shell.out().println("display too: "+(System.currentTimeMillis()-start));
     }
 
     private List<TerminalString> formatFileList(File[] fileList) {
@@ -193,14 +187,6 @@ public class Ls implements Command {
 
                 counter++;
             }
-            shell.out().println("Getting attributes took: "+(System.currentTimeMillis()-start));
-
-            //access.formatStringsBasedOnMaxLength();
-            //size.formatStringsBasedOnMaxLength();
-            //owner.formatStringsBasedOnMaxLength();
-            //group.formatStringsBasedOnMaxLength();
-            //modified.formatStringsBasedOnMaxLength();
-            shell.out().println("Formatting took: "+(System.currentTimeMillis()-start));
         }
         catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -225,8 +211,8 @@ public class Ls implements Command {
                 builder.append(access.getString(i))
                         .append(owner.getFormattedString(i))
                         .append(group.getFormattedString(i))
-                        .append(SPACE)
                         .append(size.getFormattedString(i))
+                        .append(SPACE)
                         .append(modified.getString(i))
                         .append(SPACE)
                         .append(files[i].getName())
@@ -235,7 +221,6 @@ public class Ls implements Command {
         }
 
 
-        shell.out().println("Creating String took: "+(System.currentTimeMillis()-start));
         return builder.toString();
     }
 
