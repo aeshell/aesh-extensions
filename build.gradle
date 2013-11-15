@@ -6,7 +6,7 @@ apply plugin: 'application'
 
 sourceCompatibility = 1.7
 group = 'org.jboss.aesh'
-version = '0.43-SNAPSHOT'
+version = '0.43'
 mainClassName = "ExampleExtension"
 
 jar {
