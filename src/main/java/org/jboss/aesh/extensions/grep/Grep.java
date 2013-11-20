@@ -20,6 +20,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 
 /**
@@ -61,13 +63,13 @@ public class Grep implements Command {
     private File file;
 
     @Option(shortName = 'i', name = "ignore-case", hasValue = false,
-    description = "ignore case distinctions")
+            description = "ignore case distinctions")
     private boolean ignoreCase;
 
     @Arguments(completer = GrepCompletor.class)
     private List<String> arguments;
 
-    private String pattern;
+    private Pattern pattern;
 
     public List<String> getArguments() {
         return arguments;
@@ -76,10 +78,23 @@ public class Grep implements Command {
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
         //just display help and return
-        if(help) {
+        if(help || arguments == null || arguments.size() == 0) {
             commandInvocation.getShell().out().println(commandInvocation.getHelpInfo("grep"));
             return CommandResult.SUCCESS;
         }
+
+        //first create the pattern
+        try {
+            if(ignoreCase)
+                pattern = Pattern.compile(arguments.remove(0), Pattern.CASE_INSENSITIVE);
+            else
+                pattern = Pattern.compile(arguments.remove(0));
+        }
+        catch(PatternSyntaxException pse) {
+            commandInvocation.getShell().out().println("grep: invalid pattern.");
+            return CommandResult.FAILURE;
+        }
+
         //do we have data from a pipe/redirect?
         if(commandInvocation.getShell().in().getStdIn().available() > 0) {
             java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
@@ -88,15 +103,10 @@ public class Grep implements Command {
             for(String i : input.split("\n"))
                 inputLines.add(i);
 
-            if(arguments != null && arguments.size() > 0)
-                pattern = arguments.remove(0);
-
             doGrep(inputLines, commandInvocation.getShell());
         }
         //find argument files and build regex..
         else {
-            if(arguments != null && arguments.size() > 0)
-                pattern = arguments.remove(0);
             if(arguments != null && arguments.size() > 0) {
                 for(String s : arguments)
                     doGrep(new File(s), commandInvocation.getShell());
@@ -104,9 +114,9 @@ public class Grep implements Command {
             //posix starts an interactive shell and read from the input here
             //atm, we'll just quit
             else {
+                commandInvocation.getShell().out().print("grep: no file or input given.");
                 return CommandResult.SUCCESS;
             }
-
         }
 
         return null;
@@ -142,7 +152,7 @@ public class Grep implements Command {
     private void doGrep(List<String> inputLines, Shell shell) {
         if(pattern != null) {
             for(String line : inputLines) {
-                if(line != null && line.contains(pattern)) {
+                if(line != null && pattern.matcher(line).find()) {
                     shell.out().println(line);
                 }
             }
