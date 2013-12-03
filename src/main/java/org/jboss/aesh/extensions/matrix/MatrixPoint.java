@@ -36,6 +36,7 @@ public class MatrixPoint {
     private int position;
     private int length;
     private char character;
+    private char defaultCharacter;
     private boolean previousWasText = false;
     //private String cursorPosition;
 
@@ -57,7 +58,7 @@ public class MatrixPoint {
 
     public void getChanges(Shell shell) throws IOException {
 
-        if(out[out.length-2] != -1) {
+        if(out[out.length-2] != -1 && defaultCharacter == '\u0000') {
             if(length == cyclesToLive && character != ' ') {
                 shell.out().print(WHITE_COLOR.fullString());
                 if(out[out.length-1] != -1) {
@@ -97,10 +98,14 @@ public class MatrixPoint {
     public void newCycle(int position, int length, boolean text) {
         this.length = length;
         this.cyclesToLive = length;
-        if(text)
-            character = (char) getRandomChar();
-        else
-            character = ' ';
+        if(defaultCharacter != '\u0000')
+            character = defaultCharacter;
+        else {
+            if(text)
+                character = (char) getRandomChar();
+            else
+                character = ' ';
+        }
 
         updateOut(character);
     }
@@ -142,6 +147,10 @@ public class MatrixPoint {
         this.length = length;
     }
 
+    public void setDefaultCharacter(char c) {
+        defaultCharacter = c;
+    }
+
     private static int getRandomChar() {
         return (int) (random() * randNum) + randMin;
     }
@@ -155,6 +164,6 @@ public class MatrixPoint {
     }
 
     private static boolean shouldStartWithText() {
-        return ((int) (random() * 5)) > 2;
+        return ((int) (random() * 6)) > 2;
     }
 }

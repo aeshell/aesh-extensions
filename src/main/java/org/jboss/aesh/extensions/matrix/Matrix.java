@@ -7,6 +7,7 @@
 package org.jboss.aesh.extensions.matrix;
 
 import org.jboss.aesh.cl.CommandDefinition;
+import org.jboss.aesh.cl.Option;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.CommandResult;
@@ -15,12 +16,16 @@ import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.terminal.Key;
 import org.jboss.aesh.terminal.Shell;
 import org.jboss.aesh.util.ANSI;
-import org.jboss.aesh.util.LoggerUtil;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -28,35 +33,101 @@ import java.util.logging.Logger;
 @CommandDefinition(name = "matrix", description = "do you take the blue pill??")
 public class Matrix implements Command, ConsoleCommand {
 
-    private static Logger logger = LoggerUtil.getLogger("Matrix.class");
+    @Option(shortName = 'h', hasValue = false)
+    private boolean help;
+
+    @Option(shortName = 'a', hasValue = false, defaultValue = {"true"})
+    private boolean async;
+
+    @Option(shortName = 'f')
+    private File file;
+
+    @Option(shortName = 'k', defaultValue = {"false"})
+    private boolean knock;
+
+    @Option
+    private String knockText;
+
+    @Option(shortName = 's', defaultValue = {"3"})
+    private int speed;
+
+    @Option(shortName = 'l', defaultValue = {"true"})
+    private boolean logo;
 
     private boolean attached = false;
     private ExecutorService executorService;
     private MatrixRunner runner;
     private Shell shell;
+    private List<String> knockLines;
+    private InputStream inputStream;
+
+    public Matrix() {
+    }
+
+    public Matrix(int speed, boolean async, boolean knock) {
+        this.speed = speed;
+        this.async = async;
+        this.knock = knock;
+    }
+
+    public Matrix(InputStream inputStream, List<String> knockLines) {
+        this.inputStream = inputStream;
+        this.knockLines = knockLines;
+        if(knockLines != null)
+            knock = true;
+        if(inputStream != null)
+            logo = true;
+    }
+
+    public Matrix(InputStream inputStream, List<String> knockLines, int speed, boolean async) {
+        this.inputStream = inputStream;
+        this.knockLines = knockLines;
+        this.speed = speed;
+        this.async = async;
+        if(knockLines != null)
+            knock = true;
+        if(inputStream != null)
+            logo = true;
+    }
 
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
-        attached = true;
-        shell = commandInvocation.getShell();
-        commandInvocation.attachConsoleCommand(this);
-        shell.out().print(ANSI.saveCursor());
-        shell.out().print(ANSI.hideCursor());
-        shell.enableAlternateBuffer();
-        shell.out().flush();
-        startMatrix(shell);
+        if(help) {
+            commandInvocation.getShell().out().println(commandInvocation.getHelpInfo("matrix"));
+            commandInvocation.getShell().out().flush();
+        }
+        else {
+            attached = true;
+            shell = commandInvocation.getShell();
+            commandInvocation.attachConsoleCommand(this);
+            shell.out().print(ANSI.saveCursor());
+            shell.out().print(ANSI.hideCursor());
+            shell.enableAlternateBuffer();
+            shell.out().flush();
+            startMatrix(shell);
+        }
         return CommandResult.SUCCESS;
     }
 
     private void startMatrix(Shell shell) {
-        runner = new MatrixRunner(shell);
+        setupKnock();
+        setupInput();
+        runner = new MatrixRunner(shell, knockLines, inputStream, speed, async);
         executorService = Executors.newSingleThreadExecutor();
         executorService.execute(runner);
     }
 
     @Override
     public void processOperation(CommandOperation commandOperation) throws IOException {
-        if(commandOperation.getInputKey() == Key.q) {
+        if(commandOperation.getInputKey().isNumber()) {
+            if(runner != null)
+                runner.speed(Integer.parseInt(String.valueOf((char) commandOperation.getInput()[0])));
+        }
+        if(commandOperation.getInputKey() == Key.a) {
+            if(runner != null)
+                runner.asynch();
+        }
+        else if(commandOperation.getInputKey() == Key.q) {
             if(runner != null)
                 runner.stop();
             if(executorService != null) {
@@ -64,6 +135,10 @@ public class Matrix implements Command, ConsoleCommand {
                 attached = false;
             }
 
+            //need to set it to null
+            inputStream = null;
+
+            shell.clear();
             shell.out().print(ANSI.restoreCursor());
             shell.out().print(ANSI.showCursor());
             shell.enableMainBuffer();
@@ -74,5 +149,34 @@ public class Matrix implements Command, ConsoleCommand {
     @Override
     public boolean isAttached() {
         return attached;
+    }
+
+    private void setupKnock() {
+        if(knock) {
+            if(knockText != null) {
+                knockLines = new ArrayList<>();
+                knockLines.add(knockText);
+            }
+            else {
+                knockLines = new ArrayList<>();
+                knockLines.add("Follow the white rabbit...");
+                knockLines.add("Knock, knock, "+System.getProperty("user.name")+"...");
+            }
+        }
+    }
+
+    private void setupInput() {
+        if(logo) {
+            if(inputStream == null) {
+                if(file != null && file.isFile()) {
+                    try {
+                        inputStream = new FileInputStream(file);
+                    }
+                    catch (FileNotFoundException ignored) { }
+                }
+                else
+                    inputStream = this.getClass().getClassLoader().getResourceAsStream("aesh_logo.txt");
+            }
+        }
     }
 }
