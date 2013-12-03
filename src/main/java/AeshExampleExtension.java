@@ -20,6 +20,7 @@ import org.jboss.aesh.extensions.groovy.GroovyCommand;
 import org.jboss.aesh.extensions.harlem.aesh.Harlem;
 import org.jboss.aesh.extensions.less.aesh.Less;
 import org.jboss.aesh.extensions.ls.Ls;
+import org.jboss.aesh.extensions.matrix.Matrix;
 import org.jboss.aesh.extensions.more.aesh.More;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ public class AeshExampleExtension {
                 .command(More.class)
                 //.command(man)
                 .command(Harlem.class)
+                .command(Matrix.class)
                 .command(GroovyCommand.class)
                 .command(Ls.class)
                 .command(Grep.class)
