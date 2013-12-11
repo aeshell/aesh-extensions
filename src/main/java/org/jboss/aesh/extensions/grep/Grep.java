@@ -9,6 +9,7 @@ import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
+import org.jboss.aesh.console.command.completer.CompleterInvocation;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.terminal.Shell;
 import org.jboss.aesh.util.FileLister;
@@ -166,10 +167,10 @@ public class Grep implements Command {
      * First argument is the pattern
      * All other arguments should be files
      */
-    public static class GrepCompletor implements OptionCompleter {
+    public static class GrepCompletor implements OptionCompleter<CompleterInvocation> {
 
         @Override
-        public void complete(CompleterData completerData) {
+        public void complete(CompleterInvocation completerData) {
             Grep grep = (Grep) completerData.getCommand();
             //the first argument is the pattern, do not autocomplete
             if(grep.getArguments() == null || grep.getArguments().size() == 0) {
@@ -177,7 +178,8 @@ public class Grep implements Command {
             }
             else if(grep.getArguments().size() > 0) {
                 File cwd = new File(Config.getUserDir());
-                CompleteOperation completeOperation = new CompleteOperation(completerData.getGivenCompleteValue(), 0);
+                CompleteOperation completeOperation =
+                        new CompleteOperation(completerData.getAeshContext(), completerData.getGivenCompleteValue(), 0);
                 if (completerData.getGivenCompleteValue() == null)
                     new FileLister("", cwd, FileLister.Filter.ALL).findMatchingDirectories(completeOperation);
                 else
