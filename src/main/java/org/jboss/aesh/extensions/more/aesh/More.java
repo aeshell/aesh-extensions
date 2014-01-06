@@ -6,6 +6,10 @@
  */
 package org.jboss.aesh.extensions.more.aesh;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.console.Buffer;
@@ -23,10 +27,6 @@ import org.jboss.aesh.extensions.manual.ManCommand;
 import org.jboss.aesh.extensions.page.SimpleFileParser;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.PathResolver;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -233,8 +233,8 @@ public class More implements ConsoleCommand, Command, ManCommand {
         }
         else if(arguments != null && arguments.size() > 0) {
             File f = arguments.get(0);
+            f = PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
             if(f.isFile()) {
-                f = PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
                 setFile(f);
                 this.commandInvocation.attachConsoleCommand(this);
                 afterAttach();
