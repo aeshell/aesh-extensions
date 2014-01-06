@@ -7,6 +7,7 @@ import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.console.command.registry.MutableCommandRegistry;
+import org.jboss.aesh.util.PathResolver;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +29,12 @@ public class GroovyCommand implements Command {
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
         this.commandInvocation = commandInvocation;
 
-        if(files != null && files.size() > 0)
-            loadCommand(files.get(0));
+        if(files != null && files.size() > 0) {
+            if(files.get(0).isFile()) {
+                File f = PathResolver.resolvePath(files.get(0), commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
+                loadCommand(f);
+            }
+        }
 
         return CommandResult.SUCCESS;
     }

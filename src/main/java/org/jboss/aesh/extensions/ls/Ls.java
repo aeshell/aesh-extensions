@@ -72,15 +72,8 @@ public class Ls implements Command {
             Config.isOSPOSIXCompatible() ? PosixFileAttributes.class : DosFileAttributes.class;
 
     private static DateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd hh:mm");
-    public Ls() {
-        cwd = new File(Config.getUserDir());
-    }
 
-    public Ls(File cwd) {
-        if(cwd != null && cwd.isDirectory())
-            this.cwd = cwd;
-        else
-            cwd = new File(Config.getUserDir());
+    public Ls() {
     }
 
     @Override
@@ -95,6 +88,9 @@ public class Ls implements Command {
             arguments = new ArrayList<File>(1);
             arguments.add(cwd);
         }
+
+        //set the cwd before displaying
+        setCwd(commandInvocation.getAeshContext().getCurrentWorkingDirectory());
 
         for(File f : arguments) {
             if(f.isDirectory())
@@ -113,6 +109,9 @@ public class Ls implements Command {
     public void setCwd(File cwd) {
         if(cwd.isDirectory())
             this.cwd = cwd;
+        else {
+            this.cwd = new File(Config.getUserDir());
+        }
     }
 
     private void displayDirectory(File input, Shell shell) {

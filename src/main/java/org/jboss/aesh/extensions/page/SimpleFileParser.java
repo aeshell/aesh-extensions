@@ -54,6 +54,9 @@ public class SimpleFileParser implements FileParser {
     public void setFile(File file) throws IOException {
         if(!file.isFile())
             throw new IllegalArgumentException(file+" must be a file.");
+
+        file =
+
         else {
             if(file.getName().endsWith("gz"))
                 initGzReader(file);

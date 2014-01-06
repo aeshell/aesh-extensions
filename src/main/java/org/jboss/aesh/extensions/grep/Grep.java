@@ -3,10 +3,8 @@ package org.jboss.aesh.extensions.grep;
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.cl.Option;
-import org.jboss.aesh.cl.completer.CompleterData;
 import org.jboss.aesh.cl.completer.OptionCompleter;
 import org.jboss.aesh.complete.CompleteOperation;
-import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.completer.CompleterInvocation;
@@ -177,14 +175,14 @@ public class Grep implements Command {
                 return;
             }
             else if(grep.getArguments().size() > 0) {
-                File cwd = new File(Config.getUserDir());
                 CompleteOperation completeOperation =
                         new CompleteOperation(completerData.getAeshContext(), completerData.getGivenCompleteValue(), 0);
                 if (completerData.getGivenCompleteValue() == null)
-                    new FileLister("", cwd, FileLister.Filter.ALL).findMatchingDirectories(completeOperation);
+                    new FileLister("", completerData.getAeshContext().getCurrentWorkingDirectory(),
+                            FileLister.Filter.ALL).findMatchingDirectories(completeOperation);
                 else
-                    new FileLister(completerData.getGivenCompleteValue(), cwd, FileLister.Filter.ALL)
-                            .findMatchingDirectories(completeOperation);
+                    new FileLister(completerData.getGivenCompleteValue(), completerData.getAeshContext().getCurrentWorkingDirectory(),
+                            FileLister.Filter.ALL).findMatchingDirectories(completeOperation);
 
                 if (completeOperation.getCompletionCandidates().size() > 1) {
                     completeOperation.removeEscapedSpacesFromCompletionCandidates();

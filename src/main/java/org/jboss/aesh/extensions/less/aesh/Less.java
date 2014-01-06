@@ -15,6 +15,7 @@ import org.jboss.aesh.console.man.FileParser;
 import org.jboss.aesh.console.man.TerminalPage;
 import org.jboss.aesh.extensions.page.SimpleFileParser;
 import org.jboss.aesh.util.ANSI;
+import org.jboss.aesh.util.PathResolver;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,6 +93,7 @@ public class Less extends AeshFileDisplayer {
         else if(arguments != null && arguments.size() > 0) {
             File f = arguments.get(0);
             if(f.isFile()) {
+                f = PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
                 setFile(f);
                 getCommandInvocation().attachConsoleCommand(this);
                 afterAttach();
