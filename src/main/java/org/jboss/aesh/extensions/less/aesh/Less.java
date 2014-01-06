@@ -6,6 +6,10 @@
  */
 package org.jboss.aesh.extensions.less.aesh;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.console.command.CommandResult;
@@ -16,10 +20,6 @@ import org.jboss.aesh.console.man.TerminalPage;
 import org.jboss.aesh.extensions.page.SimpleFileParser;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.PathResolver;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * A less implementation for Æsh ref: http://en.wikipedia.org/wiki/Less_(Unix)
@@ -92,8 +92,8 @@ public class Less extends AeshFileDisplayer {
         }
         else if(arguments != null && arguments.size() > 0) {
             File f = arguments.get(0);
+            f = PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
             if(f.isFile()) {
-                f = PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
                 setFile(f);
                 getCommandInvocation().attachConsoleCommand(this);
                 afterAttach();
