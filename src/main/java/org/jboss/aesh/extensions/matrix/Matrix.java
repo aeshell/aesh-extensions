@@ -11,7 +11,6 @@ import org.jboss.aesh.cl.Option;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.CommandResult;
-import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.terminal.Key;
 import org.jboss.aesh.terminal.Shell;
@@ -31,7 +30,7 @@ import java.util.concurrent.Executors;
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name = "matrix", description = "do you take the blue pill??")
-public class Matrix implements Command, ConsoleCommand {
+public class Matrix implements Command {
 
     @Option(shortName = 'h', hasValue = false)
     private boolean help;
@@ -58,6 +57,7 @@ public class Matrix implements Command, ConsoleCommand {
     private ExecutorService executorService;
     private MatrixRunner runner;
     private Shell shell;
+    private CommandInvocation commandInvocation;
     private List<String> knockLines;
     private InputStream inputStream;
 
@@ -99,12 +99,13 @@ public class Matrix implements Command, ConsoleCommand {
         else {
             attached = true;
             shell = commandInvocation.getShell();
-            commandInvocation.attachConsoleCommand(this);
+            this.commandInvocation = commandInvocation;
             shell.out().print(ANSI.saveCursor());
             shell.out().print(ANSI.hideCursor());
             shell.enableAlternateBuffer();
             shell.out().flush();
             startMatrix(shell);
+            processOperation();
         }
         return CommandResult.SUCCESS;
     }
@@ -117,38 +118,37 @@ public class Matrix implements Command, ConsoleCommand {
         executorService.execute(runner);
     }
 
-    @Override
-    public void processOperation(CommandOperation commandOperation) throws IOException {
-        if(commandOperation.getInputKey().isNumber()) {
-            if(runner != null)
-                runner.speed(Integer.parseInt(String.valueOf((char) commandOperation.getInput()[0])));
-        }
-        if(commandOperation.getInputKey() == Key.a) {
-            if(runner != null)
-                runner.asynch();
-        }
-        else if(commandOperation.getInputKey() == Key.q) {
-            if(runner != null)
-                runner.stop();
-            if(executorService != null) {
-                executorService.shutdown();
-                attached = false;
+    public void processOperation() throws IOException {
+
+        while(true) {
+            CommandOperation commandOperation = commandInvocation.getInput().get(0);
+            if(commandOperation.getInputKey().isNumber()) {
+                if(runner != null)
+                    runner.speed(Integer.parseInt(String.valueOf((char) commandOperation.getInput()[0])));
             }
+            if(commandOperation.getInputKey() == Key.a) {
+                if(runner != null)
+                    runner.asynch();
+            }
+            else if(commandOperation.getInputKey() == Key.q) {
+                if(runner != null)
+                    runner.stop();
+                if(executorService != null) {
+                    executorService.shutdown();
+                    attached = false;
+                }
 
-            //need to set it to null
-            inputStream = null;
+                //need to set it to null
+                inputStream = null;
 
-            shell.clear();
-            shell.out().print(ANSI.restoreCursor());
-            shell.out().print(ANSI.showCursor());
-            shell.enableMainBuffer();
-            shell.out().flush();
+                shell.clear();
+                shell.out().print(ANSI.restoreCursor());
+                shell.out().print(ANSI.showCursor());
+                shell.enableMainBuffer();
+                shell.out().flush();
+                return;
+            }
         }
-    }
-
-    @Override
-    public boolean isAttached() {
-        return attached;
     }
 
     private void setupKnock() {

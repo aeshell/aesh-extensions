@@ -12,7 +12,6 @@ import org.jboss.aesh.console.Buffer;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.command.CommandOperation;
-import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.console.man.FileParser;
 import org.jboss.aesh.console.man.TerminalPage;
 import org.jboss.aesh.console.operator.ControlOperator;
@@ -29,7 +28,7 @@ import java.io.IOException;
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class More implements ConsoleCommand, Completion {
+public class More implements Completion {
 
     private int rows;
     private int topVisibleRow;
@@ -100,12 +99,6 @@ public class More implements ConsoleCommand, Completion {
         attached = false;
     }
 
-    @Override
-    public boolean isAttached() {
-        return attached;
-    }
-
-    @Override
     public void processOperation(CommandOperation operation) throws IOException {
         if(operation.getInput()[0] == 'q') {
             afterDetach();

@@ -87,7 +87,6 @@ public class Less extends AeshFileDisplayer {
             java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
             String fileContent = s.hasNext() ? s.next() : "";
             setInput(fileContent);
-            getCommandInvocation().attachConsoleCommand(this);
             afterAttach();
         }
         else if(arguments != null && arguments.size() > 0) {
@@ -95,7 +94,6 @@ public class Less extends AeshFileDisplayer {
             f = PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
             if(f.isFile()) {
                 setFile(f);
-                getCommandInvocation().attachConsoleCommand(this);
                 afterAttach();
             }
             else if(f.isDirectory()) {

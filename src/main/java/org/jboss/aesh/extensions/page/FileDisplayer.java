@@ -11,7 +11,6 @@ import org.jboss.aesh.console.Buffer;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.command.CommandOperation;
-import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.console.man.FileParser;
 import org.jboss.aesh.console.man.TerminalPage;
 import org.jboss.aesh.console.operator.ControlOperator;
@@ -31,7 +30,7 @@ import static org.jboss.aesh.console.man.TerminalPage.Search;
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public abstract class FileDisplayer  implements ConsoleCommand, Completion {
+public abstract class FileDisplayer implements Completion {
 
     private int rows;
     private int columns;
@@ -58,11 +57,6 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
 
     public void setControlOperator(ControlOperator controlOperator) {
         this.controlOperator = controlOperator;
-    }
-
-    @Override
-    public boolean isAttached() {
-        return attached;
     }
 
     public void afterAttach() throws IOException {
@@ -113,7 +107,6 @@ public abstract class FileDisplayer  implements ConsoleCommand, Completion {
         attached = false;
     }
 
-    @Override
     public void processOperation(CommandOperation operation) throws IOException {
         if(operation.getInput()[0] == 'q') {
             if(search == Search.SEARCHING) {

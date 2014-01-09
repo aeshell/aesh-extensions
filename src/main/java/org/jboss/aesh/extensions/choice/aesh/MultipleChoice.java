@@ -5,7 +5,6 @@ import org.jboss.aesh.complete.Completion;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.command.CommandOperation;
-import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.LoggerUtil;
 
@@ -16,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class MultipleChoice implements ConsoleCommand, Completion {
+public class MultipleChoice implements Completion {
 
     private List<org.jboss.aesh.extensions.choice.console.MultipleChoice> choices;
     private String commandName;
@@ -44,11 +43,6 @@ public class MultipleChoice implements ConsoleCommand, Completion {
     @Override
     public void complete(CompleteOperation completeOperation) {
         //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean isAttached() {
-        return attached;
     }
 
     protected void afterAttach() throws IOException {
@@ -83,7 +77,6 @@ public class MultipleChoice implements ConsoleCommand, Completion {
         attached = false;
     }
 
-    @Override
     public void processOperation(CommandOperation operation) throws IOException {
         if(Character.isDigit(operation.getInput()[0])) {
             int c = Character.getNumericValue(operation.getInput()[0]);

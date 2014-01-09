@@ -11,7 +11,6 @@ import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.CommandResult;
-import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.terminal.Color;
 import org.jboss.aesh.terminal.Shell;
@@ -32,7 +31,7 @@ import java.util.Random;
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name="harlem", description = "wanna do the harlem..?")
-public class Harlem implements ConsoleCommand, Command {
+public class Harlem implements Command {
 
     private int rows;
     private int columns;
@@ -43,7 +42,6 @@ public class Harlem implements ConsoleCommand, Command {
     private boolean allowDownload = false;
     private File harlemWav = new File(Config.getTmpDir()+Config.getPathSeparator()+"harlem.wav");
     private CommandInvocation commandInvocation;
-    private boolean attached = true;
 
     public Harlem() {
         random = new Random();
@@ -61,11 +59,6 @@ public class Harlem implements ConsoleCommand, Command {
             startHarlem();
     }
 
-    @Override
-    public boolean isAttached() {
-        return attached;
-    }
-
     private Shell getShell() {
         return commandInvocation.getShell();
     }
@@ -74,13 +67,13 @@ public class Harlem implements ConsoleCommand, Command {
         getShell().out().print(ANSI.getStart()+rows+";1H");
         getShell().out().print("Allow harlem to save file to \""+Config.getTmpDir()+"? (y or n)");
         getShell().out().flush();
+        processOperation(commandInvocation.getInput().get(0));
     }
 
     protected void afterDetach() throws IOException {
         getShell().out().print(ANSI.getMainBufferScreen());
         getShell().out().print(ANSI.getStart()+"?25h");
         getShell().out().flush();
-        attached = false;
     }
 
     private void displayWait() throws IOException {
@@ -175,7 +168,6 @@ public class Harlem implements ConsoleCommand, Command {
         getShell().out().flush();
     }
 
-    @Override
     public void processOperation(CommandOperation operation) throws IOException {
         if(operation.getInput()[0] == 'y') {
            allowDownload = true;
@@ -238,7 +230,6 @@ public class Harlem implements ConsoleCommand, Command {
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
         this.commandInvocation = commandInvocation;
-        commandInvocation.attachConsoleCommand(this);
         afterAttach();
         return CommandResult.SUCCESS;
     }

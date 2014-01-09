@@ -17,13 +17,11 @@ import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.CommandResult;
-import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.console.man.FileParser;
 import org.jboss.aesh.console.man.TerminalPage;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
-import org.jboss.aesh.extensions.manual.ManCommand;
 import org.jboss.aesh.extensions.page.SimpleFileParser;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.PathResolver;
@@ -32,7 +30,7 @@ import org.jboss.aesh.util.PathResolver;
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name="more", description = "is more less?")
-public class More implements ConsoleCommand, Command, ManCommand {
+public class More implements Command {
 
     private int rows;
     private int topVisibleRow;
@@ -86,6 +84,8 @@ public class More implements ConsoleCommand, Command, ManCommand {
             else
                 display(Background.INVERSE);
         }
+
+        processOperation();
     }
 
     protected void afterDetach() throws IOException {
@@ -98,56 +98,54 @@ public class More implements ConsoleCommand, Command, ManCommand {
         }
         page.clear();
         loader = new SimpleFileParser();
-        attached = false;
     }
 
-    @Override
-    public void processOperation(CommandOperation operation) throws IOException {
-        if(operation.getInput()[0] == 'q') {
-            afterDetach();
-        }
-        else if( operation.equals(Operation.NEW_LINE)) {
-            topVisibleRow = topVisibleRow + getNumber();
-            if(topVisibleRow > (page.size()-rows)) {
-                topVisibleRow = page.size()-rows;
+    public void processOperation() throws IOException {
+        boolean attach = true;
+        while(attach) {
+            CommandOperation operation = commandInvocation.getInput().get(0);
+            if(operation.getInput()[0] == 'q') {
+                attach = false;
+            }
+            else if( operation.equals(Operation.NEW_LINE)) {
+                topVisibleRow = topVisibleRow + getNumber();
+                if(topVisibleRow > (page.size()-rows)) {
+                    topVisibleRow = page.size()-rows;
+                    if(topVisibleRow < 0)
+                        topVisibleRow = 0;
+                    display(Background.INVERSE);
+                    attach = false;
+                }
+                else
+                    display(Background.INVERSE);
+                clearNumber();
+            }
+            // ctrl-f ||  space
+            else if(operation.getInput()[0] == 6 || operation.getInput()[0] == 32) {
+                topVisibleRow = topVisibleRow + rows*getNumber();
+                if(topVisibleRow > (page.size()-rows)) {
+                    topVisibleRow = page.size()-rows;
+                    if(topVisibleRow < 0)
+                        topVisibleRow = 0;
+                    display(Background.INVERSE);
+                    attach = false;
+                }
+                else
+                    display(Background.INVERSE);
+                clearNumber();
+            }
+            else if(operation.getInput()[0] == 2) { // ctrl-b
+                topVisibleRow = topVisibleRow - rows*getNumber();
                 if(topVisibleRow < 0)
                     topVisibleRow = 0;
                 display(Background.INVERSE);
-                afterDetach();
+                clearNumber();
             }
-            else
-                display(Background.INVERSE);
-            clearNumber();
-        }
-        // ctrl-f ||  space
-        else if(operation.getInput()[0] == 6 || operation.getInput()[0] == 32) {
-            topVisibleRow = topVisibleRow + rows*getNumber();
-            if(topVisibleRow > (page.size()-rows)) {
-                topVisibleRow = page.size()-rows;
-                if(topVisibleRow < 0)
-                    topVisibleRow = 0;
-                display(Background.INVERSE);
-                afterDetach();
+            else if(Character.isDigit(operation.getInput()[0])) {
+                number.append(Character.getNumericValue(operation.getInput()[0]));
             }
-            else
-                display(Background.INVERSE);
-            clearNumber();
         }
-        else if(operation.getInput()[0] == 2) { // ctrl-b
-            topVisibleRow = topVisibleRow - rows*getNumber();
-            if(topVisibleRow < 0)
-                topVisibleRow = 0;
-            display(Background.INVERSE);
-            clearNumber();
-        }
-        else if(Character.isDigit(operation.getInput()[0])) {
-            number.append(Character.getNumericValue(operation.getInput()[0]));
-        }
-    }
-
-    @Override
-    public boolean isAttached() {
-        return attached;
+        afterDetach();
     }
 
     private void display(Background background) throws IOException {
@@ -228,7 +226,6 @@ public class More implements ConsoleCommand, Command, ManCommand {
             java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
             String fileContent = s.hasNext() ? s.next() : "";
             setInput(fileContent);
-            this.commandInvocation.attachConsoleCommand(this);
             afterAttach();
         }
         else if(arguments != null && arguments.size() > 0) {
@@ -236,7 +233,6 @@ public class More implements ConsoleCommand, Command, ManCommand {
             f = PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
             if(f.isFile()) {
                 setFile(f);
-                this.commandInvocation.attachConsoleCommand(this);
                 afterAttach();
             }
             else if(f.isDirectory()) {
@@ -248,12 +244,6 @@ public class More implements ConsoleCommand, Command, ManCommand {
         }
 
         return CommandResult.SUCCESS;
-    }
-
-    @Override
-    public File getManLocation() {
-        //just a test atm
-        return new File("/tmp/more.txt");
     }
 
     private static enum Background {

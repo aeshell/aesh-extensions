@@ -104,9 +104,9 @@ public class ExampleExtension {
         exampleConsole.setPrompt(new Prompt("[test@foo]~> "));
         //exampleConsole.pushToConsole(ANSI.greenText());
         //while ((consoleOutput = exampleConsole.read("[test@foo.bar]~> ")) != null) {
-        exampleConsole.setConsoleCallback(new ConsoleCallback() {
+        exampleConsole.setConsoleCallback(new AeshConsoleCallback() {
             @Override
-            public int readConsoleOutput(ConsoleOperation consoleOutput) {
+            public int execute(ConsoleOperation consoleOutput) {
                 try {
                     String line = consoleOutput.getBuffer();
                     exampleConsole.getShell().out().print("======>\"" + line + "\"\n");
@@ -124,7 +124,7 @@ public class ExampleExtension {
                             man.setFile("/tmp/test.txt.gz");
                             man.setConsole(exampleConsole);
                             man.setControlOperator(consoleOutput.getControlOperator());
-                            exampleConsole.attachProcess(man);
+                            //exampleConsole.attachProcess(man);
                         }
                         catch (IllegalArgumentException iae) {
                             exampleConsole.getShell().out().print(iae.getMessage());
@@ -132,10 +132,10 @@ public class ExampleExtension {
                     }
                     if(line.startsWith("choice")) {
 
-                        exampleConsole.attachProcess(choice);
+                        //exampleConsole.attachProcess(choice);
                     }
                     if(line.startsWith("harlem")) {
-                        exampleConsole.attachProcess(harlem);
+                        //exampleConsole.attachProcess(harlem);
                         harlem.afterAttach();
                     }
                     if(line.trim().startsWith("less")) {
@@ -145,7 +145,7 @@ public class ExampleExtension {
                             String fileContent = s.hasNext() ? s.next() : "";
                             less.setInput(fileContent);
                             less.setControlOperator(consoleOutput.getControlOperator());
-                            exampleConsole.attachProcess(less);
+                            //exampleConsole.attachProcess(less);
                             less.afterAttach();
 
                         }
@@ -155,7 +155,7 @@ public class ExampleExtension {
                                 //less.setPage(f);
                                 less.setFile(f);
                                 less.setControlOperator(consoleOutput.getControlOperator());
-                                exampleConsole.attachProcess(less);
+                                //exampleConsole.attachProcess(less);
                                 less.afterAttach();
                             }
                             else if(f.isDirectory()) {
@@ -178,7 +178,7 @@ public class ExampleExtension {
                             String fileContent = s.hasNext() ? s.next() : "";
                             more.setInput(fileContent);
                             more.setControlOperator(consoleOutput.getControlOperator());
-                            exampleConsole.attachProcess(more);
+                            //exampleConsole.attachProcess(more);
                             more.afterAttach();
 
                         }
@@ -187,7 +187,7 @@ public class ExampleExtension {
                             if(f.isFile()) {
                                 more.setFile(f);
                                 more.setControlOperator(consoleOutput.getControlOperator());
-                                exampleConsole.attachProcess(more);
+                                //exampleConsole.attachProcess(more);
                                 more.afterAttach();
 
                             }

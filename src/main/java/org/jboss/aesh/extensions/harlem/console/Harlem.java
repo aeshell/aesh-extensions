@@ -11,7 +11,6 @@ import org.jboss.aesh.complete.Completion;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.command.CommandOperation;
-import org.jboss.aesh.console.command.ConsoleCommand;
 import org.jboss.aesh.terminal.Color;
 import org.jboss.aesh.terminal.TerminalCharacter;
 import org.jboss.aesh.terminal.TerminalColor;
@@ -30,7 +29,7 @@ import java.util.Random;
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
-public class Harlem implements ConsoleCommand, Completion {
+public class Harlem implements Completion {
 
     private int rows;
     private int columns;
@@ -60,15 +59,11 @@ public class Harlem implements ConsoleCommand, Completion {
             startHarlem();
     }
 
-    @Override
-    public boolean isAttached() {
-        return attached;
-    }
-
     private void displayQuestion() throws IOException {
         console.getShell().out().print(ANSI.getStart()+rows+";1H");
         console.getShell().out().print("Allow harlem to save file to \""+Config.getTmpDir()+"? (y or n)");
         console.getShell().out().flush();
+        //processInvocation(..)
     }
 
     protected void afterDetach() throws IOException {
@@ -170,7 +165,6 @@ public class Harlem implements ConsoleCommand, Completion {
         console.getShell().out().flush();
     }
 
-    @Override
     public void processOperation(CommandOperation operation) throws IOException {
         if(operation.getInput()[0] == 'y') {
            allowDownload = true;
