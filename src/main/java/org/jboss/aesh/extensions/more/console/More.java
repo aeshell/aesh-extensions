@@ -38,7 +38,6 @@ public class More implements Completion {
     private SimpleFileParser loader;
     private Console console;
     private ControlOperator controlOperator;
-    private boolean attached = true;
 
     public More(Console console) {
         this.console = console;
@@ -96,7 +95,6 @@ public class More implements Completion {
             console.getShell().out().flush();
         }
         page.clear();
-        attached = false;
     }
 
     public void processOperation(CommandOperation operation) throws IOException {

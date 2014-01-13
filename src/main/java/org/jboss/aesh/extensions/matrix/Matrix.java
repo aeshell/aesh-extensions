@@ -121,7 +121,7 @@ public class Matrix implements Command {
     public void processOperation() throws IOException {
 
         while(true) {
-            CommandOperation commandOperation = commandInvocation.getInput().get(0);
+            CommandOperation commandOperation = commandInvocation.getInput();
             if(commandOperation.getInputKey().isNumber()) {
                 if(runner != null)
                     runner.speed(Integer.parseInt(String.valueOf((char) commandOperation.getInput()[0])));

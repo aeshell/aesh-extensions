@@ -103,7 +103,7 @@ public class More implements Command {
     public void processOperation() throws IOException {
         boolean attach = true;
         while(attach) {
-            CommandOperation operation = commandInvocation.getInput().get(0);
+            CommandOperation operation = commandInvocation.getInput();
             if(operation.getInput()[0] == 'q') {
                 attach = false;
             }

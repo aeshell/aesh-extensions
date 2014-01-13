@@ -67,7 +67,7 @@ public class Harlem implements Command {
         getShell().out().print(ANSI.getStart()+rows+";1H");
         getShell().out().print("Allow harlem to save file to \""+Config.getTmpDir()+"? (y or n)");
         getShell().out().flush();
-        processOperation(commandInvocation.getInput().get(0));
+        processOperation(commandInvocation.getInput());
     }
 
     protected void afterDetach() throws IOException {
