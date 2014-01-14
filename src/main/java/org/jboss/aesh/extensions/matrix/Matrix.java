@@ -120,35 +120,44 @@ public class Matrix implements Command {
 
     public void processOperation() throws IOException {
 
-        while(true) {
-            CommandOperation commandOperation = commandInvocation.getInput();
-            if(commandOperation.getInputKey().isNumber()) {
-                if(runner != null)
-                    runner.speed(Integer.parseInt(String.valueOf((char) commandOperation.getInput()[0])));
-            }
-            if(commandOperation.getInputKey() == Key.a) {
-                if(runner != null)
-                    runner.asynch();
-            }
-            else if(commandOperation.getInputKey() == Key.q) {
-                if(runner != null)
-                    runner.stop();
-                if(executorService != null) {
-                    executorService.shutdown();
-                    attached = false;
+        try {
+            while(true) {
+                CommandOperation commandOperation = commandInvocation.getInput();
+                if(commandOperation.getInputKey().isNumber()) {
+                    if(runner != null)
+                        runner.speed(Integer.parseInt(String.valueOf((char) commandOperation.getInput()[0])));
                 }
-
-                //need to set it to null
-                inputStream = null;
-
-                shell.clear();
-                shell.out().print(ANSI.restoreCursor());
-                shell.out().print(ANSI.showCursor());
-                shell.enableMainBuffer();
-                shell.out().flush();
-                return;
+                if(commandOperation.getInputKey() == Key.a) {
+                    if(runner != null)
+                        runner.asynch();
+                }
+                else if(commandOperation.getInputKey() == Key.q) {
+                    stop();
+                    return;
+                }
             }
         }
+        catch (InterruptedException ie) {
+            stop();
+        }
+    }
+
+    private void stop() throws IOException {
+        if(runner != null)
+            runner.stop();
+        if(executorService != null) {
+            executorService.shutdown();
+            attached = false;
+        }
+
+        //need to set it to null
+        inputStream = null;
+
+        shell.clear();
+        shell.out().print(ANSI.restoreCursor());
+        shell.out().print(ANSI.showCursor());
+        shell.enableMainBuffer();
+        shell.out().flush();
     }
 
     private void setupKnock() {

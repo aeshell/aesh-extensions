@@ -102,48 +102,52 @@ public class More implements Command {
 
     public void processOperation() throws IOException {
         boolean attach = true;
-        while(attach) {
-            CommandOperation operation = commandInvocation.getInput();
-            if(operation.getInput()[0] == 'q') {
-                attach = false;
-            }
-            else if( operation.equals(Operation.NEW_LINE)) {
-                topVisibleRow = topVisibleRow + getNumber();
-                if(topVisibleRow > (page.size()-rows)) {
-                    topVisibleRow = page.size()-rows;
+        try {
+            while(attach) {
+                CommandOperation operation = commandInvocation.getInput();
+                if(operation.getInput()[0] == 'q') {
+                    attach = false;
+                }
+                else if( operation.equals(Operation.NEW_LINE)) {
+                    topVisibleRow = topVisibleRow + getNumber();
+                    if(topVisibleRow > (page.size()-rows)) {
+                        topVisibleRow = page.size()-rows;
+                        if(topVisibleRow < 0)
+                            topVisibleRow = 0;
+                        display(Background.INVERSE);
+                        attach = false;
+                    }
+                    else
+                        display(Background.INVERSE);
+                    clearNumber();
+                }
+                // ctrl-f ||  space
+                else if(operation.getInput()[0] == 6 || operation.getInput()[0] == 32) {
+                    topVisibleRow = topVisibleRow + rows*getNumber();
+                    if(topVisibleRow > (page.size()-rows)) {
+                        topVisibleRow = page.size()-rows;
+                        if(topVisibleRow < 0)
+                            topVisibleRow = 0;
+                        display(Background.INVERSE);
+                        attach = false;
+                    }
+                    else
+                        display(Background.INVERSE);
+                    clearNumber();
+                }
+                else if(operation.getInput()[0] == 2) { // ctrl-b
+                    topVisibleRow = topVisibleRow - rows*getNumber();
                     if(topVisibleRow < 0)
                         topVisibleRow = 0;
                     display(Background.INVERSE);
-                    attach = false;
+                    clearNumber();
                 }
-                else
-                    display(Background.INVERSE);
-                clearNumber();
-            }
-            // ctrl-f ||  space
-            else if(operation.getInput()[0] == 6 || operation.getInput()[0] == 32) {
-                topVisibleRow = topVisibleRow + rows*getNumber();
-                if(topVisibleRow > (page.size()-rows)) {
-                    topVisibleRow = page.size()-rows;
-                    if(topVisibleRow < 0)
-                        topVisibleRow = 0;
-                    display(Background.INVERSE);
-                    attach = false;
+                else if(Character.isDigit(operation.getInput()[0])) {
+                    number.append(Character.getNumericValue(operation.getInput()[0]));
                 }
-                else
-                    display(Background.INVERSE);
-                clearNumber();
             }
-            else if(operation.getInput()[0] == 2) { // ctrl-b
-                topVisibleRow = topVisibleRow - rows*getNumber();
-                if(topVisibleRow < 0)
-                    topVisibleRow = 0;
-                display(Background.INVERSE);
-                clearNumber();
-            }
-            else if(Character.isDigit(operation.getInput()[0])) {
-                number.append(Character.getNumericValue(operation.getInput()[0]));
-            }
+        }
+        catch (InterruptedException ie) {
         }
         afterDetach();
     }
