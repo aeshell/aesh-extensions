@@ -64,8 +64,6 @@ public class Ls implements Command {
     @Arguments
     private List<File> arguments;
 
-    private File cwd;
-
     private static final char SPACE = ' ';
 
     private static final Class<? extends BasicFileAttributes> fileAttributes =
@@ -85,12 +83,9 @@ public class Ls implements Command {
         }
 
         if(arguments == null) {
-            arguments = new ArrayList<File>(1);
-            arguments.add(cwd);
+            arguments = new ArrayList<>(1);
+            arguments.add(commandInvocation.getAeshContext().getCurrentWorkingDirectory());
         }
-
-        //set the cwd before displaying
-        setCwd(commandInvocation.getAeshContext().getCurrentWorkingDirectory());
 
         for(File f : arguments) {
             if(f.isDirectory())
@@ -104,14 +99,6 @@ public class Ls implements Command {
         }
 
         return CommandResult.SUCCESS;
-    }
-
-    public void setCwd(File cwd) {
-        if(cwd.isDirectory())
-            this.cwd = cwd;
-        else {
-            this.cwd = new File(Config.getUserDir());
-        }
     }
 
     private void displayDirectory(File input, Shell shell) {
