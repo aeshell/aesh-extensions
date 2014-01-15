@@ -21,8 +21,8 @@ import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.console.man.FileParser;
 import org.jboss.aesh.console.man.TerminalPage;
 import org.jboss.aesh.console.operator.ControlOperator;
-import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.extensions.page.SimpleFileParser;
+import org.jboss.aesh.terminal.Key;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.PathResolver;
 
@@ -40,7 +40,6 @@ public class More implements Command {
     private SimpleFileParser loader;
     private CommandInvocation commandInvocation;
     private ControlOperator operator;
-    private boolean attached = true;
 
     @Arguments
     private List<File> arguments;
@@ -75,7 +74,8 @@ public class More implements Command {
                     commandInvocation.getShell().out().print(Config.getLineSeparator());
             }
 
-            afterDetach();
+            page.clear();
+            loader = new SimpleFileParser();
         }
         else {
             if(!page.hasData()) {
@@ -83,9 +83,9 @@ public class More implements Command {
             }
             else
                 display(Background.INVERSE);
-        }
 
-        processOperation();
+            processOperation();
+        }
     }
 
     protected void afterDetach() throws IOException {
@@ -105,10 +105,10 @@ public class More implements Command {
         try {
             while(attach) {
                 CommandOperation operation = commandInvocation.getInput();
-                if(operation.getInput()[0] == 'q') {
+                if(operation.getInputKey() == Key.q) {
                     attach = false;
                 }
-                else if( operation.equals(Operation.NEW_LINE)) {
+                else if( operation.getInputKey() == Key.ENTER) {
                     topVisibleRow = topVisibleRow + getNumber();
                     if(topVisibleRow > (page.size()-rows)) {
                         topVisibleRow = page.size()-rows;
@@ -122,7 +122,8 @@ public class More implements Command {
                     clearNumber();
                 }
                 // ctrl-f ||  space
-                else if(operation.getInput()[0] == 6 || operation.getInput()[0] == 32) {
+                else if(operation.getInputKey() == Key.CTRL_F ||
+                        operation.getInputKey() == Key.SPACE) {
                     topVisibleRow = topVisibleRow + rows*getNumber();
                     if(topVisibleRow > (page.size()-rows)) {
                         topVisibleRow = page.size()-rows;
@@ -135,7 +136,7 @@ public class More implements Command {
                         display(Background.INVERSE);
                     clearNumber();
                 }
-                else if(operation.getInput()[0] == 2) { // ctrl-b
+                else if(operation.getInputKey() == Key.CTRL_B) { // ctrl-b
                     topVisibleRow = topVisibleRow - rows*getNumber();
                     if(topVisibleRow < 0)
                         topVisibleRow = 0;
