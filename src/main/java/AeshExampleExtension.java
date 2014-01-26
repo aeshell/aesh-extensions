@@ -15,6 +15,7 @@ import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.console.command.registry.AeshCommandRegistryBuilder;
 import org.jboss.aesh.console.command.registry.CommandRegistry;
 import org.jboss.aesh.console.settings.SettingsBuilder;
+import org.jboss.aesh.extensions.cat.Cat;
 import org.jboss.aesh.extensions.grep.Grep;
 import org.jboss.aesh.extensions.groovy.GroovyCommand;
 import org.jboss.aesh.extensions.harlem.aesh.Harlem;
@@ -45,6 +46,7 @@ public class AeshExampleExtension {
                 .command(GroovyCommand.class)
                 .command(Ls.class)
                 .command(Grep.class)
+                .command(Cat.class)
                 .create();
 
         AeshConsole aeshConsole = new AeshConsoleBuilder()
