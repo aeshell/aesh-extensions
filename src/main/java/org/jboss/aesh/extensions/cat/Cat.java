@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * A simple cat command
+ *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name = "cat", description = "concatenate files and print on the standard output")
@@ -29,7 +31,7 @@ public class Cat implements Command {
     @Option(shortName = 'b', name = "number-nonblank", hasValue = false, description = "number nonempty output lines, overrides -n")
     private boolean numberNonBlank;
 
-    @Option(shortName = 'e', name = "show-ends", hasValue = false, description = "display $ at end of each line")
+    @Option(shortName = 'E', name = "show-ends", hasValue = false, description = "display $ at end of each line")
     private boolean showEnds;
 
     @Option(shortName = 'n', name = "number", hasValue = false, description = "number all output lines")
@@ -50,7 +52,17 @@ public class Cat implements Command {
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
 
+        if(help) {
+            commandInvocation.getShell().out().print(
+                    commandInvocation.getHelpInfo("cat") );
+            return CommandResult.SUCCESS;
+        }
+
         try {
+            if(showAll) {
+                showEnds = true;
+                showTabs = true;
+            }
             if(files != null && files.size() > 0) {
                 for(File f : files)
                     displayFile(f, commandInvocation.getShell());
@@ -67,7 +79,6 @@ public class Cat implements Command {
             commandInvocation.getShell().err().println("cat: "+fnfe.getMessage());
             return CommandResult.FAILURE;
         }
-
     }
 
     private void displayFile(File f, Shell shell) throws FileNotFoundException {
