@@ -5,9 +5,11 @@ import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.cl.Option;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
+import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.parser.Parser;
+import org.jboss.aesh.terminal.Key;
 import org.jboss.aesh.terminal.Shell;
 
 import java.io.BufferedReader;
@@ -49,6 +51,10 @@ public class Cat implements Command {
     @Arguments
     private List<File> files;
 
+    private boolean prevBlank = false;
+    private boolean currentBlank = false;
+    private int counter;
+
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
 
@@ -59,6 +65,7 @@ public class Cat implements Command {
         }
 
         try {
+            counter = 1;
             if(showAll) {
                 showEnds = true;
                 showTabs = true;
@@ -71,6 +78,7 @@ public class Cat implements Command {
             }
             //read from stdin
             else {
+                readFromStdin(commandInvocation);
 
                 return CommandResult.SUCCESS;
             }
@@ -85,9 +93,6 @@ public class Cat implements Command {
         BufferedReader br = new BufferedReader(new FileReader(f));
 
         String line = null;
-        boolean prevBlank = false;
-        boolean currentBlank = false;
-        int counter = 1;
         try {
             line = br.readLine();
             while(line != null) {
@@ -99,33 +104,7 @@ public class Cat implements Command {
                 else
                     prevBlank = currentBlank = false;
 
-                if(numberNonBlank) {
-                    if(!currentBlank) {
-                        shell.out().print(Parser.padLeft(6, String.valueOf(counter)));
-                        shell.out().print(' ');
-                        counter++;
-                    }
-                }
-                else if(number && !prevBlank) {
-                    shell.out().print(Parser.padLeft(6, String.valueOf(counter)));
-                    shell.out().print(' ');
-                    counter++;
-                }
-
-                //todo
-                if(showTabs) {
-                    //if(line.contains())
-                }
-                else {
-                    if(!prevBlank)
-                        shell.out().print(line);
-                }
-
-                if(showEnds && !prevBlank)
-                    shell.out().print('$');
-
-                if(!prevBlank)
-                    shell.out().print(Config.getLineSeparator());
+                displayLine(line, shell);
 
                 line = br.readLine();
             }
@@ -136,4 +115,57 @@ public class Cat implements Command {
         }
     }
 
+    private void displayLine(String line, Shell shell) {
+        if(numberNonBlank) {
+            if(!currentBlank) {
+                shell.out().print(Parser.padLeft(6, String.valueOf(counter)));
+                shell.out().print(' ');
+                counter++;
+            }
+        }
+        else if(number && !prevBlank) {
+            shell.out().print(Parser.padLeft(6, String.valueOf(counter)));
+            shell.out().print(' ');
+            counter++;
+        }
+
+        //todo
+        if(showTabs) {
+            //if(line.contains())
+        }
+        else {
+            if(!prevBlank)
+                shell.out().print(line);
+        }
+
+        if(showEnds && !prevBlank)
+            shell.out().print('$');
+
+        if(!prevBlank)
+            shell.out().print(Config.getLineSeparator());
+    }
+
+    private void readFromStdin(CommandInvocation commandInvocation) {
+        try {
+            CommandOperation input = commandInvocation.getInput();
+            StringBuilder builder = new StringBuilder();
+            while(input.getInputKey() != Key.CTRL_C) {
+                if(input.getInputKey() == Key.ENTER) {
+                    commandInvocation.getShell().out().println();
+                    displayLine(builder.toString(), commandInvocation.getShell());
+                    builder = new StringBuilder();
+                }
+                else {
+                    builder.append(input.getInputKey().getAsChar());
+                    commandInvocation.getShell().out().print(input.getInputKey().getAsChar());
+                }
+
+                input = commandInvocation.getInput();
+            }
+
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }
