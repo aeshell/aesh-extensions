@@ -14,7 +14,7 @@
     <groupId>org.jboss.aesh</groupId>
     <artifactId>aesh-extensions</artifactId>
     <packaging>jar</packaging>
-    <version>0.47</version>
+    <version>0.48-SNAPSHOT</version>
     <name>Æsh Extensions</name>
     <description>Commands that may be used as part of a Æsh program</description>
 
@@ -28,7 +28,7 @@
         <connection>scm:git:git://github.com/aeshell/aesh-extensions.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/aeshell/aesh-extensions.git</developerConnection>
         <url>http://github.com/aeshell/aesh-extensions</url>
-      <tag>0.47</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <!-- Licenses -->
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.jboss.aesh</groupId>
             <artifactId>aesh</artifactId>
-            <version>0.47</version>
+            <version>0.48-SNAPSHOT</version>
         </dependency>
 
         <dependency>
