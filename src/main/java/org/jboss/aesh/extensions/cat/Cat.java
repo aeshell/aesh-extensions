@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -70,7 +71,17 @@ public class Cat implements Command {
                 showEnds = true;
                 showTabs = true;
             }
-            if(files != null && files.size() > 0) {
+            //do we have data from a pipe/redirect?
+            if(commandInvocation.getShell().in().getStdIn().available() > 0) {
+                java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
+                String input = s.hasNext() ? s.next() : "";
+                commandInvocation.getShell().out().println();
+                for(String i : input.split(Config.getLineSeparator()))
+                    displayLine(i, commandInvocation.getShell());
+
+                return CommandResult.SUCCESS;
+            }
+            else if(files != null && files.size() > 0) {
                 for(File f : files)
                     displayFile(f, commandInvocation.getShell());
 

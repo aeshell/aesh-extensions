@@ -5,6 +5,7 @@ import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.cl.Option;
 import org.jboss.aesh.cl.completer.OptionCompleter;
 import org.jboss.aesh.complete.CompleteOperation;
+import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.completer.CompleterInvocation;
@@ -98,8 +99,8 @@ public class Grep implements Command {
         if(commandInvocation.getShell().in().getStdIn().available() > 0) {
             java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
             String input = s.hasNext() ? s.next() : "";
-            List<String> inputLines = new ArrayList<String>();
-            for(String i : input.split("\n"))
+            List<String> inputLines = new ArrayList<>();
+            for(String i : input.split(Config.getLineSeparator()))
                 inputLines.add(i);
 
             doGrep(inputLines, commandInvocation.getShell());
