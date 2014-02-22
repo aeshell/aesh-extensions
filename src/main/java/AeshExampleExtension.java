@@ -40,7 +40,6 @@ public class AeshExampleExtension {
                 .command(ExitCommand.class)
                 .command(Less.class)
                 .command(More.class)
-                //.command(man)
                 .command(Harlem.class)
                 .command(Matrix.class)
                 .command(GroovyCommand.class)

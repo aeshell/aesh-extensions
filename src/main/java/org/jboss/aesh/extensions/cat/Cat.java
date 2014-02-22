@@ -11,6 +11,7 @@ import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.parser.Parser;
 import org.jboss.aesh.terminal.Key;
 import org.jboss.aesh.terminal.Shell;
+import org.jboss.aesh.util.PathResolver;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -83,7 +84,8 @@ public class Cat implements Command {
             }
             else if(files != null && files.size() > 0) {
                 for(File f : files)
-                    displayFile(f, commandInvocation.getShell());
+                    displayFile(PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0),
+                            commandInvocation.getShell());
 
                 return CommandResult.SUCCESS;
             }
@@ -103,9 +105,8 @@ public class Cat implements Command {
     private void displayFile(File f, Shell shell) throws FileNotFoundException {
         BufferedReader br = new BufferedReader(new FileReader(f));
 
-        String line = null;
         try {
-            line = br.readLine();
+            String line = br.readLine();
             while(line != null) {
                 if(line.length() == 0) {
                     if(currentBlank && squeezeBlank)
