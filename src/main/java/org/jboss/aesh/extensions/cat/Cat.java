@@ -141,9 +141,11 @@ public class Cat implements Command {
             counter++;
         }
 
-        //todo
         if(showTabs) {
-            //if(line.contains())
+            if(line.contains("\t"))
+                line = line.replaceAll("\t","^I");
+            if(!prevBlank)
+                shell.out().print(line);
         }
         else {
             if(!prevBlank)
