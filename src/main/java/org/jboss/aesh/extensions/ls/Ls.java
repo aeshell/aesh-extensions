@@ -20,14 +20,17 @@ import org.jboss.aesh.terminal.Shell;
 import org.jboss.aesh.terminal.TerminalColor;
 import org.jboss.aesh.terminal.TerminalString;
 import org.jboss.aesh.util.FileLister;
+import org.jboss.aesh.util.PathResolver;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,6 +64,10 @@ public class Ls implements Command {
             description = "print the allocated size of each file, in blocks")
     private boolean size;
 
+    @Option(shortName = 'h', name ="human-readable", hasValue = false,
+            description = "with -l, print sizes in human readable format (e.g., 1K 234M 2G)")
+    private boolean humanReadable;
+
     @Arguments
     private List<File> arguments;
 
@@ -69,9 +76,12 @@ public class Ls implements Command {
     private static final Class<? extends BasicFileAttributes> fileAttributes =
             Config.isOSPOSIXCompatible() ? PosixFileAttributes.class : DosFileAttributes.class;
 
-    private static DateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd hh:mm");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd hh:mm");
+
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat(".#");
 
     public Ls() {
+        DECIMAL_FORMAT.setRoundingMode(RoundingMode.UP);
     }
 
     @Override
@@ -87,14 +97,16 @@ public class Ls implements Command {
             arguments.add(commandInvocation.getAeshContext().getCurrentWorkingDirectory());
         }
 
-        for(File f : arguments) {
-            if(f.isDirectory())
-                displayDirectory(f, commandInvocation.getShell());
-            else if(f.isFile())
-                displayFile(f,commandInvocation.getShell());
-            else if(!f.exists()) {
-                commandInvocation.getShell().out().println("ls: cannot access "+
-                        f.toString()+": No such file or directory");
+        for(File file : arguments) {
+            for(File f : PathResolver.resolvePath(file, commandInvocation.getAeshContext().getCurrentWorkingDirectory())) {
+                if(f.isDirectory())
+                    displayDirectory(f, commandInvocation.getShell());
+                else if(f.isFile())
+                    displayFile(f,commandInvocation.getShell());
+                else if(!f.exists()) {
+                    commandInvocation.getShell().out().println("ls: cannot access "+
+                            f.toString()+": No such file or directory");
+                }
             }
         }
 
@@ -106,14 +118,12 @@ public class Ls implements Command {
             if(all) {
                 File[] files = input.listFiles();
                 Arrays.sort(files, new PosixFileNameComparator());
-                shell.out().println(
-                        displayLongListing(files));
+                shell.out().println( displayLongListing(files));
             }
             else {
                 File[] files = input.listFiles(new FileLister.FileAndDirectoryNoDotNamesFilter());
                 Arrays.sort(files, new PosixFileNameComparator());
-                shell.out().println(
-                        displayLongListing(files));
+                shell.out().println( displayLongListing(files));
             }
         }
         else {
@@ -143,7 +153,13 @@ public class Ls implements Command {
     }
 
     private void displayFile(File input, Shell shell) {
-
+        if(longListing) {
+            shell.out().println( displayLongListing(new File[] {input}));
+        }
+        else {
+            shell.out().println(Parser.formatDisplayListTerminalString(
+                    formatFileList(new File[] {input}), shell.getSize().getHeight(), shell.getSize().getWidth()));
+        }
     }
 
     private String displayLongListing(File[] files) {
@@ -160,7 +176,7 @@ public class Ls implements Command {
                 BasicFileAttributes attr = Files.readAttributes(file.toPath(), fileAttributes);
 
                 access.addString(AeshPosixFilePermissions.toString(((PosixFileAttributes) attr)), counter);
-                size.addString(String.valueOf(attr.size()), counter);
+                size.addString(makeSizeReadable(attr.size()), counter);
                 if(Config.isOSPOSIXCompatible())
                     owner.addString(((PosixFileAttributes) attr).owner().getName(), counter);
                 else
@@ -208,6 +224,21 @@ public class Ls implements Command {
 
 
         return builder.toString();
+    }
+
+    private String makeSizeReadable(long size) {
+        if(!humanReadable)
+            return String.valueOf(size);
+        else {
+            if(size < 10000)
+                return String.valueOf(size);
+            else if(size < 10000000) //K
+                return DECIMAL_FORMAT.format((double) size/1024)+"K";
+            else if(size < 1000000000) //M
+                return DECIMAL_FORMAT.format((double) size/(1048576))+"M";
+            else
+                return DECIMAL_FORMAT.format((double) size/(1048576*1014))+"G";
+        }
     }
 
     class PosixTerminalStringNameComparator implements Comparator<TerminalString> {
