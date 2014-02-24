@@ -15,10 +15,10 @@ import org.jboss.aesh.util.FileLister;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -100,8 +100,7 @@ public class Grep implements Command {
             java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
             String input = s.hasNext() ? s.next() : "";
             List<String> inputLines = new ArrayList<>();
-            for(String i : input.split(Config.getLineSeparator()))
-                inputLines.add(i);
+            Collections.addAll(inputLines, input.split(Config.getLineSeparator()));
 
             doGrep(inputLines, commandInvocation.getShell());
         }
@@ -130,7 +129,7 @@ public class Grep implements Command {
             try {
                 FileReader fileReader = new FileReader(file);
                 BufferedReader br = new BufferedReader(fileReader);
-                List<String> inputLines = new ArrayList<String>();
+                List<String> inputLines = new ArrayList<>();
 
                 String line;
                 while ((line = br.readLine()) != null) {
@@ -138,9 +137,6 @@ public class Grep implements Command {
                 }
 
                 doGrep(inputLines, shell);
-            }
-            catch (FileNotFoundException fnf) {
-                fnf.printStackTrace();
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -172,10 +168,7 @@ public class Grep implements Command {
         public void complete(CompleterInvocation completerData) {
             Grep grep = (Grep) completerData.getCommand();
             //the first argument is the pattern, do not autocomplete
-            if(grep.getArguments() == null || grep.getArguments().size() == 0) {
-                return;
-            }
-            else if(grep.getArguments().size() > 0) {
+            if(grep.getArguments() != null && grep.getArguments().size() > 0) {
                 CompleteOperation completeOperation =
                         new CompleteOperation(completerData.getAeshContext(), completerData.getGivenCompleteValue(), 0);
                 if (completerData.getGivenCompleteValue() == null)
