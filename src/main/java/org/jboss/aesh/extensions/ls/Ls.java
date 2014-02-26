@@ -97,7 +97,12 @@ public class Ls implements Command {
             arguments.add(commandInvocation.getAeshContext().getCurrentWorkingDirectory());
         }
 
+        int counter = 0;
         for(File file : arguments) {
+            if(counter > 0) {
+                commandInvocation.getShell().out().println(Config.getLineSeparator()+file.getName()+":");
+            }
+
             for(File f : PathResolver.resolvePath(file, commandInvocation.getAeshContext().getCurrentWorkingDirectory())) {
                 if(f.isDirectory())
                     displayDirectory(f, commandInvocation.getShell());
@@ -108,6 +113,7 @@ public class Ls implements Command {
                             f.toString()+": No such file or directory");
                 }
             }
+            counter++;
         }
 
         return CommandResult.SUCCESS;
@@ -118,21 +124,21 @@ public class Ls implements Command {
             if(all) {
                 File[] files = input.listFiles();
                 Arrays.sort(files, new PosixFileNameComparator());
-                shell.out().println( displayLongListing(files));
+                shell.out().print(displayLongListing(files));
             }
             else {
                 File[] files = input.listFiles(new FileLister.FileAndDirectoryNoDotNamesFilter());
                 Arrays.sort(files, new PosixFileNameComparator());
-                shell.out().println( displayLongListing(files));
+                shell.out().print(displayLongListing(files));
             }
         }
         else {
             if(all)
-                shell.out().println(Parser.formatDisplayListTerminalString(
+                shell.out().print(Parser.formatDisplayListTerminalString(
                         formatFileList(input.listFiles()),
                         shell.getSize().getHeight(), shell.getSize().getWidth()));
             else
-                shell.out().println(Parser.formatDisplayListTerminalString(
+                shell.out().print(Parser.formatDisplayListTerminalString(
                         formatFileList(input.listFiles(new FileLister.FileAndDirectoryNoDotNamesFilter())),
                         shell.getSize().getHeight(), shell.getSize().getWidth()));
 
@@ -154,11 +160,11 @@ public class Ls implements Command {
 
     private void displayFile(File input, Shell shell) {
         if(longListing) {
-            shell.out().println( displayLongListing(new File[] {input}));
+            shell.out().print(displayLongListing(new File[]{input}));
         }
         else {
-            shell.out().println(Parser.formatDisplayListTerminalString(
-                    formatFileList(new File[] {input}), shell.getSize().getHeight(), shell.getSize().getWidth()));
+            shell.out().print(Parser.formatDisplayListTerminalString(
+                    formatFileList(new File[]{input}), shell.getSize().getHeight(), shell.getSize().getWidth()));
         }
     }
 
