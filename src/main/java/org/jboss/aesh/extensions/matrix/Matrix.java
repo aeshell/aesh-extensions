@@ -53,7 +53,6 @@ public class Matrix implements Command {
     @Option(shortName = 'l', defaultValue = {"true"})
     private boolean logo;
 
-    private boolean attached = false;
     private ExecutorService executorService;
     private MatrixRunner runner;
     private Shell shell;
@@ -97,7 +96,6 @@ public class Matrix implements Command {
             commandInvocation.getShell().out().flush();
         }
         else {
-            attached = true;
             shell = commandInvocation.getShell();
             this.commandInvocation = commandInvocation;
             shell.out().print(ANSI.saveCursor());
@@ -147,7 +145,6 @@ public class Matrix implements Command {
             runner.stop();
         if(executorService != null) {
             executorService.shutdown();
-            attached = false;
         }
 
         //need to set it to null

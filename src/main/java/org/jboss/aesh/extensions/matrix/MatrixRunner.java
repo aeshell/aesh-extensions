@@ -84,7 +84,7 @@ public class MatrixRunner implements Runnable {
     public void run() {
 
         int counter = 1;
-        int sleepTime = 0;
+        int sleepTime;
         long startTime;
         try {
             while(running) {
@@ -132,11 +132,8 @@ public class MatrixRunner implements Runnable {
             }
 
         }
-        catch(IOException ioe) {
+        catch(IOException | InterruptedException ioe) {
             logger.warning(ioe.getMessage());
-        }
-        catch (InterruptedException e) {
-            logger.warning(e.getMessage());
         }
     }
 
@@ -179,10 +176,7 @@ public class MatrixRunner implements Runnable {
             }
             br.close();
         }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-            logger.warning(e.getMessage());
-        } catch (IOException e) {
+        catch (IOException e) {
             e.printStackTrace();
             logger.warning(e.getMessage());
         }
@@ -214,7 +208,6 @@ public class MatrixRunner implements Runnable {
             shell.out().flush();
         }
 
-        stream = null;
     }
 
     public void stop() {

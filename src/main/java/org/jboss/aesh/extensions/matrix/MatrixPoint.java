@@ -10,10 +10,8 @@ import org.jboss.aesh.terminal.Color;
 import org.jboss.aesh.terminal.Shell;
 import org.jboss.aesh.terminal.TerminalColor;
 import org.jboss.aesh.util.ANSI;
-import org.jboss.aesh.util.LoggerUtil;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import static java.lang.Math.*;
 
@@ -22,7 +20,6 @@ import static java.lang.Math.*;
  */
 public class MatrixPoint {
 
-    private static Logger logger = LoggerUtil.getLogger("MatrixPoint.class");
 
     private static final int randNum = 90;
     private static final int randMin = 33;
