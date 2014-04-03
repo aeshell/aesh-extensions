@@ -6,18 +6,27 @@
  */
 package org.jboss.aesh.extensions.less.aesh;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
+import org.jboss.aesh.cl.Option;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.console.man.AeshFileDisplayer;
 import org.jboss.aesh.console.man.FileParser;
 import org.jboss.aesh.console.man.TerminalPage;
 import org.jboss.aesh.extensions.page.SimpleFileParser;
+import org.jboss.aesh.extensions.text.highlight.Encoder;
+import org.jboss.aesh.extensions.text.highlight.Scanner;
+import org.jboss.aesh.extensions.text.highlight.Syntax;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.PathResolver;
 
@@ -31,6 +40,9 @@ public class Less extends AeshFileDisplayer {
 
     @Arguments
     List<File> arguments;
+
+    @Option(hasValue = false)
+    private boolean color;
 
     private SimpleFileParser loader;
 
@@ -93,8 +105,25 @@ public class Less extends AeshFileDisplayer {
             File f = arguments.get(0);
             f = PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
             if(f.isFile()) {
-                setFile(f);
-                afterAttach();
+                if(color) {
+                    String content = new String(Files.readAllBytes(f.toPath()));
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                    Syntax.builtIns();
+                    Syntax.Builder.create()
+                            .encoderType(Encoder.Type.TERMINAL)
+                            .output(baos)
+                            .scanner(Scanner.Factory.byFileName(f.getName()))
+                            .execute(content);
+
+                    setInput(new String(baos.toByteArray()));
+                    afterAttach();
+                }
+                else {
+                    setFile(f);
+                    afterAttach();
+                }
             }
             else if(f.isDirectory()) {
                 getShell().err().println(f.getAbsolutePath()+": is a directory");
@@ -105,5 +134,10 @@ public class Less extends AeshFileDisplayer {
         }
 
         return CommandResult.SUCCESS;
+    }
+
+    private static String readFile(String path, Charset encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return encoding.decode(ByteBuffer.wrap(encoded)).toString();
     }
 }
