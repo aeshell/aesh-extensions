@@ -46,6 +46,9 @@ public class Touch implements Command {
 
         try {
             for (File file : arguments) {
+                if (file.exists()) {
+                    continue;
+                }
                 file.createNewFile();
             }
         }
