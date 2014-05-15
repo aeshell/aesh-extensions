@@ -5,6 +5,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
 
+import java.io.IOException;
+
 import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.AeshConsoleBuilder;
@@ -25,8 +27,7 @@ import org.jboss.aesh.extensions.less.aesh.Less;
 import org.jboss.aesh.extensions.ls.Ls;
 import org.jboss.aesh.extensions.matrix.Matrix;
 import org.jboss.aesh.extensions.more.aesh.More;
-
-import java.io.IOException;
+import org.jboss.aesh.extensions.pwd.Pwd;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -50,6 +51,7 @@ public class AeshExampleExtension {
                 .command(Grep.class)
                 .command(Cat.class)
                 .command(Cd.class)
+                .command(Pwd.class)
                 .create();
 
         AeshConsole aeshConsole = new AeshConsoleBuilder()
