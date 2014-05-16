@@ -32,7 +32,7 @@ import java.util.regex.PatternSyntaxException;
                 "Search for PATTERN in each FILE or standard input.\n"+
                 "PATTERN is, by default, a basic regular expression (BRE).\n" +
                 "Example: grep -i 'hello world' menu.h main.c\n")
-public class Grep implements Command {
+public class Grep implements Command<CommandInvocation> {
 
     @Option(shortName = 'H', name = "help", hasValue = false,
             description = "display this help and exit")

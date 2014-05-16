@@ -30,7 +30,7 @@ import org.jboss.aesh.util.PathResolver;
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name="more", description = "is more less?")
-public class More implements Command {
+public class More implements Command<CommandInvocation> {
 
     private int rows;
     private int topVisibleRow;

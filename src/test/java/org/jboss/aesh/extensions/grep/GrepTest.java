@@ -2,7 +2,6 @@ package org.jboss.aesh.extensions.grep;
 
 import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.AeshConsoleBuilder;
-import org.jboss.aesh.console.AeshConsoleImpl;
 import org.jboss.aesh.console.Prompt;
 import org.jboss.aesh.console.command.registry.AeshCommandRegistryBuilder;
 import org.jboss.aesh.console.command.registry.CommandRegistry;
@@ -52,9 +51,6 @@ public class GrepTest {
         byteArrayOutputStream.flush();
         outputStream.write(("grep -i 'foo' /tmp\n").getBytes());
         outputStream.flush();
-
-        String buffer = ((AeshConsoleImpl) aeshConsole).getBuffer();
-
         System.out.println("Got out: "+byteArrayOutputStream.toString());
     }
 }

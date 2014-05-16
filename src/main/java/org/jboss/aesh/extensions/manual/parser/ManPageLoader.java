@@ -7,7 +7,6 @@
 package org.jboss.aesh.extensions.manual.parser;
 
 import org.jboss.aesh.console.Config;
-import org.jboss.aesh.extensions.manual.ManPage;
 import org.jboss.aesh.extensions.page.PageLoader;
 
 import java.io.*;
@@ -15,7 +14,6 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 

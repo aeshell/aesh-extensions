@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name = "matrix", description = "do you take the blue pill??")
-public class Matrix implements Command {
+public class Matrix implements Command<CommandInvocation> {
 
     @Option(shortName = 'h', hasValue = false)
     private boolean help;

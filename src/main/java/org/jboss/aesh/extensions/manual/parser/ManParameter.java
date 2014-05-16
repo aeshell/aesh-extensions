@@ -18,7 +18,6 @@ import java.util.List;
 public class ManParameter {
 
     List<String> out = new ArrayList<String>();
-    private static final int padding = 4;
     private static String argPad = "  ";
     private static String textPad = "    ";
 

@@ -22,7 +22,7 @@ import org.jboss.aesh.console.command.invocation.CommandInvocation;
  *
  */
 @CommandDefinition(name = "touch", description = "change directory [dir]")
-public class Touch implements Command {
+public class Touch implements Command<CommandInvocation> {
 
     @Option(shortName = 'h', name = "help", hasValue = false, description = "display this help and exit")
     private boolean help;

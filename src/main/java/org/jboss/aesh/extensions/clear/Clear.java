@@ -17,7 +17,7 @@ import java.io.IOException;
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name = "clear", description = "clear the terminal screen")
-public class Clear implements Command {
+public class Clear implements Command<CommandInvocation> {
 
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {

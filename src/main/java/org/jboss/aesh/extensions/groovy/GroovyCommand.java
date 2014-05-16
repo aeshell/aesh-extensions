@@ -18,7 +18,7 @@ import java.util.List;
  */
 @CommandDefinition(name = "add-command",
         description = "specify a groovy command file ")
-public class GroovyCommand implements Command {
+public class GroovyCommand implements Command<CommandInvocation> {
 
     private CommandInvocation commandInvocation;
 
