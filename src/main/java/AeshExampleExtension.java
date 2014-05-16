@@ -28,6 +28,7 @@ import org.jboss.aesh.extensions.ls.Ls;
 import org.jboss.aesh.extensions.matrix.Matrix;
 import org.jboss.aesh.extensions.more.aesh.More;
 import org.jboss.aesh.extensions.pwd.Pwd;
+import org.jboss.aesh.extensions.touch.Touch;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -52,6 +53,7 @@ public class AeshExampleExtension {
                 .command(Cat.class)
                 .command(Cd.class)
                 .command(Pwd.class)
+                .command(Touch.class)
                 .create();
 
         AeshConsole aeshConsole = new AeshConsoleBuilder()
