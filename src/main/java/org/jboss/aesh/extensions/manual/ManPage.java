@@ -7,10 +7,8 @@
 package org.jboss.aesh.extensions.manual;
 
 import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
-import org.jboss.aesh.extensions.manual.parser.ManSection;
 
 import java.io.*;
-import java.util.List;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>

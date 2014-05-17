@@ -45,7 +45,7 @@ import java.util.List;
 @CommandDefinition(name = "ls", description = "[OPTION]... [FILE]...\n" +
         "List information about the FILEs (the current directory by default).\n" +
         "Sort entries alphabetically if none of -cftuvSUX nor --sort is specified.\n")
-public class Ls implements Command {
+public class Ls implements Command<CommandInvocation> {
 
     @Option(shortName = 'H', name = "help", hasValue = false,
             description = "display this help and exit")

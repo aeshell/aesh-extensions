@@ -18,7 +18,7 @@ import org.jboss.aesh.console.command.invocation.CommandInvocation;
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name = "cd", description = "change directory [dir]")
-public class Cd implements Command {
+public class Cd implements Command<CommandInvocation> {
 
     @Option(shortName = 'h', name = "help", hasValue = false, description = "display this help and exit")
     private boolean help;

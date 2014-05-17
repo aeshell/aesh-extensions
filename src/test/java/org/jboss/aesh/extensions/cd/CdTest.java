@@ -14,13 +14,11 @@ import java.io.PrintStream;
 
 import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.AeshConsoleBuilder;
-import org.jboss.aesh.console.AeshConsoleImpl;
 import org.jboss.aesh.console.Prompt;
 import org.jboss.aesh.console.command.registry.AeshCommandRegistryBuilder;
 import org.jboss.aesh.console.command.registry.CommandRegistry;
 import org.jboss.aesh.console.settings.Settings;
 import org.jboss.aesh.console.settings.SettingsBuilder;
-import org.jboss.aesh.extensions.ls.Ls;
 import org.jboss.aesh.terminal.TestTerminal;
 import org.junit.Test;
 
@@ -61,8 +59,6 @@ public class CdTest {
         pipedOutputStream.flush();
         pipedOutputStream.write(("ls").getBytes());
         pipedOutputStream.flush();
-        String buffer = ((AeshConsoleImpl) console).getBuffer();
-        
         System.out.println("Got out: "+byteArrayOutputStream.toString());
         
     }

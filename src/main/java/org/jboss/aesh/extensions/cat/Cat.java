@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +26,7 @@ import java.util.List;
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name = "cat", description = "concatenate files and print on the standard output")
-public class Cat implements Command {
+public class Cat implements Command<CommandInvocation> {
 
     @Option(shortName = 'A', name = "show-all", hasValue = false, description = "equivalent to -vET")
     private boolean showAll;

@@ -31,7 +31,7 @@ import java.util.Random;
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name="harlem", description = "wanna do the harlem..?")
-public class Harlem implements Command {
+public class Harlem implements Command<CommandInvocation> {
 
     private int rows;
     private int columns;
@@ -212,23 +212,14 @@ public class Harlem implements Command {
     }
 
     private void saveHarlem(File harlemWav) throws IOException {
-        BufferedInputStream in = null;
-        FileOutputStream fout = null;
-        try {
-            in = new BufferedInputStream(new URL("https://dl.dropbox.com/u/30971563/harlem.wav").openStream());
-            fout = new FileOutputStream(harlemWav);
-
-            byte data[] = new byte[1024];
+        try (BufferedInputStream in = new BufferedInputStream(new URL("https://dl.dropbox.com/u/30971563/harlem.wav").openStream())) {
+        	byte data[] = new byte[1024];
             int count;
-            while ((count = in.read(data, 0, 1024)) != -1) {
-                fout.write(data, 0, count);
+        	try (FileOutputStream fout = new FileOutputStream(harlemWav);) {
+        		while ((count = in.read(data, 0, 1024)) != -1) {
+                    fout.write(data, 0, count);
+                }
             }
-        }
-        finally {
-            if (in != null)
-                in.close();
-            if (fout != null)
-                fout.close();
         }
     }
 

@@ -6,16 +6,13 @@
  */
 package org.jboss.aesh.extensions.matrix;
 
-import org.jboss.aesh.terminal.CharacterType;
 import org.jboss.aesh.terminal.Color;
 import org.jboss.aesh.terminal.Shell;
 import org.jboss.aesh.terminal.TerminalColor;
-import org.jboss.aesh.terminal.TerminalTextStyle;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.LoggerUtil;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,8 +38,6 @@ public class MatrixRunner implements Runnable {
     private boolean async = true;
     private int speed;
 
-    private static final TerminalTextStyle TEXT_BOLD = new TerminalTextStyle(CharacterType.BOLD);
-    private static final TerminalTextStyle TEXT_FAINT = new TerminalTextStyle(CharacterType.BOLD);
     private static final TerminalColor GREEN_COLOR = new TerminalColor(Color.GREEN, Color.DEFAULT);
     private static final TerminalColor DEFAULT_COLOR = new TerminalColor(Color.DEFAULT, Color.DEFAULT);
 

@@ -61,8 +61,6 @@ public class MatrixTest {
 //        outputStream.flush();
         Thread.sleep(100);
 
-        String buffer = ((AeshConsoleImpl) aeshConsole).getBuffer();
-
         System.out.println("Got out: "+byteArrayOutputStream.toString());
 
     }

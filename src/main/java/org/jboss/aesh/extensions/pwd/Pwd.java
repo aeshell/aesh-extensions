@@ -19,7 +19,7 @@ import org.jboss.aesh.console.command.invocation.CommandInvocation;
  *
  */
 @CommandDefinition(name = "pwd", description = "show the current [dir]")
-public class Pwd implements Command {
+public class Pwd implements Command<CommandInvocation> {
 
     @Option(shortName = 'h', name = "help", hasValue = false, description = "display this help and exit")
     private boolean help;
