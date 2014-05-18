@@ -21,7 +21,7 @@ import org.jboss.aesh.console.command.invocation.CommandInvocation;
  * @author <a href="mailto:danielsoro@gmail.com">Daniel Cunha (soro)</a>
  *
  */
-@CommandDefinition(name = "touch", description = "change directory [dir]")
+@CommandDefinition(name = "touch", description = "create and change file timestamps")
 public class Touch implements Command<CommandInvocation> {
 
     @Option(shortName = 'h', name = "help", hasValue = false, description = "display this help and exit")
