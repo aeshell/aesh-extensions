@@ -47,7 +47,7 @@ public class Touch implements Command<CommandInvocation> {
         try {
             for (File file : arguments) {
                 if (file.exists()) {
-                    continue;
+                    file.setLastModified(System.currentTimeMillis());
                 }
                 file.createNewFile();
             }
