@@ -30,7 +30,7 @@ public class Pwd implements Command<CommandInvocation> {
             commandInvocation.getShell().out().print(commandInvocation.getHelpInfo("pwd"));
             return CommandResult.SUCCESS;
         }
-        commandInvocation.getShell().out().print(commandInvocation.getAeshContext().getCurrentWorkingDirectory());
+        commandInvocation.getShell().out().println(commandInvocation.getAeshContext().getCurrentWorkingDirectory());
         return CommandResult.SUCCESS;
     }
 }

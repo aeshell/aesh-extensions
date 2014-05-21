@@ -11,6 +11,7 @@ import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.util.PathResolver;
 
 /**
  * Use AeshConsole.getAeshContext().cwd as reference
@@ -37,7 +38,10 @@ public class Cd implements Command<CommandInvocation> {
             updatePrompt(commandInvocation, new File(Config.getUserDir()));
         }
         else {
-            updatePrompt(commandInvocation, arguments.get(0));
+            List<File> files = PathResolver.resolvePath(arguments.get(0), commandInvocation.getAeshContext().getCurrentWorkingDirectory());
+
+            if(files.get(0).isDirectory())
+                updatePrompt(commandInvocation, files.get(0));
         }
         return CommandResult.SUCCESS;
     }
