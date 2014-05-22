@@ -5,9 +5,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.complete.Completion;
-import org.jboss.aesh.console.*;
+import org.jboss.aesh.console.AeshConsoleCallback;
+import org.jboss.aesh.console.Config;
+import org.jboss.aesh.console.Console;
+import org.jboss.aesh.console.ConsoleOperation;
+import org.jboss.aesh.console.Prompt;
 import org.jboss.aesh.console.settings.SettingsBuilder;
 import org.jboss.aesh.extensions.choice.aesh.MultipleChoice;
 import org.jboss.aesh.extensions.harlem.console.Harlem;
@@ -15,12 +25,6 @@ import org.jboss.aesh.extensions.less.console.Less;
 import org.jboss.aesh.extensions.manual.console.Man;
 import org.jboss.aesh.extensions.more.console.More;
 import org.jboss.aesh.parser.Parser;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -50,12 +54,12 @@ public class ExampleExtension {
         choices.add(new org.jboss.aesh.extensions.choice.console.MultipleChoice(2,"Do you want bar?"));
 
         final MultipleChoice choice =
-                new MultipleChoice(exampleConsole, "choice", choices);
+            new MultipleChoice(exampleConsole,"choice",choices);
 
         Completion completer = new Completion() {
             @Override
             public void complete(CompleteOperation co) {
-                // very simple completor
+                //very simple completor
                 List<String> commands = new ArrayList<String>();
                 if(co.getBuffer().equals("fo") || co.getBuffer().equals("foo")) {
                     commands.add("foo");
@@ -91,7 +95,7 @@ public class ExampleExtension {
                 else if(co.getBuffer().equals("deploy")) {
                     commands.add("deploy /home/blabla/foo/bar/alkdfe/en/to/tre");
                 }
-                 co.setCompletionCandidates(commands);
+                co.setCompletionCandidates(commands);
             }
         };
 
@@ -111,8 +115,8 @@ public class ExampleExtension {
                     String line = consoleOutput.getBuffer();
                     exampleConsole.getShell().out().print("======>\"" + line + "\"\n");
 
-                    if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit") ||
-                            line.equalsIgnoreCase("reset")) {
+                    if(line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit") ||
+                        line.equalsIgnoreCase("reset")) {
                         exampleConsole.stop();
                     }
                     if(line.equals("clear"))
@@ -126,7 +130,7 @@ public class ExampleExtension {
                             man.setControlOperator(consoleOutput.getControlOperator());
                             //exampleConsole.attachProcess(man);
                         }
-                        catch (IllegalArgumentException iae) {
+                        catch(IllegalArgumentException iae) {
                             exampleConsole.getShell().out().print(iae.getMessage());
                         }
                     }
@@ -159,12 +163,12 @@ public class ExampleExtension {
                                 less.afterAttach();
                             }
                             else if(f.isDirectory()) {
-                                exampleConsole.getShell().out().print(f.getAbsolutePath()+": is a directory"+
-                                        Config.getLineSeparator());
+                                exampleConsole.getShell().out().print(f.getAbsolutePath() + ": is a directory" +
+                                    Config.getLineSeparator());
                             }
                             else {
-                                exampleConsole.getShell().out().print(f.getAbsolutePath()+": No such file or directory"+
-                                        Config.getLineSeparator());
+                                exampleConsole.getShell().out().print(f.getAbsolutePath() + ": No such file or directory" +
+                                    Config.getLineSeparator());
                             }
                         }
                         else {
@@ -192,12 +196,12 @@ public class ExampleExtension {
 
                             }
                             else if(f.isDirectory()) {
-                                exampleConsole.getShell().out().print(f.getAbsolutePath()+": is a directory"+
-                                        Config.getLineSeparator());
+                                exampleConsole.getShell().out().print(f.getAbsolutePath() + ": is a directory" +
+                                    Config.getLineSeparator());
                             }
                             else {
-                                exampleConsole.getShell().out().print(f.getAbsolutePath()+": No such file or directory"+
-                                        Config.getLineSeparator());
+                                exampleConsole.getShell().out().print(f.getAbsolutePath() + ": No such file or directory" +
+                                    Config.getLineSeparator());
                             }
                         }
                     }

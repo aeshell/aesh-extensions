@@ -90,28 +90,28 @@ public class Ls implements Command<CommandInvocation> {
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
         // just display help and return
-        if (help) {
+        if(help) {
             commandInvocation.getShell().out().println(commandInvocation.getHelpInfo("ls"));
             return CommandResult.SUCCESS;
         }
 
-        if (arguments == null) {
+        if(arguments == null) {
             arguments = new ArrayList<>(1);
             arguments.add(commandInvocation.getAeshContext().getCurrentWorkingDirectory());
         }
 
         int counter = 0;
-        for (File file : arguments) {
-            if (counter > 0) {
+        for(File file : arguments) {
+            if(counter > 0) {
                 commandInvocation.getShell().out().println(Config.getLineSeparator() + file.getName() + ":");
             }
 
-            for (File f : PathResolver.resolvePath(file, commandInvocation.getAeshContext().getCurrentWorkingDirectory())) {
-                if (f.isDirectory())
+            for(File f : PathResolver.resolvePath(file, commandInvocation.getAeshContext().getCurrentWorkingDirectory())) {
+                if(f.isDirectory())
                     displayDirectory(f, commandInvocation.getShell());
-                else if (f.isFile())
+                else if(f.isFile())
                     displayFile(f, commandInvocation.getShell());
-                else if (!f.exists()) {
+                else if(!f.exists()) {
                     commandInvocation.getShell().out().println("ls: cannot access " +
                         f.toString() + ": No such file or directory");
                 }
@@ -123,8 +123,8 @@ public class Ls implements Command<CommandInvocation> {
     }
 
     private void displayDirectory(File input, Shell shell) {
-        if (longListing) {
-            if (all) {
+        if(longListing) {
+            if(all) {
                 File[] files = input.listFiles();
                 Arrays.sort(files, new PosixFileNameComparator());
                 shell.out().print(displayLongListing(files));
@@ -136,7 +136,7 @@ public class Ls implements Command<CommandInvocation> {
             }
         }
         else {
-            if (all)
+            if(all)
                 shell.out().print(Parser.formatDisplayListTerminalString(
                     formatFileList(input.listFiles()),
                     shell.getSize().getHeight(), shell.getSize().getWidth()));
@@ -150,10 +150,10 @@ public class Ls implements Command<CommandInvocation> {
 
     private List<TerminalString> formatFileList(File[] fileList) {
         ArrayList<TerminalString> list = new ArrayList<TerminalString>(fileList.length);
-        for (File file : fileList) {
-            if (file.isDirectory())
+        for(File file : fileList) {
+            if(file.isDirectory())
                 list.add(new TerminalString(file.getName(),
-                    new TerminalColor(BLUE, DEFAULT)));
+                    new TerminalColor(BLUE,DEFAULT)));
             else
                 list.add(new TerminalString(file.getName()));
         }
@@ -162,7 +162,7 @@ public class Ls implements Command<CommandInvocation> {
     }
 
     private void displayFile(File input, Shell shell) {
-        if (longListing) {
+        if(longListing) {
             shell.out().print(displayLongListing(new File[] { input }));
         }
         else {
@@ -181,16 +181,16 @@ public class Ls implements Command<CommandInvocation> {
 
         try {
             int counter = 0;
-            for (File file : files) {
+            for(File file : files) {
                 BasicFileAttributes attr = Files.readAttributes(file.toPath(), fileAttributes);
 
                 access.addString(AeshPosixFilePermissions.toString(((PosixFileAttributes) attr)), counter);
                 size.addString(makeSizeReadable(attr.size()), counter);
-                if (Config.isOSPOSIXCompatible())
+                if(Config.isOSPOSIXCompatible())
                     owner.addString(((PosixFileAttributes) attr).owner().getName(), counter);
                 else
                     owner.addString("", counter);
-                if (Config.isOSPOSIXCompatible())
+                if(Config.isOSPOSIXCompatible())
                     group.addString(((PosixFileAttributes) attr).group().getName(), counter);
                 else
                     owner.addString("", counter);
@@ -199,14 +199,14 @@ public class Ls implements Command<CommandInvocation> {
                 counter++;
             }
         }
-        catch (IOException e) {
+        catch(IOException e) {
             e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
         }
 
         StringBuilder builder = new StringBuilder();
-        TerminalColor directoryColor = new TerminalColor(BLUE, DEFAULT, BRIGHT);
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory()) {
+        TerminalColor directoryColor = new TerminalColor(BLUE,DEFAULT,BRIGHT);
+        for(int i = 0; i < files.length; i++) {
+            if(files[i].isDirectory()) {
                 builder.append(access.getString(i))
                     .append(owner.getFormattedString(i))
                     .append(group.getFormattedString(i))
@@ -214,7 +214,7 @@ public class Ls implements Command<CommandInvocation> {
                     .append(SPACE)
                     .append(modified.getString(i))
                     .append(SPACE);
-                builder.append(new TerminalString(files[i].getName(), directoryColor))
+                builder.append(new TerminalString(files[i].getName(),directoryColor))
                     .append(Config.getLineSeparator());
 
             }
@@ -235,14 +235,14 @@ public class Ls implements Command<CommandInvocation> {
     }
 
     private String makeSizeReadable(long size) {
-        if (!humanReadable)
+        if(!humanReadable)
             return String.valueOf(size);
         else {
-            if (size < 10000)
+            if(size < 10000)
                 return String.valueOf(size);
-            else if (size < 10000000) // K
+            else if(size < 10000000) // K
                 return DECIMAL_FORMAT.format((double) size / 1024) + "K";
-            else if (size < 1000000000) // M
+            else if(size < 1000000000) // M
                 return DECIMAL_FORMAT.format((double) size / (1048576)) + "M";
             else
                 return DECIMAL_FORMAT.format((double) size / (1048576 * 1014)) + "G";
@@ -254,15 +254,15 @@ public class Ls implements Command<CommandInvocation> {
 
         @Override
         public int compare(TerminalString o1, TerminalString o2) {
-            if (o1.getCharacters().length() > 1 && o2.getCharacters().length() > 1) {
-                if (o1.getCharacters().indexOf(DOT) == 0) {
-                    if (o2.getCharacters().indexOf(DOT) == 0)
+            if(o1.getCharacters().length() > 1 && o2.getCharacters().length() > 1) {
+                if(o1.getCharacters().indexOf(DOT) == 0) {
+                    if(o2.getCharacters().indexOf(DOT) == 0)
                         return o1.getCharacters().substring(1).compareToIgnoreCase(o2.getCharacters().substring(1));
                     else
                         return o1.getCharacters().substring(1).compareToIgnoreCase(o2.getCharacters());
                 }
                 else {
-                    if (o2.getCharacters().indexOf(DOT) == 0)
+                    if(o2.getCharacters().indexOf(DOT) == 0)
                         return o1.getCharacters().compareToIgnoreCase(o2.getCharacters().substring(1));
                     else
                         return o1.getCharacters().compareToIgnoreCase(o2.getCharacters());
@@ -278,15 +278,15 @@ public class Ls implements Command<CommandInvocation> {
 
         @Override
         public int compare(File o1, File o2) {
-            if (o1.getName().length() > 1 && o2.getName().length() > 1) {
-                if (o1.getName().indexOf(DOT) == 0) {
-                    if (o2.getName().indexOf(DOT) == 0)
+            if(o1.getName().length() > 1 && o2.getName().length() > 1) {
+                if(o1.getName().indexOf(DOT) == 0) {
+                    if(o2.getName().indexOf(DOT) == 0)
                         return o1.getName().substring(1).compareToIgnoreCase(o2.getName().substring(1));
                     else
                         return o1.getName().substring(1).compareToIgnoreCase(o2.getName());
                 }
                 else {
-                    if (o2.getName().indexOf(DOT) == 0)
+                    if(o2.getName().indexOf(DOT) == 0)
                         return o1.getName().compareToIgnoreCase(o2.getName().substring(1));
                     else
                         return o1.getName().compareToIgnoreCase(o2.getName());

@@ -1,6 +1,6 @@
 package org.jboss.aesh.extensions.text.highlight;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,8 +20,8 @@ public class Theme {
 
     public Theme set(Color color, TokenType type, TokenType... types) {
         this.map.put(type, color);
-        if (types != null) {
-            for (TokenType t : types) {
+        if(types != null) {
+            for(TokenType t : types) {
                 map.put(t, color);
             }
         }

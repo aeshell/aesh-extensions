@@ -77,26 +77,26 @@ public class Grep implements Command<CommandInvocation> {
 
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
-        // just display help and return
-        if (help || arguments == null || arguments.size() == 0) {
+        //just display help and return
+        if(help || arguments == null || arguments.size() == 0) {
             commandInvocation.getShell().out().println(commandInvocation.getHelpInfo("grep"));
             return CommandResult.SUCCESS;
         }
 
-        // first create the pattern
+        //first create the pattern
         try {
-            if (ignoreCase)
+            if(ignoreCase)
                 pattern = Pattern.compile(arguments.remove(0), Pattern.CASE_INSENSITIVE);
             else
                 pattern = Pattern.compile(arguments.remove(0));
         }
-        catch (PatternSyntaxException pse) {
+        catch(PatternSyntaxException pse) {
             commandInvocation.getShell().out().println("grep: invalid pattern.");
             return CommandResult.FAILURE;
         }
 
-        // do we have data from a pipe/redirect?
-        if (commandInvocation.getShell().in().getStdIn().available() > 0) {
+        //do we have data from a pipe/redirect?
+        if(commandInvocation.getShell().in().getStdIn().available() > 0) {
             java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
             String input = s.hasNext() ? s.next() : "";
             List<String> inputLines = new ArrayList<>();
@@ -104,14 +104,14 @@ public class Grep implements Command<CommandInvocation> {
 
             doGrep(inputLines, commandInvocation.getShell());
         }
-        // find argument files and build regex..
+        //find argument files and build regex..
         else {
-            if (arguments != null && arguments.size() > 0) {
-                for (String s : arguments)
+            if(arguments != null && arguments.size() > 0) {
+                for(String s : arguments)
                     doGrep(new File(s), commandInvocation.getShell());
             }
-            // posix starts an interactive shell and read from the input here
-            // atm, we'll just quit
+            //posix starts an interactive shell and read from the input here
+            //atm, we'll just quit
             else {
                 commandInvocation.getShell().out().print("grep: no file or input given.");
                 return CommandResult.SUCCESS;
@@ -122,10 +122,10 @@ public class Grep implements Command<CommandInvocation> {
     }
 
     private void doGrep(File file, Shell shell) {
-        if (!file.exists()) {
+        if(!file.exists()) {
             shell.out().println("grep: " + file.toString() + ": No such file or directory");
         }
-        else if (file.isFile()) {
+        else if(file.isFile()) {
             try {
                 FileReader fileReader = new FileReader(file);
                 BufferedReader br = new BufferedReader(fileReader);
@@ -138,7 +138,7 @@ public class Grep implements Command<CommandInvocation> {
 
                 doGrep(inputLines, shell);
             }
-            catch (IOException e) {
+            catch(IOException e) {
                 e.printStackTrace();
             }
 
@@ -146,9 +146,9 @@ public class Grep implements Command<CommandInvocation> {
     }
 
     private void doGrep(List<String> inputLines, Shell shell) {
-        if (pattern != null) {
-            for (String line : inputLines) {
-                if (line != null && pattern.matcher(line).find()) {
+        if(pattern != null) {
+            for(String line : inputLines) {
+                if(line != null && pattern.matcher(line).find()) {
                     shell.out().println(line);
                 }
             }
@@ -166,23 +166,23 @@ public class Grep implements Command<CommandInvocation> {
         @Override
         public void complete(CompleterInvocation completerData) {
             Grep grep = (Grep) completerData.getCommand();
-            // the first argument is the pattern, do not autocomplete
-            if (grep.getArguments() != null && grep.getArguments().size() > 0) {
+            //the first argument is the pattern, do not autocomplete
+            if(grep.getArguments() != null && grep.getArguments().size() > 0) {
                 CompleteOperation completeOperation =
-                    new CompleteOperation(completerData.getAeshContext(), completerData.getGivenCompleteValue(), 0);
-                if (completerData.getGivenCompleteValue() == null)
-                    new FileLister("", completerData.getAeshContext().getCurrentWorkingDirectory(),
+                    new CompleteOperation(completerData.getAeshContext(),completerData.getGivenCompleteValue(),0);
+                if(completerData.getGivenCompleteValue() == null)
+                    new FileLister("",completerData.getAeshContext().getCurrentWorkingDirectory(),
                         Filter.ALL).findMatchingDirectories(completeOperation);
                 else
-                    new FileLister(completerData.getGivenCompleteValue(), completerData.getAeshContext().getCurrentWorkingDirectory(),
+                    new FileLister(completerData.getGivenCompleteValue(),completerData.getAeshContext().getCurrentWorkingDirectory(),
                         Filter.ALL).findMatchingDirectories(completeOperation);
 
-                if (completeOperation.getCompletionCandidates().size() > 1) {
+                if(completeOperation.getCompletionCandidates().size() > 1) {
                     completeOperation.removeEscapedSpacesFromCompletionCandidates();
                 }
 
                 completerData.setCompleterValuesTerminalString(completeOperation.getCompletionCandidates());
-                if (completerData.getGivenCompleteValue() != null && completerData.getCompleterValues().size() == 1) {
+                if(completerData.getGivenCompleteValue() != null && completerData.getCompleterValues().size() == 1) {
                     completerData.setAppendSpace(completeOperation.hasAppendSeparator());
                 }
             }

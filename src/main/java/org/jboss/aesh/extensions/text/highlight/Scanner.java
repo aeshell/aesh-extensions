@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public interface Scanner {
-    public Type getType();
+    Type getType();
 
     void scan(StringScanner source, Encoder encoder, Map<String, Object> options);
 
@@ -16,7 +16,7 @@ public interface Scanner {
         private Pattern pattern;
 
         public Type(String name, String pattern) {
-            this(name, Pattern.compile(pattern, Pattern.CASE_INSENSITIVE));
+            this(name,Pattern.compile(pattern, Pattern.CASE_INSENSITIVE));
         }
 
         public Type(String name, Pattern pattern) {
@@ -29,7 +29,7 @@ public interface Scanner {
         }
 
         public boolean supports(String fileName) {
-            if (pattern == null) {
+            if(pattern == null) {
                 return false;
             }
             return pattern.matcher(fileName).find();
@@ -46,7 +46,7 @@ public interface Scanner {
         }
 
         private static Factory instance() {
-            if (factory == null) {
+            if(factory == null) {
                 factory = new Factory();
             }
             return factory;
@@ -58,8 +58,8 @@ public interface Scanner {
         }
 
         public static Scanner byType(String typeName) {
-            for (Scanner scanner : instance().registry.values()) {
-                if (scanner.getType().getName().equalsIgnoreCase(typeName)) {
+            for(Scanner scanner : instance().registry.values()) {
+                if(scanner.getType().getName().equalsIgnoreCase(typeName)) {
                     return scanner;
                 }
             }
@@ -67,8 +67,8 @@ public interface Scanner {
         }
 
         public static Scanner byFileName(String fileName) {
-            for (Scanner scanner : instance().registry.values()) {
-                if (scanner.getType().supports(fileName)) {
+            for(Scanner scanner : instance().registry.values()) {
+                if(scanner.getType().supports(fileName)) {
                     return scanner;
                 }
             }
@@ -76,11 +76,11 @@ public interface Scanner {
         }
 
         private static Scanner create(Class<? extends Scanner> scanner) {
-            if (scanner != null) {
+            if(scanner != null) {
                 try {
                     return scanner.newInstance();
                 }
-                catch (Exception e) {
+                catch(Exception e) {
                     throw new RuntimeException("Could not create new instance of " + scanner);
                 }
             }

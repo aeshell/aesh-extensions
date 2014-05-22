@@ -1,24 +1,24 @@
 package org.jboss.aesh.extensions.text.highlight.encoder;
 
+import java.awt.Color;
+import java.io.OutputStream;
+import java.util.Map;
+
 import org.jboss.aesh.extensions.text.highlight.Encoder;
 import org.jboss.aesh.extensions.text.highlight.Theme;
 import org.jboss.aesh.extensions.text.highlight.TokenType;
 
-import java.awt.*;
-import java.io.OutputStream;
-import java.util.Map;
-
 public class TerminalEncoder extends Encoder.AbstractEncoder implements Encoder {
 
     public TerminalEncoder(OutputStream out, Theme theme, Map<String, Object> options) {
-        super(out, theme, options);
+        super(out,theme,options);
         write(TerminalString.RESET); // reset terminal colors
     }
 
     @Override
     public void textToken(String text, TokenType type) {
         Color color = color(type);
-        if (color != null) {
+        if(color != null) {
             write(TerminalString.of(color, text));
         }
         else {
@@ -51,8 +51,8 @@ public class TerminalEncoder extends Encoder.AbstractEncoder implements Encoder 
         public static String of(Color color, String text) {
             StringBuilder sb = new StringBuilder();
             sb.append(START_COLOR)
-                    .append(from(color))
-                    .append(END);
+                .append(from(color))
+                .append(END);
             sb.append(text);
             sb.append(RESET);
             return sb.toString();
@@ -60,11 +60,11 @@ public class TerminalEncoder extends Encoder.AbstractEncoder implements Encoder 
 
         public static String from(Color color) {
             return String.valueOf(
-                    rgbToAnsi(
-                            color.getRed(),
-                            color.getGreen(),
-                            color.getBlue())
-            );
+                rgbToAnsi(
+                    color.getRed(),
+                    color.getGreen(),
+                    color.getBlue())
+                );
         }
 
         private static int rgbToAnsi(int red, int green, int blue) {

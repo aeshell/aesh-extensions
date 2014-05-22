@@ -1,5 +1,13 @@
 package org.jboss.aesh.extensions.text.highlight;
 
+import java.awt.Color;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
+
 import org.jboss.aesh.extensions.text.highlight.encoder.DebugEncoder;
 import org.jboss.aesh.extensions.text.highlight.encoder.TerminalEncoder;
 import org.jboss.aesh.extensions.text.highlight.scanner.CSSScanner;
@@ -14,14 +22,6 @@ import org.jboss.aesh.extensions.text.highlight.scanner.SQLScanner;
 import org.jboss.aesh.extensions.text.highlight.scanner.XMLScanner;
 import org.jboss.aesh.extensions.text.highlight.scanner.YAMLScanner;
 
-import java.awt.*;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Map;
-
 public class Syntax {
     public static void builtIns() {
         Scanner.Factory.registrer(PlainScanner.class);
@@ -35,7 +35,6 @@ public class Syntax {
         Scanner.Factory.registrer(SQLScanner.class);
         Scanner.Factory.registrer(GroovyScanner.class);
         Scanner.Factory.registrer(YAMLScanner.class);
-
 
         Encoder.Factory.registrer(Encoder.Type.TERMINAL.name(), TerminalEncoder.class);
         Encoder.Factory.registrer(Encoder.Type.DEBUG.name(), DebugEncoder.class);
@@ -111,24 +110,24 @@ public class Syntax {
         }
 
         public void execute(StringScanner source) {
-            if (output == null && encoder == null) {
+            if(output == null && encoder == null) {
                 throw new IllegalArgumentException("Either output or encoder must be defined");
             }
 
             Scanner in = scanner;
-            if (scanner == null) {
-                if (scannerType == null) {
+            if(scanner == null) {
+                if(scannerType == null) {
                     throw new IllegalArgumentException("Either input or inputType must be defined");
                 }
                 in = Scanner.Factory.byType(scannerType);
             }
             Encoder out = encoder;
-            if (encoder == null) {
-                if (encoderType == null) {
+            if(encoder == null) {
+                if(encoderType == null) {
                     throw new IllegalArgumentException("Either output or outputType must be defined");
                 }
                 out = Encoder.Factory.create(encoderType, output, theme, encoderOptions == null ? Options.create()
-                        : encoderOptions);
+                    : encoderOptions);
             }
             in.scan(source, out, scannerOptions == null ? Options.create() : scannerOptions);
         }
@@ -136,27 +135,27 @@ public class Syntax {
 
     public static Theme defaultTheme() {
         return new Theme()
-                .set(Color.RED, TokenType.predefined_constant, TokenType.content, TokenType.delimiter, TokenType.color,
-                        TokenType.value, TokenType.integer, TokenType.float_)
-                .set(Color.CYAN, TokenType.tag, TokenType.class_, TokenType.function)
-                .set(Color.MAGENTA, TokenType.keyword)
-                .set(Color.GREEN, TokenType.type, TokenType.directive, TokenType.string, TokenType.attribute_value,
-                        TokenType.attribute_name, TokenType.key);
+            .set(Color.RED, TokenType.predefined_constant, TokenType.content, TokenType.delimiter, TokenType.color,
+                TokenType.value, TokenType.integer, TokenType.float_)
+            .set(Color.CYAN, TokenType.tag, TokenType.class_, TokenType.function)
+            .set(Color.MAGENTA, TokenType.keyword)
+            .set(Color.GREEN, TokenType.type, TokenType.directive, TokenType.string, TokenType.attribute_value,
+                TokenType.attribute_name, TokenType.key);
     }
 
     public static void main(String[] args) {
         Syntax.builtIns();
-        if (args.length < 1) {
+        if(args.length < 1) {
             System.out.println("Usage: java -jar forge-text-syntax.jar file-name");
         }
 
         Encoder.Type encoder = Encoder.Type.TERMINAL;
         String fileName = args[0];
-        if (args.length == 2) {
+        if(args.length == 2) {
             encoder = Encoder.Type.DEBUG;
         }
         Scanner scanner = Scanner.Factory.byFileName(fileName);
-        if (scanner == null) {
+        if(scanner == null) {
             throw new RuntimeException("Could not determine scanner type based on filename " + fileName);
         }
 
@@ -164,21 +163,21 @@ public class Syntax {
         try {
             content = new String(Files.readAllBytes(Paths.get(fileName)));
         }
-        catch (IOException e) {
-            throw new RuntimeException("Could not read given file " + fileName, e);
+        catch(IOException e) {
+            throw new RuntimeException("Could not read given file " + fileName,e);
         }
 
         BufferedOutputStream out = new BufferedOutputStream(System.out);
         Builder.create()
-                .scanner(scanner)
-                .encoderType(encoder)
-                .output(out)
-                .execute(content);
+            .scanner(scanner)
+            .encoderType(encoder)
+            .output(out)
+            .execute(content);
 
         try {
             out.flush();
         }
-        catch (IOException e) {
+        catch(IOException e) {
         }
     }
 }

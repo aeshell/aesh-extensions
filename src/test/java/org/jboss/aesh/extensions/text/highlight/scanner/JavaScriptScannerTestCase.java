@@ -1,16 +1,15 @@
 package org.jboss.aesh.extensions.text.highlight.scanner;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jboss.aesh.extensions.text.highlight.Encoder;
 import org.jboss.aesh.extensions.text.highlight.Scanner;
 import org.jboss.aesh.extensions.text.highlight.StringScanner;
-import org.jboss.aesh.extensions.text.highlight.Syntax;
 import org.jboss.aesh.extensions.text.highlight.Syntax.Builder;
 import org.jboss.aesh.extensions.text.highlight.encoder.NullEncoder;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class JavaScriptScannerTestCase extends AbstractScannerTestCase {
 
@@ -53,7 +52,8 @@ public class JavaScriptScannerTestCase extends AbstractScannerTestCase {
     @Ignore
     // known issue http://redmine.rubychan.de/issues/137
     // https://github.com/rubychan/coderay-scanner-tests/blob/master/javascript/xml.known-issue.yaml
-    public void shouldMatchJavaScriptXMLExample() throws Exception {
+        public
+        void shouldMatchJavaScriptXMLExample() throws Exception {
         assertMatchExample(Builder.create(), "javascript", " xml.in.js");
     }
 
@@ -63,7 +63,8 @@ public class JavaScriptScannerTestCase extends AbstractScannerTestCase {
     @Test
     @Ignore
     // simple Performance setup
-    public void performance() throws Exception {
+        public
+        void performance() throws Exception {
         String content = fetch("javascript", "sun-spider.in.js");
         Map<String, Object> options = new HashMap<String, Object>();
         // OutputStream out = NullOutputStream.INSTANCE;
@@ -71,7 +72,7 @@ public class JavaScriptScannerTestCase extends AbstractScannerTestCase {
         // Encoder encoder = new TerminalEncoder(out, Syntax.defaultTheme(), new HashMap<String, Object>());
 
         Scanner scanner = new JavaScriptScanner();
-        for (int i = 0; i < 60; i++) {
+        for(int i = 0; i < 60; i++) {
             long start = System.currentTimeMillis();
             scanner.scan(new StringScanner(content), encoder, options);
             System.out.println(i + " [" + (System.currentTimeMillis() - start) + "]");

@@ -6,10 +6,14 @@
  */
 package org.jboss.aesh.extensions.manual.parser;
 
-import org.jboss.aesh.console.Config;
-import org.jboss.aesh.extensions.page.PageLoader;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -17,9 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+import org.jboss.aesh.console.Config;
+import org.jboss.aesh.extensions.page.PageLoader;
+
 /**
- * Read a asciidoc file and parse it to something that can be
- * displayed nicely in a terminal.
+ * Read a asciidoc file and parse it to something that can be displayed nicely in a terminal.
  *
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
@@ -53,7 +59,7 @@ public class ManPageLoader implements PageLoader {
      */
     public void setFile(File file) throws IOException {
         if(!file.isFile())
-            throw new IllegalArgumentException(file+" must be a file.");
+            throw new IllegalArgumentException(file + " must be a file.");
         else {
             if(file.getName().endsWith("gz"))
                 initGzReader(file);
@@ -114,12 +120,12 @@ public class ManPageLoader implements PageLoader {
 
     @Override
     public List<String> loadPage(int columns) throws IOException {
-        //we already have the file loaded
+        // we already have the file loaded
         if(!sections.isEmpty())
             return getAsList();
         if(reader == null)
             throw new IOException("InputStreamReader is null, cannot read file.");
-        //parse the file
+        // parse the file
         BufferedReader br = new BufferedReader(reader);
         try {
             String line = br.readLine();
@@ -131,7 +137,7 @@ public class ManPageLoader implements PageLoader {
                     foundEmptyLine = true;
                     section.add(line);
                 }
-                //found two empty lines create a new section
+                // found two empty lines create a new section
                 else if(line.isEmpty() && foundEmptyLine) {
                     if(!foundHeader) {
                         processHeader(section, columns);
@@ -144,7 +150,7 @@ public class ManPageLoader implements PageLoader {
                     foundEmptyLine = false;
                     section.clear();
                 }
-                //add line to section
+                // add line to section
                 else {
                     if(foundEmptyLine)
                         foundEmptyLine = false;
