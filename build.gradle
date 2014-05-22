@@ -3,11 +3,15 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
 apply plugin: 'application'
+apply plugin: 'checkstyle'
 
-sourceCompatibility = 1.7
 group = 'org.jboss.aesh'
 version = '0.55-SNAPSHOT'
+
 mainClassName = "ExampleExtension"
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 jar {
     manifest {
