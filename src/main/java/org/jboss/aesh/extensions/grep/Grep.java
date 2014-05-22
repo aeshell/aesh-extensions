@@ -1,18 +1,5 @@
 package org.jboss.aesh.extensions.grep;
 
-import org.jboss.aesh.cl.Arguments;
-import org.jboss.aesh.cl.CommandDefinition;
-import org.jboss.aesh.cl.Option;
-import org.jboss.aesh.cl.completer.OptionCompleter;
-import org.jboss.aesh.complete.CompleteOperation;
-import org.jboss.aesh.console.Config;
-import org.jboss.aesh.console.command.Command;
-import org.jboss.aesh.console.command.CommandResult;
-import org.jboss.aesh.console.command.completer.CompleterInvocation;
-import org.jboss.aesh.console.command.invocation.CommandInvocation;
-import org.jboss.aesh.terminal.Shell;
-import org.jboss.aesh.util.FileLister;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -23,47 +10,60 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.jboss.aesh.cl.Arguments;
+import org.jboss.aesh.cl.CommandDefinition;
+import org.jboss.aesh.cl.Option;
+import org.jboss.aesh.cl.completer.OptionCompleter;
+import org.jboss.aesh.complete.CompleteOperation;
+import org.jboss.aesh.console.Config;
+import org.jboss.aesh.console.command.Command;
+import org.jboss.aesh.console.command.CommandResult;
+import org.jboss.aesh.console.command.completer.CompleterInvocation;
+import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.filters.Filter;
+import org.jboss.aesh.terminal.Shell;
+import org.jboss.aesh.util.FileLister;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
  */
 @CommandDefinition(name = "grep",
-        description = "[OPTION]... PATTERN [FILE]...\n"+
-                "Search for PATTERN in each FILE or standard input.\n"+
-                "PATTERN is, by default, a basic regular expression (BRE).\n" +
-                "Example: grep -i 'hello world' menu.h main.c\n")
+    description = "[OPTION]... PATTERN [FILE]...\n" +
+        "Search for PATTERN in each FILE or standard input.\n" +
+        "PATTERN is, by default, a basic regular expression (BRE).\n" +
+        "Example: grep -i 'hello world' menu.h main.c\n")
 public class Grep implements Command<CommandInvocation> {
 
     @Option(shortName = 'H', name = "help", hasValue = false,
-            description = "display this help and exit")
+        description = "display this help and exit")
     private boolean help;
 
     @Option(shortName = 'E', name = "extended-regexp", hasValue = false,
-            description = "PATTERN is an extended regular expression (ERE)")
+        description = "PATTERN is an extended regular expression (ERE)")
     private boolean extendedRegex;
 
     @Option(shortName = 'F', name = "fixed-strings", hasValue = false,
-            description = "PATTERN is a set of newline-separated fixed strings")
+        description = "PATTERN is a set of newline-separated fixed strings")
     private boolean fixedStrings;
 
     @Option(shortName = 'G', name = "basic-regexp", hasValue = false,
-            description = "PATTERN is a basic regular expression (BRE)")
+        description = "PATTERN is a basic regular expression (BRE)")
     private boolean basicRegexp;
 
     @Option(shortName = 'P', name = "perl-regexp", hasValue = false,
-            description = "PATTERN is a Perl regular expression")
+        description = "PATTERN is a Perl regular expression")
     private boolean perlRegexp;
 
     @Option(shortName = 'e', name = "regexp", argument = "PATTERN",
-            description = "use PATTERN for matching")
+        description = "use PATTERN for matching")
     private String regexp;
 
     @Option(shortName = 'f', name = "file", argument = "FILE",
-            description = "obtain PATTERN from FILE")
+        description = "obtain PATTERN from FILE")
     private File file;
 
     @Option(shortName = 'i', name = "ignore-case", hasValue = false,
-            description = "ignore case distinctions")
+        description = "ignore case distinctions")
     private boolean ignoreCase;
 
     @Arguments(completer = GrepCompletor.class)
@@ -77,26 +77,26 @@ public class Grep implements Command<CommandInvocation> {
 
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
-        //just display help and return
-        if(help || arguments == null || arguments.size() == 0) {
+        // just display help and return
+        if (help || arguments == null || arguments.size() == 0) {
             commandInvocation.getShell().out().println(commandInvocation.getHelpInfo("grep"));
             return CommandResult.SUCCESS;
         }
 
-        //first create the pattern
+        // first create the pattern
         try {
-            if(ignoreCase)
+            if (ignoreCase)
                 pattern = Pattern.compile(arguments.remove(0), Pattern.CASE_INSENSITIVE);
             else
                 pattern = Pattern.compile(arguments.remove(0));
         }
-        catch(PatternSyntaxException pse) {
+        catch (PatternSyntaxException pse) {
             commandInvocation.getShell().out().println("grep: invalid pattern.");
             return CommandResult.FAILURE;
         }
 
-        //do we have data from a pipe/redirect?
-        if(commandInvocation.getShell().in().getStdIn().available() > 0) {
+        // do we have data from a pipe/redirect?
+        if (commandInvocation.getShell().in().getStdIn().available() > 0) {
             java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
             String input = s.hasNext() ? s.next() : "";
             List<String> inputLines = new ArrayList<>();
@@ -104,14 +104,14 @@ public class Grep implements Command<CommandInvocation> {
 
             doGrep(inputLines, commandInvocation.getShell());
         }
-        //find argument files and build regex..
+        // find argument files and build regex..
         else {
-            if(arguments != null && arguments.size() > 0) {
-                for(String s : arguments)
+            if (arguments != null && arguments.size() > 0) {
+                for (String s : arguments)
                     doGrep(new File(s), commandInvocation.getShell());
             }
-            //posix starts an interactive shell and read from the input here
-            //atm, we'll just quit
+            // posix starts an interactive shell and read from the input here
+            // atm, we'll just quit
             else {
                 commandInvocation.getShell().out().print("grep: no file or input given.");
                 return CommandResult.SUCCESS;
@@ -122,10 +122,10 @@ public class Grep implements Command<CommandInvocation> {
     }
 
     private void doGrep(File file, Shell shell) {
-        if(!file.exists()) {
-            shell.out().println("grep: "+file.toString()+": No such file or directory");
+        if (!file.exists()) {
+            shell.out().println("grep: " + file.toString() + ": No such file or directory");
         }
-        else if(file.isFile()) {
+        else if (file.isFile()) {
             try {
                 FileReader fileReader = new FileReader(file);
                 BufferedReader br = new BufferedReader(fileReader);
@@ -146,9 +146,9 @@ public class Grep implements Command<CommandInvocation> {
     }
 
     private void doGrep(List<String> inputLines, Shell shell) {
-        if(pattern != null) {
-            for(String line : inputLines) {
-                if(line != null && pattern.matcher(line).find()) {
+        if (pattern != null) {
+            for (String line : inputLines) {
+                if (line != null && pattern.matcher(line).find()) {
                     shell.out().println(line);
                 }
             }
@@ -159,24 +159,23 @@ public class Grep implements Command<CommandInvocation> {
     }
 
     /**
-     * First argument is the pattern
-     * All other arguments should be files
+     * First argument is the pattern All other arguments should be files
      */
     public static class GrepCompletor implements OptionCompleter<CompleterInvocation> {
 
         @Override
         public void complete(CompleterInvocation completerData) {
             Grep grep = (Grep) completerData.getCommand();
-            //the first argument is the pattern, do not autocomplete
-            if(grep.getArguments() != null && grep.getArguments().size() > 0) {
+            // the first argument is the pattern, do not autocomplete
+            if (grep.getArguments() != null && grep.getArguments().size() > 0) {
                 CompleteOperation completeOperation =
-                        new CompleteOperation(completerData.getAeshContext(), completerData.getGivenCompleteValue(), 0);
+                    new CompleteOperation(completerData.getAeshContext(), completerData.getGivenCompleteValue(), 0);
                 if (completerData.getGivenCompleteValue() == null)
                     new FileLister("", completerData.getAeshContext().getCurrentWorkingDirectory(),
-                            FileLister.Filter.ALL).findMatchingDirectories(completeOperation);
+                        Filter.ALL).findMatchingDirectories(completeOperation);
                 else
                     new FileLister(completerData.getGivenCompleteValue(), completerData.getAeshContext().getCurrentWorkingDirectory(),
-                            FileLister.Filter.ALL).findMatchingDirectories(completeOperation);
+                        Filter.ALL).findMatchingDirectories(completeOperation);
 
                 if (completeOperation.getCompletionCandidates().size() > 1) {
                     completeOperation.removeEscapedSpacesFromCompletionCandidates();
