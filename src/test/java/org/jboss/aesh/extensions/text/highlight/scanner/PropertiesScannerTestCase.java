@@ -8,11 +8,10 @@ import static org.jboss.aesh.extensions.text.highlight.encoder.AssertEncoder.ass
 
 public class PropertiesScannerTestCase extends AbstractScannerTestCase {
 
-   @Test
-   public void should() throws Exception
-   {
+    @Test
+    public void should() throws Exception {
 
-      String source = "# You are reading the \".properties\" entry.\n" +
+        String source = "# You are reading the \".properties\" entry.\n" +
             "! The exclamation mark can also mark text as comments.\n" +
             "# The key and element characters #, !, =, and : are written with\n" +
             "# a preceding backslash to ensure that they are properly loaded.\n" +
@@ -30,12 +29,12 @@ public class PropertiesScannerTestCase extends AbstractScannerTestCase {
             "number : 100\n" +
             "float : 100.0\n";
 
-      Syntax.Builder.create().scannerType(PropertiesScanner.TYPE.getName()).encoderType(ASSERT_ENCODER).execute(source);
+        Syntax.Builder.create().scannerType(PropertiesScanner.TYPE.getName()).encoderType(ASSERT_ENCODER).execute(source);
 
-      assertTextToken(TokenType.comment, "# You are reading the \".properties\" entry.", "! The exclamation mark can also mark text as comments.");
-      assertTextToken(TokenType.value, "English", "Welcome to \\", "Wikipedia\\!");
-      assertTextToken(TokenType.key, "website", "language", "language2", "key\\ with\\ spaces", "tab");
-      assertTextToken(TokenType.float_, "100.0");
-      assertTextToken(TokenType.integer, "100");
-   }
+        assertTextToken(TokenType.comment, "# You are reading the \".properties\" entry.", "! The exclamation mark can also mark text as comments.");
+        assertTextToken(TokenType.value, "English", "Welcome to \\", "Wikipedia\\!");
+        assertTextToken(TokenType.key, "website", "language", "language2", "key\\ with\\ spaces", "tab");
+        assertTextToken(TokenType.float_, "100.0");
+        assertTextToken(TokenType.integer, "100");
+    }
 }

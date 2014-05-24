@@ -1,6 +1,6 @@
 package org.jboss.aesh.extensions.text.highlight;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
@@ -20,10 +20,11 @@ public interface Encoder {
     void endLine(TokenType type);
 
     public enum Type {
-        TERMINAL, DEBUG
+        TERMINAL,
+        DEBUG
     }
 
-    public static abstract class AbstractEncoder implements Encoder {
+    public abstract static class AbstractEncoder implements Encoder {
         public static final String NEW_LINE = System.getProperty("line.separator");
 
         protected OutputStream out;
@@ -44,8 +45,8 @@ public interface Encoder {
             try {
                 out.write(str.getBytes());
             }
-            catch (IOException e) {
-                throw new RuntimeException("Could not write to output", e);
+            catch(IOException e) {
+                throw new RuntimeException("Could not write to output",e);
             }
         }
 
@@ -53,8 +54,8 @@ public interface Encoder {
             try {
                 out.write(bytes);
             }
-            catch (IOException e) {
-                throw new RuntimeException("Could not write to output", e);
+            catch(IOException e) {
+                throw new RuntimeException("Could not write to output",e);
             }
         }
     }
@@ -69,7 +70,7 @@ public interface Encoder {
         }
 
         private static Factory instance() {
-            if (factory == null) {
+            if(factory == null) {
                 factory = new Factory();
             }
             return factory;
@@ -81,13 +82,13 @@ public interface Encoder {
 
         public static Encoder create(String type, OutputStream out, Theme theme, Map<String, Object> options) {
             Class<? extends Encoder> encoder = instance().registry.get(type);
-            if (encoder != null) {
+            if(encoder != null) {
                 try {
                     Constructor<? extends Encoder> constructor = encoder.getConstructor(OutputStream.class, Theme.class,
-                            Map.class);
+                        Map.class);
                     return constructor.newInstance(out, theme, options);
                 }
-                catch (Exception e) {
+                catch(Exception e) {
                     throw new RuntimeException("Could not create new instance of " + encoder);
                 }
             }
