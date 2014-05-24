@@ -6,9 +6,9 @@
  */
 package org.jboss.aesh.extensions.manual;
 
-import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
+import java.io.IOException;
 
-import java.io.*;
+import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>

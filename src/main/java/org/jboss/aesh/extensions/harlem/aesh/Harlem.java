@@ -213,10 +213,10 @@ public class Harlem implements Command<CommandInvocation> {
 
     private void saveHarlem(File harlemWav) throws IOException {
         try (BufferedInputStream in = new BufferedInputStream(new URL("https://dl.dropbox.com/u/30971563/harlem.wav").openStream())) {
-        	byte data[] = new byte[1024];
+            byte[] data = new byte[1024];
             int count;
-        	try (FileOutputStream fout = new FileOutputStream(harlemWav);) {
-        		while ((count = in.read(data, 0, 1024)) != -1) {
+            try (FileOutputStream fout = new FileOutputStream(harlemWav);) {
+                while ((count = in.read(data, 0, 1024)) != -1) {
                     fout.write(data, 0, count);
                 }
             }

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public interface Scanner {
-    public Type getType();
+    Type getType();
 
     void scan(StringScanner source, Encoder encoder, Map<String, Object> options);
 

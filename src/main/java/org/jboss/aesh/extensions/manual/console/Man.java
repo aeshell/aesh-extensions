@@ -6,23 +6,20 @@
  */
 package org.jboss.aesh.extensions.manual.console;
 
-import org.jboss.aesh.complete.CompleteOperation;
-import org.jboss.aesh.console.Console;
-import org.jboss.aesh.console.man.FileParser;
-import org.jboss.aesh.extensions.manual.ManPage;
-import org.jboss.aesh.extensions.manual.parser.ManPageLoader;
-import org.jboss.aesh.extensions.page.FileDisplayer;
-import org.jboss.aesh.extensions.page.PageLoader;
-import org.jboss.aesh.extensions.page.SimpleFileParser;
-import org.jboss.aesh.terminal.TerminalString;
-import org.jboss.aesh.util.ANSI;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.jboss.aesh.complete.CompleteOperation;
+import org.jboss.aesh.console.Console;
+import org.jboss.aesh.console.man.FileParser;
+import org.jboss.aesh.extensions.manual.ManPage;
+import org.jboss.aesh.extensions.page.FileDisplayer;
+import org.jboss.aesh.extensions.page.SimpleFileParser;
+import org.jboss.aesh.terminal.TerminalString;
+import org.jboss.aesh.util.ANSI;
 
 /**
  * A Man implementation for Aesh. ref: http://en.wikipedia.org/wiki/Man_page

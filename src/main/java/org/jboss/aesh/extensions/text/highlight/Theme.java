@@ -1,6 +1,6 @@
 package org.jboss.aesh.extensions.text.highlight;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
