@@ -41,6 +41,10 @@ public class StringGroup {
         return Parser.padLeft(maxLength+1, strings[place]);
     }
 
+    public String getFormattedStringPadRight(int place) {
+        return " " + Parser.padRight(maxLength, strings[place]);
+    }
+
     public void formatStringsBasedOnMaxLength() {
         for(int i=0; i<strings.length;i++)
             strings[i] = Parser.padLeft(maxLength, strings[i]);
