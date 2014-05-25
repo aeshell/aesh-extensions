@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.RoundingMode;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.PosixFileAttributes;
@@ -18,6 +19,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -26,6 +28,7 @@ import java.util.List;
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.cl.Option;
+import org.jboss.aesh.comparators.PosixFileNameComparator;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
@@ -76,9 +79,13 @@ public class Ls implements Command<CommandInvocation> {
     private static final Class<? extends BasicFileAttributes> fileAttributes =
             Config.isOSPOSIXCompatible() ? PosixFileAttributes.class : DosFileAttributes.class;
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd hh:mm");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd HH:mm");
+    private static final DateFormat OLD_FILE_DATE_FORMAT = new SimpleDateFormat("MMM dd  yyyy");
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat(".#");
+
+    private static final TerminalColor DIRECTORY_COLOR = new TerminalColor(Color.BLUE, Color.DEFAULT, Color.Intensity.BRIGHT);
+    private static final TerminalColor SYMBOLIC_LINK_COLOR = new TerminalColor(Color.CYAN, Color.DEFAULT, Color.Intensity.BRIGHT);
 
     public Ls() {
         DECIMAL_FORMAT.setRoundingMode(RoundingMode.UP);
@@ -120,41 +127,40 @@ public class Ls implements Command<CommandInvocation> {
     }
 
     private void displayDirectory(File input, Shell shell) {
-        if(longListing) {
-            if(all) {
-                File[] files = input.listFiles();
-                Arrays.sort(files, new PosixFileNameComparator());
-                shell.out().print(displayLongListing(files));
-            }
-            else {
-                File[] files = input.listFiles(new FileAndDirectoryNoDotNamesFilter());
-                Arrays.sort(files, new PosixFileNameComparator());
-                shell.out().print(displayLongListing(files));
-            }
-        }
-        else {
-            if(all)
-                shell.out().print(Parser.formatDisplayListTerminalString(
-                        formatFileList(input.listFiles()),
-                        shell.getSize().getHeight(), shell.getSize().getWidth()));
-            else
-                shell.out().print(Parser.formatDisplayListTerminalString(
-                        formatFileList(input.listFiles(new FileAndDirectoryNoDotNamesFilter())),
-                        shell.getSize().getHeight(), shell.getSize().getWidth()));
+        File[] files;
 
+        if (all) {
+            // add "." and ".." to list of files
+            File[] fileArray = input.listFiles();
+            files = Arrays.copyOf(fileArray, fileArray.length + 2);
+            files[fileArray.length] = new File(input, ".");
+            files[fileArray.length + 1] = new File(input, "..");
+        } else {
+            files = input.listFiles(new FileAndDirectoryNoDotNamesFilter());
+        }
+
+        Arrays.sort(files, new PosixFileComparator());
+
+        if (longListing) {
+            shell.out().print(displayLongListing(files));
+        } else {
+            shell.out().print(Parser.formatDisplayCompactListTerminalString(
+                formatFileList(files),
+                shell.getSize().getWidth()));
         }
     }
 
     private List<TerminalString> formatFileList(File[] fileList) {
         ArrayList<TerminalString> list = new ArrayList<TerminalString>(fileList.length);
         for(File file : fileList) {
-            if(file.isDirectory())
-                list.add(new TerminalString(file.getName(),
-                        new TerminalColor(Color.BLUE, Color.DEFAULT)));
-            else
+            if (Files.isSymbolicLink(file.toPath())) {
+                list.add(new TerminalString(file.getName(), SYMBOLIC_LINK_COLOR));
+            } else if (file.isDirectory()) {
+                list.add(new TerminalString(file.getName(), DIRECTORY_COLOR));
+            } else {
                 list.add(new TerminalString(file.getName()));
+            }
         }
-        Collections.sort(list, new PosixTerminalStringNameComparator());
         return list;
     }
 
@@ -179,19 +185,37 @@ public class Ls implements Command<CommandInvocation> {
         try {
             int counter = 0;
             for(File file : files) {
-                BasicFileAttributes attr = Files.readAttributes(file.toPath(), fileAttributes);
+                BasicFileAttributes attr = Files.readAttributes(file.toPath(), fileAttributes, LinkOption.NOFOLLOW_LINKS);
 
-                access.addString(AeshPosixFilePermissions.toString(((PosixFileAttributes) attr)), counter);
+                if (Config.isOSPOSIXCompatible()) {
+                    access.addString(AeshPosixFilePermissions.toString(((PosixFileAttributes) attr)), counter);
+                } else {
+                    access.addString("", counter);
+                }
+
                 size.addString(makeSizeReadable(attr.size()), counter);
-                if(Config.isOSPOSIXCompatible())
+
+                if (Config.isOSPOSIXCompatible()) {
                     owner.addString(((PosixFileAttributes) attr).owner().getName(), counter);
-                else
-                    owner.addString("", counter);
-                if(Config.isOSPOSIXCompatible())
                     group.addString(((PosixFileAttributes) attr).group().getName(), counter);
-                else
+                } else {
                     owner.addString("", counter);
-                modified.addString(DATE_FORMAT.format(new Date(attr.lastModifiedTime().toMillis())), counter);
+                    group.addString("", counter);
+                }
+
+                // show year instead of time when file wasn't changed in actual year
+                Date lastModifiedTime = new Date(attr.lastModifiedTime().toMillis());
+
+                Calendar lastModifiedCalendar = Calendar.getInstance();
+                lastModifiedCalendar.setTime(lastModifiedTime);
+
+                Calendar nowCalendar = Calendar.getInstance();
+
+                if (lastModifiedCalendar.get(Calendar.YEAR) == nowCalendar.get(Calendar.YEAR)) {
+                    modified.addString(DATE_FORMAT.format(lastModifiedTime), counter);
+                } else {
+                    modified.addString(OLD_FILE_DATE_FORMAT.format(lastModifiedTime), counter);
+                }
 
                 counter++;
             }
@@ -201,33 +225,32 @@ public class Ls implements Command<CommandInvocation> {
         }
 
         StringBuilder builder = new StringBuilder();
-        TerminalColor directoryColor = new TerminalColor(Color.BLUE, Color.DEFAULT, Color.Intensity.BRIGHT);
-        for(int i=0; i < files.length; i++) {
-            if(files[i].isDirectory()) {
-                builder.append(access.getString(i))
-                        .append(owner.getFormattedString(i))
-                        .append(group.getFormattedString(i))
-                        .append(size.getFormattedString(i))
-                        .append(SPACE)
-                        .append(modified.getString(i))
-                        .append(SPACE);
-                builder.append(new TerminalString(files[i].getName(), directoryColor))
-                        .append(Config.getLineSeparator());
 
+        for (int i = 0; i < files.length; i++) {
+            builder.append(access.getString(i))
+                .append(owner.getFormattedStringPadRight(i))
+                .append(group.getFormattedStringPadRight(i))
+                .append(size.getFormattedString(i))
+                .append(SPACE)
+                .append(modified.getString(i))
+                .append(SPACE);
+
+            if (Files.isSymbolicLink(files[i].toPath())) {
+                builder.append(new TerminalString(files[i].getName(), SYMBOLIC_LINK_COLOR));
+                builder.append(" -> ");
+                try {
+                    builder.append(Files.readSymbolicLink(files[i].toPath()));
+                } catch (IOException ex) {
+                    ex.printStackTrace(); // this should not happen
+                }
+            } else if (files[i].isDirectory()) {
+                builder.append(new TerminalString(files[i].getName(), DIRECTORY_COLOR));
+            } else {
+                builder.append(files[i].getName());
             }
-            else {
-                builder.append(access.getString(i))
-                        .append(owner.getFormattedString(i))
-                        .append(group.getFormattedString(i))
-                        .append(size.getFormattedString(i))
-                        .append(SPACE)
-                        .append(modified.getString(i))
-                        .append(SPACE)
-                        .append(files[i].getName())
-                        .append(Config.getLineSeparator());
-            }
+
+            builder.append(Config.getLineSeparator());
         }
-
 
         return builder.toString();
     }
@@ -247,55 +270,12 @@ public class Ls implements Command<CommandInvocation> {
         }
     }
 
-    class PosixTerminalStringNameComparator implements Comparator<TerminalString> {
-        private static final char DOT = '.';
-
-        @Override
-        public int compare(TerminalString o1, TerminalString o2) {
-            if(o1.getCharacters().length() > 1 && o2.getCharacters().length() > 1) {
-                if(o1.getCharacters().indexOf(DOT) == 0) {
-                    if(o2.getCharacters().indexOf(DOT) == 0)
-                        return o1.getCharacters().substring(1).compareToIgnoreCase(o2.getCharacters().substring(1));
-                    else
-                        return o1.getCharacters().substring(1).compareToIgnoreCase(o2.getCharacters());
-                }
-                else {
-                    if(o2.getCharacters().indexOf(DOT) == 0)
-                        return o1.getCharacters().compareToIgnoreCase(o2.getCharacters().substring(1));
-                    else
-                        return o1.getCharacters().compareToIgnoreCase(o2.getCharacters());
-                }
-            }
-            else
-                return 0;
-        }
-    }
-
-
-    class PosixFileNameComparator implements Comparator<File> {
-        private static final char DOT = '.';
+    class PosixFileComparator implements Comparator<File> {
+        private PosixFileNameComparator posixFileNameComparator = new PosixFileNameComparator();
 
         @Override
         public int compare(File o1, File o2) {
-            if(o1.getName().length() > 1 && o2.getName().length() > 1) {
-                if(o1.getName().indexOf(DOT) == 0) {
-                    if(o2.getName().indexOf(DOT) == 0)
-                        return o1.getName().substring(1).compareToIgnoreCase(o2.getName().substring(1));
-                    else
-                        return o1.getName().substring(1).compareToIgnoreCase(o2.getName());
-                }
-                else {
-                    if(o2.getName().indexOf(DOT) == 0)
-                        return o1.getName().compareToIgnoreCase(o2.getName().substring(1));
-                    else
-                        return o1.getName().compareToIgnoreCase(o2.getName());
-                }
-            }
-            else
-                return 0;
+            return posixFileNameComparator.compare(o1.getName(), o2.getName());
         }
     }
-
-
-
 }
