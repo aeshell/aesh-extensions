@@ -1,6 +1,6 @@
 package org.jboss.aesh.extensions.text.highlight;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
@@ -23,7 +23,7 @@ public interface Encoder {
         TERMINAL, DEBUG
     }
 
-    public static abstract class AbstractEncoder implements Encoder {
+    public abstract static class AbstractEncoder implements Encoder {
         public static final String NEW_LINE = System.getProperty("line.separator");
 
         protected OutputStream out;

@@ -6,22 +6,6 @@
  */
 package org.jboss.aesh.extensions.ls;
 
-import org.jboss.aesh.cl.Arguments;
-import org.jboss.aesh.cl.CommandDefinition;
-import org.jboss.aesh.cl.Option;
-import org.jboss.aesh.console.Config;
-import org.jboss.aesh.console.command.Command;
-import org.jboss.aesh.console.command.CommandResult;
-import org.jboss.aesh.console.command.invocation.CommandInvocation;
-import org.jboss.aesh.extensions.grep.AeshPosixFilePermissions;
-import org.jboss.aesh.parser.Parser;
-import org.jboss.aesh.terminal.Color;
-import org.jboss.aesh.terminal.Shell;
-import org.jboss.aesh.terminal.TerminalColor;
-import org.jboss.aesh.terminal.TerminalString;
-import org.jboss.aesh.util.FileLister;
-import org.jboss.aesh.util.PathResolver;
-
 import java.io.File;
 import java.io.IOException;
 import java.math.RoundingMode;
@@ -38,6 +22,22 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+
+import org.jboss.aesh.cl.Arguments;
+import org.jboss.aesh.cl.CommandDefinition;
+import org.jboss.aesh.cl.Option;
+import org.jboss.aesh.console.Config;
+import org.jboss.aesh.console.command.Command;
+import org.jboss.aesh.console.command.CommandResult;
+import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.extensions.grep.AeshPosixFilePermissions;
+import org.jboss.aesh.filters.file.FileAndDirectoryNoDotNamesFilter;
+import org.jboss.aesh.parser.Parser;
+import org.jboss.aesh.terminal.Color;
+import org.jboss.aesh.terminal.Shell;
+import org.jboss.aesh.terminal.TerminalColor;
+import org.jboss.aesh.terminal.TerminalString;
+import org.jboss.aesh.util.PathResolver;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -127,7 +127,7 @@ public class Ls implements Command<CommandInvocation> {
                 shell.out().print(displayLongListing(files));
             }
             else {
-                File[] files = input.listFiles(new FileLister.FileAndDirectoryNoDotNamesFilter());
+                File[] files = input.listFiles(new FileAndDirectoryNoDotNamesFilter());
                 Arrays.sort(files, new PosixFileNameComparator());
                 shell.out().print(displayLongListing(files));
             }
@@ -139,7 +139,7 @@ public class Ls implements Command<CommandInvocation> {
                         shell.getSize().getHeight(), shell.getSize().getWidth()));
             else
                 shell.out().print(Parser.formatDisplayListTerminalString(
-                        formatFileList(input.listFiles(new FileLister.FileAndDirectoryNoDotNamesFilter())),
+                        formatFileList(input.listFiles(new FileAndDirectoryNoDotNamesFilter())),
                         shell.getSize().getHeight(), shell.getSize().getWidth()));
 
         }

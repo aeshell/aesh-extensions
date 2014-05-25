@@ -9,8 +9,7 @@ import static org.jboss.aesh.extensions.text.highlight.encoder.AssertEncoder.ass
 public class PropertiesScannerTestCase extends AbstractScannerTestCase {
 
    @Test
-   public void should() throws Exception
-   {
+   public void should() throws Exception {
 
       String source = "# You are reading the \".properties\" entry.\n" +
             "! The exclamation mark can also mark text as comments.\n" +

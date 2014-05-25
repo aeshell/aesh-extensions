@@ -8,7 +8,7 @@ import java.util.List;
  */
 public interface PageLoader {
 
-    public List<String> loadPage(int columns) throws IOException;
+    List<String> loadPage(int columns) throws IOException;
 
-    public String getResourceName();
+    String getResourceName();
 }

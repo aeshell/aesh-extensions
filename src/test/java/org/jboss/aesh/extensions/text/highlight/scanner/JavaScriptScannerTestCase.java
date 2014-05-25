@@ -1,16 +1,15 @@
 package org.jboss.aesh.extensions.text.highlight.scanner;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jboss.aesh.extensions.text.highlight.Encoder;
 import org.jboss.aesh.extensions.text.highlight.Scanner;
 import org.jboss.aesh.extensions.text.highlight.StringScanner;
-import org.jboss.aesh.extensions.text.highlight.Syntax;
 import org.jboss.aesh.extensions.text.highlight.Syntax.Builder;
 import org.jboss.aesh.extensions.text.highlight.encoder.NullEncoder;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class JavaScriptScannerTestCase extends AbstractScannerTestCase {
 

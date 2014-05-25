@@ -51,15 +51,12 @@ public class CdTest {
             .commandRegistry(commandRegistry)
             .prompt(new Prompt(""))
             .create();
-        
         console.start();
-        
         byteArrayOutputStream.flush();
         pipedOutputStream.write(("cd /tmp").getBytes());
         pipedOutputStream.flush();
         pipedOutputStream.write(("ls").getBytes());
         pipedOutputStream.flush();
         System.out.println("Got out: "+byteArrayOutputStream.toString());
-        
     }
 }

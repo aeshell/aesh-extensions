@@ -3,8 +3,7 @@ package org.jboss.aesh.extensions.text.highlight.scanner.java;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BuiltInTypes
-{
+public class BuiltInTypes {
 
    private static final String raw_string =
             "AbstractAction AbstractBorder AbstractButton AbstractCellEditor AbstractCollection\n"
@@ -822,19 +821,15 @@ public class BuiltInTypes
    public static final String[] PREDEFINED_TYPES = cleanUp();
    public static final String[] EXCEPTION_TYPES = extractExceptions(PREDEFINED_TYPES);
 
-   private static String[] cleanUp()
-   {
+   private static String[] cleanUp() {
       return raw_string.replaceAll("\n", " ").split(" ");
    }
 
-   private static String[] extractExceptions(String[] types)
-   {
+   private static String[] extractExceptions(String[] types) {
 
       List<String> match = new ArrayList<String>();
-      for (String s : types)
-      {
-         if (s.endsWith("Error") || s.endsWith("Exception"))
-         {
+      for (String s : types) {
+         if (s.endsWith("Error") || s.endsWith("Exception")) {
             match.add(s);
          }
       }

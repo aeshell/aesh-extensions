@@ -1,5 +1,13 @@
 package org.jboss.aesh.extensions.text.highlight;
 
+import java.awt.Color;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
+
 import org.jboss.aesh.extensions.text.highlight.encoder.DebugEncoder;
 import org.jboss.aesh.extensions.text.highlight.encoder.TerminalEncoder;
 import org.jboss.aesh.extensions.text.highlight.scanner.CSSScanner;
@@ -13,14 +21,6 @@ import org.jboss.aesh.extensions.text.highlight.scanner.PropertiesScanner;
 import org.jboss.aesh.extensions.text.highlight.scanner.SQLScanner;
 import org.jboss.aesh.extensions.text.highlight.scanner.XMLScanner;
 import org.jboss.aesh.extensions.text.highlight.scanner.YAMLScanner;
-
-import java.awt.*;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Map;
 
 public class Syntax {
     public static void builtIns() {

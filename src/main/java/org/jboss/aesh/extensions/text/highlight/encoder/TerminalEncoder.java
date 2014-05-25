@@ -1,12 +1,12 @@
 package org.jboss.aesh.extensions.text.highlight.encoder;
 
+import java.awt.Color;
+import java.io.OutputStream;
+import java.util.Map;
+
 import org.jboss.aesh.extensions.text.highlight.Encoder;
 import org.jboss.aesh.extensions.text.highlight.Theme;
 import org.jboss.aesh.extensions.text.highlight.TokenType;
-
-import java.awt.*;
-import java.io.OutputStream;
-import java.util.Map;
 
 public class TerminalEncoder extends Encoder.AbstractEncoder implements Encoder {
 

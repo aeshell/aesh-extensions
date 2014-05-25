@@ -5,9 +5,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jboss.aesh.complete.CompleteOperation;
 import org.jboss.aesh.complete.Completion;
-import org.jboss.aesh.console.*;
+import org.jboss.aesh.console.AeshConsoleCallback;
+import org.jboss.aesh.console.Config;
+import org.jboss.aesh.console.Console;
+import org.jboss.aesh.console.ConsoleOperation;
+import org.jboss.aesh.console.Prompt;
 import org.jboss.aesh.console.settings.SettingsBuilder;
 import org.jboss.aesh.extensions.choice.aesh.MultipleChoice;
 import org.jboss.aesh.extensions.harlem.console.Harlem;
@@ -15,12 +25,6 @@ import org.jboss.aesh.extensions.less.console.Less;
 import org.jboss.aesh.extensions.manual.console.Man;
 import org.jboss.aesh.extensions.more.console.More;
 import org.jboss.aesh.parser.Parser;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>

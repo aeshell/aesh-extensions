@@ -217,7 +217,7 @@ public class Harlem implements Completion {
             in = new BufferedInputStream(new URL("https://dl.dropbox.com/u/30971563/harlem.wav").openStream());
             fout = new FileOutputStream(harlemWav);
 
-            byte data[] = new byte[1024];
+            byte[] data = new byte[1024];
             int count;
             while ((count = in.read(data, 0, 1024)) != -1) {
                 fout.write(data, 0, count);

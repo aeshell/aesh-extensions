@@ -8,12 +8,10 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StringScannerTestCase
-{
+public class StringScannerTestCase {
 
    @Test
-   public void shouldTrackIndex() throws Exception
-   {
+   public void shouldTrackIndex() throws Exception {
       String test = "abcde";
 
       StringScanner scan = new StringScanner(test);
@@ -37,8 +35,7 @@ public class StringScannerTestCase
    }
 
    @Test
-   public void shouldScanUntil() throws Exception
-   {
+   public void shouldScanUntil() throws Exception {
       String test = "aaaabc";
 
       StringScanner scan = new StringScanner(test);
@@ -54,8 +51,7 @@ public class StringScannerTestCase
 
    @Test
    @Ignore
-   public void should2() throws Exception
-   {
+   public void should2() throws Exception {
 
       String test = "package pl.silvermedia.ws";
       StringScanner scan = new StringScanner(test);
@@ -66,8 +62,7 @@ public class StringScannerTestCase
    }
 
    @Test
-   public void shouldMatchMatcherGroups() throws Exception
-   {
+   public void shouldMatchMatcherGroups() throws Exception {
       Pattern p = Pattern.compile("<(?:(script|style)|[-\\w.:]+)(>)?", Pattern.DOTALL);
 
       String source = "<textarea disabled>\n" +
