@@ -90,7 +90,7 @@ public class Matrix implements Command<CommandInvocation> {
     }
 
     @Override
-    public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
+    public CommandResult execute(CommandInvocation commandInvocation) throws IOException, InterruptedException {
         if(help) {
             commandInvocation.getShell().out().println(commandInvocation.getHelpInfo("matrix"));
             commandInvocation.getShell().out().flush();
@@ -116,20 +116,19 @@ public class Matrix implements Command<CommandInvocation> {
         executorService.execute(runner);
     }
 
-    public void processOperation() throws IOException {
-
+    public void processOperation() throws IOException, InterruptedException {
         try {
-            while(true) {
+            while (true) {
                 CommandOperation commandOperation = commandInvocation.getInput();
-                if(commandOperation.getInputKey().isNumber()) {
-                    if(runner != null)
+                if (commandOperation.getInputKey().isNumber()) {
+                    if (runner != null)
                         runner.speed(Integer.parseInt(String.valueOf((char) commandOperation.getInput()[0])));
                 }
-                if(commandOperation.getInputKey() == Key.a) {
-                    if(runner != null)
+                if (commandOperation.getInputKey() == Key.a) {
+                    if (runner != null)
                         runner.asynch();
                 }
-                else if(commandOperation.getInputKey() == Key.q) {
+                else if (commandOperation.getInputKey() == Key.q) {
                     stop();
                     return;
                 }
@@ -137,6 +136,7 @@ public class Matrix implements Command<CommandInvocation> {
         }
         catch (InterruptedException ie) {
             stop();
+            throw ie;
         }
     }
 
