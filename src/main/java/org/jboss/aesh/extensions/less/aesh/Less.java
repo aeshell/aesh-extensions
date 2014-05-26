@@ -91,7 +91,7 @@ public class Less extends AeshFileDisplayer {
     }
 
     @Override
-    public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
+    public CommandResult execute(CommandInvocation commandInvocation) throws IOException, InterruptedException {
         setCommandInvocation(commandInvocation);
         //make sure to reset loader on each execute
         loader = new SimpleFileParser();
