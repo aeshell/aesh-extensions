@@ -27,6 +27,8 @@ import org.jboss.aesh.extensions.less.aesh.Less;
 import org.jboss.aesh.extensions.ls.Ls;
 import org.jboss.aesh.extensions.matrix.Matrix;
 import org.jboss.aesh.extensions.more.aesh.More;
+import org.jboss.aesh.extensions.pushdpopd.Popd;
+import org.jboss.aesh.extensions.pushdpopd.Pushd;
 import org.jboss.aesh.extensions.pwd.Pwd;
 import org.jboss.aesh.extensions.touch.Touch;
 
@@ -54,6 +56,8 @@ public class AeshExampleExtension {
                 .command(Cd.class)
                 .command(Pwd.class)
                 .command(Touch.class)
+                .command(Pushd.class)
+                .command(Popd.class)
                 .create();
 
         AeshConsole aeshConsole = new AeshConsoleBuilder()
