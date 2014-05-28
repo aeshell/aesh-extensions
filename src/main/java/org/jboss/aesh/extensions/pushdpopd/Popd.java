@@ -31,6 +31,10 @@ public class Popd implements Command<CommandInvocation> {
                 commandInvocation.getAeshContext().setCurrentWorkingDirectory(popFile);
                 return CommandResult.SUCCESS;
             }
+            else {
+                commandInvocation.getShell().out().println("popd: directory stack empty");
+                return CommandResult.SUCCESS;
+            }
         }
         catch (CommandNotFoundException ignored) { }
 

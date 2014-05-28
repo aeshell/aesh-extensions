@@ -51,14 +51,27 @@ public class Pushd implements Command<CommandInvocation> {
                 File oldCwd = commandInvocation.getAeshContext().getCurrentWorkingDirectory();
                 directories.add(oldCwd);
                 commandInvocation.getAeshContext().setCurrentWorkingDirectory(files.get(0));
-                commandInvocation.getShell().out().println(files.get(0)+" "+oldCwd);
+                commandInvocation.getShell().out().println(files.get(0)+" "+getDirectoriesAsString());
                 return CommandResult.SUCCESS;
             }
 
             return CommandResult.FAILURE;
         }
-        else
+        else {
+            commandInvocation.getShell().out().println("pushd: no other directory");
             return CommandResult.FAILURE;
+        }
+    }
+
+    private String getDirectoriesAsString() {
+        StringBuilder builder = new StringBuilder();
+        for(File f : directories) {
+            if(builder.length() > 0)
+                builder.insert(0, " ");
+            builder.insert(0, f.toString());
+        }
+
+        return builder.toString();
     }
 
     public File popDirectory() {
