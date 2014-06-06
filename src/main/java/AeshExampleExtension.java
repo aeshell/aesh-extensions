@@ -26,6 +26,7 @@ import org.jboss.aesh.extensions.harlem.aesh.Harlem;
 import org.jboss.aesh.extensions.less.aesh.Less;
 import org.jboss.aesh.extensions.ls.Ls;
 import org.jboss.aesh.extensions.matrix.Matrix;
+import org.jboss.aesh.extensions.mkdir.Mkdir;
 import org.jboss.aesh.extensions.more.aesh.More;
 import org.jboss.aesh.extensions.pushdpopd.Popd;
 import org.jboss.aesh.extensions.pushdpopd.Pushd;
@@ -58,6 +59,7 @@ public class AeshExampleExtension {
                 .command(Touch.class)
                 .command(Pushd.class)
                 .command(Popd.class)
+                .command(Mkdir.class)
                 .create();
 
         AeshConsole aeshConsole = new AeshConsoleBuilder()
