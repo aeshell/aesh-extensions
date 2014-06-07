@@ -163,7 +163,7 @@ public abstract class FileDisplayer implements Completion {
 
             }
             else {
-                topVisibleRow = topVisibleRow + rows*getNumber()-1;
+                topVisibleRow = topVisibleRow + ((rows - 1) * getNumber());
                 if(topVisibleRow > (page.size()-rows-1)) {
                     topVisibleRow = page.size()-rows-1;
                     if(topVisibleRow < 0)
@@ -177,7 +177,7 @@ public abstract class FileDisplayer implements Completion {
         }
         else if(operation.getInput()[0] == 2 || operation.equals(Operation.PGUP)) { // ctrl-b || pgup
             if(search != Search.SEARCHING) {
-                topVisibleRow = topVisibleRow - rows*getNumber()-1;
+                topVisibleRow = topVisibleRow - ((rows - 1) * getNumber());
                 if(topVisibleRow < 0)
                     topVisibleRow = 0;
                 display();
