@@ -18,6 +18,7 @@ import org.jboss.aesh.util.PathResolver;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * A simple mkdir command.
@@ -29,6 +30,10 @@ public class Mkdir implements Command<CommandInvocation> {
 
     @Option(shortName = 'h', name = "help", hasValue = false, description = "display this help and exit")
     private boolean help;
+
+    @Option(shortName = 'p', name = "parents", hasValue = false,
+            description = "make parent directories as needed")
+    private boolean parents;
 
     @Option(shortName = 'v', name = "verbose", hasValue = false,
             description = "print a message for each created directory")
@@ -45,8 +50,13 @@ public class Mkdir implements Command<CommandInvocation> {
         }
         if (arguments != null && !arguments.isEmpty()) {
             for (String a : arguments) {
-                makeDir(PathResolver.resolvePath(new File(a), commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0),
-                        commandInvocation.getShell());
+                File currentWorkingDirectory = commandInvocation.getAeshContext().getCurrentWorkingDirectory();
+                Shell shell = commandInvocation.getShell();
+                if (parents || a.contains(File.separator)) {
+                    makeDirs(a, PathResolver.resolvePath(new File(a), currentWorkingDirectory).get(0), shell);
+                } else {
+                    makeDir(PathResolver.resolvePath(new File(a), currentWorkingDirectory).get(0), shell);
+                }
             }
         }
         return CommandResult.SUCCESS;
@@ -60,6 +70,20 @@ public class Mkdir implements Command<CommandInvocation> {
             }
         } else {
             shell.out().println("cannot create directory '" + dir.getName() + "': Directory exists");
+        }
+    }
+
+    private void makeDirs(String path, File dir, Shell shell) {
+        if (!dir.exists()) {
+            dir.mkdirs();
+            if (verbose) {
+                StringTokenizer st = new StringTokenizer(path, File.separator);
+                String dirName = "";
+                while (st.hasMoreElements()) {
+                    dirName += st.nextElement() + File.separator;
+                    shell.out().println("created directory '" + dirName + "'");
+                }
+            }
         }
     }
 
