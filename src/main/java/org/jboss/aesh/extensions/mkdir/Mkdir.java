@@ -9,6 +9,7 @@ package org.jboss.aesh.extensions.mkdir;
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.cl.Option;
+import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
@@ -18,12 +19,11 @@ import org.jboss.aesh.util.PathResolver;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * A simple mkdir command.
  *
- * @author Helio Frota 00hf11 at gmail dot com
+ * @author <a href="mailto:00hf11@gmail.com">Helio Frota</a>
  */
 @CommandDefinition(name = "mkdir", description = "create directory(ies), if they do not already exist.")
 public class Mkdir implements Command<CommandInvocation> {
@@ -44,21 +44,21 @@ public class Mkdir implements Command<CommandInvocation> {
 
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
-        if (help) {
+        if (help || arguments == null || arguments.isEmpty()) {
             commandInvocation.getShell().out().println(commandInvocation.getHelpInfo("mkdir"));
             return CommandResult.SUCCESS;
         }
-        if (arguments != null && !arguments.isEmpty()) {
-            for (String a : arguments) {
-                File currentWorkingDirectory = commandInvocation.getAeshContext().getCurrentWorkingDirectory();
-                Shell shell = commandInvocation.getShell();
-                if (parents || a.contains(File.separator)) {
-                    makeDirs(a, PathResolver.resolvePath(new File(a), currentWorkingDirectory).get(0), shell);
-                } else {
-                    makeDir(PathResolver.resolvePath(new File(a), currentWorkingDirectory).get(0), shell);
-                }
+
+        for (String a : arguments) {
+            File currentWorkingDirectory = commandInvocation.getAeshContext().getCurrentWorkingDirectory();
+            Shell shell = commandInvocation.getShell();
+            if (parents || a.contains(Config.getPathSeparator())) {
+                makeDirs(a, PathResolver.resolvePath(new File(a), currentWorkingDirectory).get(0), shell);
+            } else {
+                makeDir(PathResolver.resolvePath(new File(a), currentWorkingDirectory).get(0), shell);
             }
         }
+
         return CommandResult.SUCCESS;
     }
 
@@ -77,10 +77,10 @@ public class Mkdir implements Command<CommandInvocation> {
         if (!dir.exists()) {
             dir.mkdirs();
             if (verbose) {
-                StringTokenizer st = new StringTokenizer(path, File.separator);
+                String[] dirs = path.split(Config.getPathSeparator());
                 String dirName = "";
-                while (st.hasMoreElements()) {
-                    dirName += st.nextElement() + File.separator;
+                for (int i = 0; i < dirs.length; i++) {
+                    dirName += dirs[i] + Config.getPathSeparator();
                     shell.out().println("created directory '" + dirName + "'");
                 }
             }
