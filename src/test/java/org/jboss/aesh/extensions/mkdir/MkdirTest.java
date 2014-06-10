@@ -38,12 +38,24 @@ import org.jboss.aesh.terminal.TestTerminal;
 public class MkdirTest extends BaseConsoleTest {
 
     private Path tempDir;
-    private String aeshRocksDir = "aesh_rocks";
+    private String aeshRocksDir;
+    private String aeshRocksSubDir;
     private FileAttribute fileAttribute = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxrwxrwx"));
 
     @Before
     public void before() throws IOException {
         tempDir = createTempDirectory();
+
+        aeshRocksDir = tempDir.toFile().getAbsolutePath() + Config.getPathSeparator() + "aesh_rocks";
+
+        aeshRocksSubDir = tempDir.toFile().getAbsolutePath()
+                + Config.getPathSeparator()
+                + "aesh_rocks"
+                + Config.getPathSeparator()
+                + "subdir1"
+                + Config.getPathSeparator()
+                + "subdir2";
+
     }
 
     public Path createTempDirectory() throws IOException {
@@ -80,9 +92,12 @@ public class MkdirTest extends BaseConsoleTest {
         AeshConsole aeshConsole = consoleBuilder.create();
         aeshConsole.start();
 
-
         baos.flush();
-        pos.write(("mkdir -v " + tempDir.toFile().getAbsolutePath() + Config.getPathSeparator() + aeshRocksDir).getBytes());
+        pos.write(("mkdir -v " + aeshRocksDir).getBytes());
+        pos.write(Config.getLineSeparator().getBytes());
+        pos.flush();
+
+        pos.write(("mkdir -p " + aeshRocksSubDir).getBytes());
         pos.write(Config.getLineSeparator().getBytes());
         pos.flush();
 
@@ -100,7 +115,14 @@ public class MkdirTest extends BaseConsoleTest {
         // target directory ( maven )
         Thread.sleep(1000);
         // removing aeshRocksDir first due java.nio.file.DirectoryNotEmptyException.
-        Files.delete(new File(tempDir.toFile().getAbsolutePath() + Config.getPathSeparator() + aeshRocksDir).toPath());
+        // subdir2
+        Files.delete(new File(aeshRocksSubDir).toPath());
+        Thread.sleep(1000);
+        // subdir1
+        Files.delete(new File(aeshRocksDir + Config.getPathSeparator() + "subdir1").toPath());
+        Thread.sleep(1000);
+        // aesh_rocks
+        Files.delete(new File(aeshRocksDir).toPath());
         Thread.sleep(1000);
         Files.delete(tempDir);
     }

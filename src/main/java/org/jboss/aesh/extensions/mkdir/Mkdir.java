@@ -40,7 +40,7 @@ public class Mkdir implements Command<CommandInvocation> {
     private boolean verbose;
 
     @Arguments
-    private List<String> arguments;
+    private List<File> arguments;
 
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
@@ -49,17 +49,26 @@ public class Mkdir implements Command<CommandInvocation> {
             return CommandResult.SUCCESS;
         }
 
-        for (String a : arguments) {
+        for (File f : arguments) {
             File currentWorkingDirectory = commandInvocation.getAeshContext().getCurrentWorkingDirectory();
             Shell shell = commandInvocation.getShell();
-            if (parents || a.contains(Config.getPathSeparator())) {
-                makeDirs(a, PathResolver.resolvePath(new File(a), currentWorkingDirectory).get(0), shell);
+
+            File pathResolved = PathResolver.resolvePath(f, currentWorkingDirectory).get(0);
+
+            String argumentDirName = getArgumentFileName(currentWorkingDirectory.getPath(), pathResolved.getPath());
+
+            if (parents || f.getName().contains(Config.getPathSeparator())) {
+                makeDirs(argumentDirName, pathResolved, shell);
             } else {
-                makeDir(PathResolver.resolvePath(new File(a), currentWorkingDirectory).get(0), shell);
+                makeDir(pathResolved, shell);
             }
         }
 
         return CommandResult.SUCCESS;
+    }
+
+    private String getArgumentFileName(String currentWorkingDirectory, String absoluteFileName) {
+        return absoluteFileName.substring(currentWorkingDirectory.length() + 1);
     }
 
     private void makeDir(File dir, Shell shell) {
@@ -73,11 +82,11 @@ public class Mkdir implements Command<CommandInvocation> {
         }
     }
 
-    private void makeDirs(String path, File dir, Shell shell) {
+    private void makeDirs(String argumentFileName, File dir, Shell shell) {
         if (!dir.exists()) {
             dir.mkdirs();
             if (verbose) {
-                String[] dirs = path.split(Config.getPathSeparator());
+                String[] dirs = argumentFileName.split(Config.getPathSeparator());
                 String dirName = "";
                 for (int i = 0; i < dirs.length; i++) {
                     dirName += dirs[i] + Config.getPathSeparator();
