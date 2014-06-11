@@ -109,21 +109,9 @@ public class MkdirTest extends BaseConsoleTest {
 
     @After
     public void after() throws IOException, InterruptedException {
-
-        // ease to watch the directory creation before delete.
-        // /tmp directory ( gradle )
-        // target directory ( maven )
-        Thread.sleep(1000);
-        // removing aeshRocksDir first due java.nio.file.DirectoryNotEmptyException.
-        // subdir2
         Files.delete(new File(aeshRocksSubDir).toPath());
-        Thread.sleep(1000);
-        // subdir1
         Files.delete(new File(aeshRocksDir + Config.getPathSeparator() + "subdir1").toPath());
-        Thread.sleep(1000);
-        // aesh_rocks
         Files.delete(new File(aeshRocksDir).toPath());
-        Thread.sleep(1000);
         Files.delete(tempDir);
     }
 }
