@@ -108,7 +108,7 @@ public class MkdirTest extends BaseConsoleTest {
     }
 
     @After
-    public void after() throws IOException, InterruptedException {
+    public void after() throws IOException {
         Files.delete(new File(aeshRocksSubDir).toPath());
         Files.delete(new File(aeshRocksDir + Config.getPathSeparator() + "subdir1").toPath());
         Files.delete(new File(aeshRocksDir).toPath());
