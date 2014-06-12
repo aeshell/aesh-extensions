@@ -35,7 +35,7 @@ public class Cd implements Command<CommandInvocation> {
         }
 
         if (arguments == null) {
-            updatePrompt(commandInvocation, new File(Config.getUserDir()));
+            updatePrompt(commandInvocation, new File(Config.getHomeDir()));
         }
         else {
             List<File> files = PathResolver.resolvePath(arguments.get(0), commandInvocation.getAeshContext().getCurrentWorkingDirectory());
