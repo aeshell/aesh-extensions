@@ -148,6 +148,8 @@ public class Less extends AeshFileDisplayer {
             builder.append(line);
         }
 
+        inputStream.close();
+
         return builder.toString();
     }
 }
