@@ -26,7 +26,6 @@ import org.jboss.aesh.extensions.page.SimpleFileParser;
 import org.jboss.aesh.extensions.text.highlight.Encoder;
 import org.jboss.aesh.extensions.text.highlight.Scanner;
 import org.jboss.aesh.extensions.text.highlight.Syntax;
-import org.jboss.aesh.io.FileResource;
 import org.jboss.aesh.io.Resource;
 import org.jboss.aesh.util.ANSI;
 

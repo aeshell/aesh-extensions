@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -33,8 +34,7 @@ import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.extensions.grep.AeshPosixFilePermissions;
-import org.jboss.aesh.io.FileAndDirectoryNoDotNamesFilter;
-import org.jboss.aesh.io.FileResource;
+import org.jboss.aesh.io.filter.NoDotNamesFilter;
 import org.jboss.aesh.io.Resource;
 import org.jboss.aesh.parser.Parser;
 import org.jboss.aesh.terminal.Color;
@@ -137,7 +137,7 @@ public class Ls implements Command<CommandInvocation> {
 
         }
         else {
-            files = input.list(new FileAndDirectoryNoDotNamesFilter());
+            files = input.list(new NoDotNamesFilter());
         }
 
         Collections.sort(files, new PosixFileComparator());

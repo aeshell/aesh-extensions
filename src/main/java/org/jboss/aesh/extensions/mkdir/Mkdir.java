@@ -13,10 +13,9 @@ import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.io.Resource;
 import org.jboss.aesh.terminal.Shell;
-import org.jboss.aesh.util.PathResolver;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -40,7 +39,7 @@ public class Mkdir implements Command<CommandInvocation> {
     private boolean verbose;
 
     @Arguments
-    private List<File> arguments;
+    private List<Resource> arguments;
 
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
@@ -49,13 +48,13 @@ public class Mkdir implements Command<CommandInvocation> {
             return CommandResult.SUCCESS;
         }
 
-        for (File f : arguments) {
-            File currentWorkingDirectory = commandInvocation.getAeshContext().getCurrentWorkingDirectory();
+        for (Resource f : arguments) {
+            Resource currentWorkingDirectory = commandInvocation.getAeshContext().getCurrentWorkingDirectory();
             Shell shell = commandInvocation.getShell();
 
-            File pathResolved = PathResolver.resolvePath(f, currentWorkingDirectory).get(0);
+            Resource pathResolved = f.resolve(currentWorkingDirectory).get(0);
 
-            String argumentDirName = getArgumentFileName(currentWorkingDirectory.getPath(), pathResolved.getPath());
+            String argumentDirName = getArgumentFileName(currentWorkingDirectory.getAbsolutePath(), pathResolved.getAbsolutePath());
 
             if (parents || f.getName().contains(Config.getPathSeparator())) {
                 makeDirs(argumentDirName, pathResolved, shell);
@@ -71,9 +70,9 @@ public class Mkdir implements Command<CommandInvocation> {
         return absoluteFileName.substring(currentWorkingDirectory.length() + 1);
     }
 
-    private void makeDir(File dir, Shell shell) {
+    private void makeDir(Resource dir, Shell shell) {
         if (!dir.exists()) {
-            dir.mkdir();
+            dir.mkdirs();
             if (verbose) {
                 shell.out().println("created directory '" + dir.getName() + "'");
             }
@@ -82,7 +81,7 @@ public class Mkdir implements Command<CommandInvocation> {
         }
     }
 
-    private void makeDirs(String argumentFileName, File dir, Shell shell) {
+    private void makeDirs(String argumentFileName, Resource dir, Shell shell) {
         if (!dir.exists()) {
             dir.mkdirs();
             if (verbose) {
