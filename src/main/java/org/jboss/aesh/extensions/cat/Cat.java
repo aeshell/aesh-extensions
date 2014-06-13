@@ -8,16 +8,16 @@ import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.io.FileResource;
+import org.jboss.aesh.io.Resource;
 import org.jboss.aesh.parser.Parser;
 import org.jboss.aesh.terminal.Key;
 import org.jboss.aesh.terminal.Shell;
-import org.jboss.aesh.util.PathResolver;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 /**
@@ -50,7 +50,7 @@ public class Cat implements Command<CommandInvocation> {
     private boolean help;
 
     @Arguments
-    private List<File> files;
+    private List<Resource> files;
 
     private boolean prevBlank = false;
     private boolean currentBlank = false;
@@ -82,8 +82,9 @@ public class Cat implements Command<CommandInvocation> {
                 return CommandResult.SUCCESS;
             }
             else if(files != null && files.size() > 0) {
-                for(File f : files)
-                    displayFile(PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0),
+                for(Resource f : files)
+                    displayFile(f.resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0),
+                            //PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0),
                             commandInvocation.getShell());
 
                 return CommandResult.SUCCESS;
@@ -101,8 +102,8 @@ public class Cat implements Command<CommandInvocation> {
         }
     }
 
-    private void displayFile(File f, Shell shell) throws FileNotFoundException {
-        BufferedReader br = new BufferedReader(new FileReader(f));
+    private void displayFile(Resource f, Shell shell) throws FileNotFoundException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(f.read()));
 
         try {
             String line = br.readLine();

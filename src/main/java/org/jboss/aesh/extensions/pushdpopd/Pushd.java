@@ -9,12 +9,13 @@ package org.jboss.aesh.extensions.pushdpopd;
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.cl.Option;
+import org.jboss.aesh.cl.completer.FileOptionCompleter;
+import org.jboss.aesh.cl.converter.FileResourceConverter;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
-import org.jboss.aesh.util.PathResolver;
+import org.jboss.aesh.io.Resource;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +29,10 @@ public class Pushd implements Command<CommandInvocation> {
     @Option(shortName = 'h', hasValue = false)
     private boolean help;
 
-    @Arguments
-    private List<File> arguments;
+    @Arguments(completer = FileOptionCompleter.class, converter = FileResourceConverter.class)
+    private List<Resource> arguments;
 
-    private List<File> directories;
+    private List<Resource> directories;
 
     public Pushd() {
         directories = new ArrayList<>();
@@ -45,10 +46,10 @@ public class Pushd implements Command<CommandInvocation> {
         }
         else if(arguments != null && arguments.size() > 0) {
 
-            List<File> files = PathResolver.resolvePath(arguments.get(0), commandInvocation.getAeshContext().getCurrentWorkingDirectory());
+            List<Resource> files = arguments.get(0).resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory());
 
             if(files.get(0).isDirectory()) {
-                File oldCwd = commandInvocation.getAeshContext().getCurrentWorkingDirectory();
+                Resource oldCwd = commandInvocation.getAeshContext().getCurrentWorkingDirectory();
                 directories.add(oldCwd);
                 commandInvocation.getAeshContext().setCurrentWorkingDirectory(files.get(0));
                 commandInvocation.getShell().out().println(files.get(0)+" "+getDirectoriesAsString());
@@ -65,7 +66,7 @@ public class Pushd implements Command<CommandInvocation> {
 
     private String getDirectoriesAsString() {
         StringBuilder builder = new StringBuilder();
-        for(File f : directories) {
+        for(Resource f : directories) {
             if(builder.length() > 0)
                 builder.insert(0, " ");
             builder.insert(0, f.toString());
@@ -74,7 +75,7 @@ public class Pushd implements Command<CommandInvocation> {
         return builder.toString();
     }
 
-    public File popDirectory() {
+    public Resource popDirectory() {
         if(directories.size() > 0)
             return directories.remove(directories.size()-1);
         else

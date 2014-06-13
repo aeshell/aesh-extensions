@@ -11,8 +11,8 @@ import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandNotFoundException;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.io.Resource;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -26,7 +26,7 @@ public class Popd implements Command<CommandInvocation> {
 
         try {
             Pushd pushd = (Pushd) commandInvocation.getCommandRegistry().getCommand("pushd", "").getCommand();
-            File popFile = pushd.popDirectory();
+            Resource popFile = pushd.popDirectory();
             if(popFile != null) {
                 commandInvocation.getAeshContext().setCurrentWorkingDirectory(popFile);
                 return CommandResult.SUCCESS;

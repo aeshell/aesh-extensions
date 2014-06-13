@@ -17,6 +17,7 @@ import org.jboss.aesh.console.man.TerminalPage;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.edit.actions.Operation;
 import org.jboss.aesh.extensions.page.SimpleFileParser;
+import org.jboss.aesh.io.FileResource;
 import org.jboss.aesh.terminal.TerminalString;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.FileLister;
@@ -211,7 +212,7 @@ public class More implements Completion {
             completeOperation.setOffset(completeOperation.getCursor());
             //FileUtils.listMatchingDirectories(completeOperation, word,
             //        new File(System.getProperty("user.dir")));
-            new FileLister(word, new File(System.getProperty("user.dir"))).findMatchingDirectories(completeOperation);
+            new FileLister(word, new FileResource(System.getProperty("user.dir"))).findMatchingDirectories(completeOperation);
         }
     }
 

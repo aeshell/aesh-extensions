@@ -7,9 +7,8 @@ import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.console.command.registry.MutableCommandRegistry;
-import org.jboss.aesh.util.PathResolver;
+import org.jboss.aesh.io.Resource;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -23,15 +22,15 @@ public class GroovyCommand implements Command<CommandInvocation> {
     private CommandInvocation commandInvocation;
 
     @Arguments
-    private List<File> files;
+    private List<Resource> files;
 
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
         this.commandInvocation = commandInvocation;
 
         if(files != null && files.size() > 0) {
-            if(files.get(0).isFile()) {
-                File f = PathResolver.resolvePath(files.get(0), commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
+            if(files.get(0).isLeaf()) {
+                Resource f = files.get(0).resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
                 loadCommand(f);
             }
         }
@@ -40,11 +39,12 @@ public class GroovyCommand implements Command<CommandInvocation> {
     }
 
     @SuppressWarnings(value = "unchecked")
-    private void loadCommand(File file) {
+    private void loadCommand(Resource file) {
         try {
             ClassLoader parent = getClass().getClassLoader();
             GroovyClassLoader loader = new GroovyClassLoader(parent);
-            Class<? extends Command> groovyClass = (Class<? extends Command>) loader.parseClass(file);
+            Class<? extends Command> groovyClass =
+                    (Class<? extends Command>) loader.parseClass(file.read(), file.getName());
 
             if(groovyClass.isAnnotationPresent(CommandDefinition.class)) {
                 boolean correctClass = false;

@@ -33,13 +33,14 @@ import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.extensions.grep.AeshPosixFilePermissions;
-import org.jboss.aesh.filters.file.FileAndDirectoryNoDotNamesFilter;
+import org.jboss.aesh.io.FileAndDirectoryNoDotNamesFilter;
+import org.jboss.aesh.io.FileResource;
+import org.jboss.aesh.io.Resource;
 import org.jboss.aesh.parser.Parser;
 import org.jboss.aesh.terminal.Color;
 import org.jboss.aesh.terminal.Shell;
 import org.jboss.aesh.terminal.TerminalColor;
 import org.jboss.aesh.terminal.TerminalString;
-import org.jboss.aesh.util.PathResolver;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -71,7 +72,7 @@ public class Ls implements Command<CommandInvocation> {
     private boolean humanReadable;
 
     @Arguments
-    private List<File> arguments;
+    private List<Resource> arguments;
 
     private static final char SPACE = ' ';
 
@@ -104,15 +105,15 @@ public class Ls implements Command<CommandInvocation> {
         }
 
         int counter = 0;
-        for(File file : arguments) {
+        for(Resource file : arguments) {
             if(counter > 0) {
                 commandInvocation.getShell().out().println(Config.getLineSeparator()+file.getName()+":");
             }
 
-            for(File f : PathResolver.resolvePath(file, commandInvocation.getAeshContext().getCurrentWorkingDirectory())) {
+            for(Resource f : file.resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory())) {
                 if(f.isDirectory())
                     displayDirectory(f, commandInvocation.getShell());
-                else if(f.isFile())
+                else if(f.isLeaf())
                     displayFile(f,commandInvocation.getShell());
                 else if(!f.exists()) {
                     commandInvocation.getShell().out().println("ls: cannot access "+
@@ -125,34 +126,36 @@ public class Ls implements Command<CommandInvocation> {
         return CommandResult.SUCCESS;
     }
 
-    private void displayDirectory(File input, Shell shell) {
-        File[] files;
+    private void displayDirectory(Resource input, Shell shell) {
+        List<Resource> files = new ArrayList<>();
 
         if (all) {
             // add "." and ".." to list of files
-            File[] fileArray = input.listFiles();
-            files = Arrays.copyOf(fileArray, fileArray.length + 2);
-            files[fileArray.length] = new File(input, ".");
-            files[fileArray.length + 1] = new File(input, "..");
-        } else {
-            files = input.listFiles(new FileAndDirectoryNoDotNamesFilter());
+            files.add(input.newInstance("."));
+            files.add(input.newInstance(".."));
+            files.addAll(input.list());
+
+        }
+        else {
+            files = input.list(new FileAndDirectoryNoDotNamesFilter());
         }
 
-        Arrays.sort(files, new PosixFileComparator());
+        Collections.sort(files, new PosixFileComparator());
 
         if (longListing) {
             shell.out().print(displayLongListing(files));
-        } else {
+        }
+        else {
             shell.out().print(Parser.formatDisplayCompactListTerminalString(
                 formatFileList(files),
                 shell.getSize().getWidth()));
         }
     }
 
-    private List<TerminalString> formatFileList(File[] fileList) {
-        ArrayList<TerminalString> list = new ArrayList<TerminalString>(fileList.length);
-        for(File file : fileList) {
-            if (Files.isSymbolicLink(file.toPath())) {
+    private List<TerminalString> formatFileList(List<Resource> fileList) {
+        ArrayList<TerminalString> list = new ArrayList<>(fileList.size());
+        for(Resource file : fileList) {
+            if (file.isSymbolicLink()) {
                 list.add(new TerminalString(file.getName(), SYMBOLIC_LINK_COLOR));
             } else if (file.isDirectory()) {
                 list.add(new TerminalString(file.getName(), DIRECTORY_COLOR));
@@ -163,28 +166,32 @@ public class Ls implements Command<CommandInvocation> {
         return list;
     }
 
-    private void displayFile(File input, Shell shell) {
+    private void displayFile(Resource input, Shell shell) {
         if(longListing) {
-            shell.out().print(displayLongListing(new File[]{input}));
+            List<Resource> resourceList = new ArrayList<>(1);
+            resourceList.add(input);
+            shell.out().print(displayLongListing(resourceList));
         }
         else {
+            List<Resource> resourceList = new ArrayList<>(1);
+            resourceList.add(input);
             shell.out().print(Parser.formatDisplayListTerminalString(
-                    formatFileList(new File[]{input}), shell.getSize().getHeight(), shell.getSize().getWidth()));
+                    formatFileList(resourceList), shell.getSize().getHeight(), shell.getSize().getWidth()));
         }
     }
 
-    private String displayLongListing(File[] files) {
+    private String displayLongListing(List<Resource> files) {
 
-        StringGroup access = new StringGroup(files.length);
-        StringGroup size = new StringGroup(files.length);
-        StringGroup owner = new StringGroup(files.length);
-        StringGroup group = new StringGroup(files.length);
-        StringGroup modified = new StringGroup(files.length);
+        StringGroup access = new StringGroup(files.size());
+        StringGroup size = new StringGroup(files.size());
+        StringGroup owner = new StringGroup(files.size());
+        StringGroup group = new StringGroup(files.size());
+        StringGroup modified = new StringGroup(files.size());
 
         try {
             int counter = 0;
-            for(File file : files) {
-                BasicFileAttributes attr = Files.readAttributes(file.toPath(), fileAttributes, LinkOption.NOFOLLOW_LINKS);
+            for(Resource file : files) {
+                BasicFileAttributes attr = file.readAttributes(fileAttributes, LinkOption.NOFOLLOW_LINKS);
 
                 if (Config.isOSPOSIXCompatible()) {
                     access.addString(AeshPosixFilePermissions.toString(((PosixFileAttributes) attr)), counter);
@@ -225,7 +232,7 @@ public class Ls implements Command<CommandInvocation> {
 
         StringBuilder builder = new StringBuilder();
 
-        for (int i = 0; i < files.length; i++) {
+        for (int i = 0; i < files.size(); i++) {
             builder.append(access.getString(i))
                 .append(owner.getFormattedStringPadRight(i))
                 .append(group.getFormattedStringPadRight(i))
@@ -234,18 +241,18 @@ public class Ls implements Command<CommandInvocation> {
                 .append(modified.getString(i))
                 .append(SPACE);
 
-            if (Files.isSymbolicLink(files[i].toPath())) {
-                builder.append(new TerminalString(files[i].getName(), SYMBOLIC_LINK_COLOR));
+            if (files.get(i).isSymbolicLink()) {
+                builder.append(new TerminalString(files.get(i).getName(), SYMBOLIC_LINK_COLOR));
                 builder.append(" -> ");
                 try {
-                    builder.append(Files.readSymbolicLink(files[i].toPath()));
+                    builder.append(files.get(i).readSymbolicLink());
                 } catch (IOException ex) {
                     ex.printStackTrace(); // this should not happen
                 }
-            } else if (files[i].isDirectory()) {
-                builder.append(new TerminalString(files[i].getName(), DIRECTORY_COLOR));
+            } else if (files.get(i).isDirectory()) {
+                builder.append(new TerminalString(files.get(i).getName(), DIRECTORY_COLOR));
             } else {
-                builder.append(files[i].getName());
+                builder.append(files.get(i).getName());
             }
 
             builder.append(Config.getLineSeparator());
@@ -269,11 +276,11 @@ public class Ls implements Command<CommandInvocation> {
         }
     }
 
-    class PosixFileComparator implements Comparator<File> {
+    class PosixFileComparator implements Comparator<Resource> {
         private PosixFileNameComparator posixFileNameComparator = new PosixFileNameComparator();
 
         @Override
-        public int compare(File o1, File o2) {
+        public int compare(Resource o1, Resource o2) {
             return posixFileNameComparator.compare(o1.getName(), o2.getName());
         }
     }

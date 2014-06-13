@@ -8,6 +8,7 @@ package org.jboss.aesh.extensions.more.aesh;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.jboss.aesh.cl.Arguments;
@@ -22,9 +23,9 @@ import org.jboss.aesh.console.man.FileParser;
 import org.jboss.aesh.console.man.TerminalPage;
 import org.jboss.aesh.console.operator.ControlOperator;
 import org.jboss.aesh.extensions.page.SimpleFileParser;
+import org.jboss.aesh.io.Resource;
 import org.jboss.aesh.terminal.Key;
 import org.jboss.aesh.util.ANSI;
-import org.jboss.aesh.util.PathResolver;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -42,7 +43,7 @@ public class More implements Command<CommandInvocation> {
     private ControlOperator operator;
 
     @Arguments
-    private List<File> arguments;
+    private List<Resource> arguments;
 
     public More() {
         number = new StringBuilder();
@@ -58,6 +59,10 @@ public class More implements Command<CommandInvocation> {
 
     public void setInput(String input) throws IOException {
         loader.readPageAsString(input);
+    }
+
+    public void setInput(InputStream inputStream, String fileName) {
+        loader.setFile(inputStream, fileName);
     }
 
     protected void afterAttach() throws IOException {
@@ -234,10 +239,10 @@ public class More implements Command<CommandInvocation> {
             afterAttach();
         }
         else if(arguments != null && arguments.size() > 0) {
-            File f = arguments.get(0);
-            f = PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
-            if(f.isFile()) {
-                setFile(f);
+            Resource f = arguments.get(0);
+            f = f.resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
+            if(f.isLeaf()) {
+                setInput(f.read(), f.getName());
                 afterAttach();
             }
             else if(f.isDirectory()) {

@@ -1,6 +1,5 @@
 package org.jboss.aesh.extensions.cd;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -11,7 +10,7 @@ import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
-import org.jboss.aesh.util.PathResolver;
+import org.jboss.aesh.io.Resource;
 
 /**
  * Use AeshConsole.getAeshContext().cwd as reference
@@ -25,7 +24,7 @@ public class Cd implements Command<CommandInvocation> {
     private boolean help;
 
     @Arguments
-    private List<File> arguments;
+    private List<Resource> arguments;
 
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
@@ -35,10 +34,12 @@ public class Cd implements Command<CommandInvocation> {
         }
 
         if (arguments == null) {
-            updatePrompt(commandInvocation, new File(Config.getHomeDir()));
+            updatePrompt(commandInvocation,
+                    commandInvocation.getAeshContext().getCurrentWorkingDirectory().newInstance(Config.getHomeDir()));
         }
         else {
-            List<File> files = PathResolver.resolvePath(arguments.get(0), commandInvocation.getAeshContext().getCurrentWorkingDirectory());
+            List<Resource> files =
+                    arguments.get(0).resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory());
 
             if(files.get(0).isDirectory())
                 updatePrompt(commandInvocation, files.get(0));
@@ -46,7 +47,7 @@ public class Cd implements Command<CommandInvocation> {
         return CommandResult.SUCCESS;
     }
 
-    private void updatePrompt(CommandInvocation commandInvocation, File file) {
+    private void updatePrompt(CommandInvocation commandInvocation, Resource file) {
         commandInvocation.getAeshContext().setCurrentWorkingDirectory(file);
     }
 }

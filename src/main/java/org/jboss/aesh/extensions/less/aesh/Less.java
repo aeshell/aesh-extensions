@@ -6,13 +6,12 @@
  */
 package org.jboss.aesh.extensions.less.aesh;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import org.jboss.aesh.cl.Arguments;
@@ -27,8 +26,9 @@ import org.jboss.aesh.extensions.page.SimpleFileParser;
 import org.jboss.aesh.extensions.text.highlight.Encoder;
 import org.jboss.aesh.extensions.text.highlight.Scanner;
 import org.jboss.aesh.extensions.text.highlight.Syntax;
+import org.jboss.aesh.io.FileResource;
+import org.jboss.aesh.io.Resource;
 import org.jboss.aesh.util.ANSI;
-import org.jboss.aesh.util.PathResolver;
 
 /**
  * A less implementation for Æsh ref: http://en.wikipedia.org/wiki/Less_(Unix)
@@ -39,7 +39,7 @@ import org.jboss.aesh.util.PathResolver;
 public class Less extends AeshFileDisplayer {
 
     @Arguments
-    List<File> arguments;
+    List<Resource> arguments;
 
     @Option(hasValue = false)
     private boolean color;
@@ -60,6 +60,10 @@ public class Less extends AeshFileDisplayer {
 
     public void setInput(String input) throws IOException {
         loader.readPageAsString(input);
+    }
+
+    public void setFile(InputStream inputStream, String fileName) {
+        loader.setFile(inputStream, fileName);
     }
 
     @Override
@@ -102,11 +106,11 @@ public class Less extends AeshFileDisplayer {
             afterAttach();
         }
         else if(arguments != null && arguments.size() > 0) {
-            File f = arguments.get(0);
-            f = PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
-            if(f.isFile()) {
+            Resource f =
+                    arguments.get(0).resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
+            if(f.isLeaf()) {
                 if(color) {
-                    String content = new String(Files.readAllBytes(f.toPath()));
+                    String content = readFile(f.read());
 
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -121,7 +125,7 @@ public class Less extends AeshFileDisplayer {
                     afterAttach();
                 }
                 else {
-                    setFile(f);
+                    setFile(f.read(), f.getName());
                     afterAttach();
                 }
             }
@@ -136,8 +140,14 @@ public class Less extends AeshFileDisplayer {
         return CommandResult.SUCCESS;
     }
 
-    private static String readFile(String path, Charset encoding) throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return encoding.decode(ByteBuffer.wrap(encoded)).toString();
+    private String readFile(InputStream inputStream) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            builder.append(line);
+        }
+
+        return builder.toString();
     }
 }

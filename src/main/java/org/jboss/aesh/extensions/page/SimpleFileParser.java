@@ -66,6 +66,12 @@ public class SimpleFileParser implements FileParser {
         reader = new InputStreamReader(inputStream);
     }
 
+    public void setFile(InputStream inputStream, String fileName) {
+        reader = new InputStreamReader(inputStream);
+        this.fileName = fileName;
+    }
+
+
     /**
      * Read a file resouce located in a jar
      *

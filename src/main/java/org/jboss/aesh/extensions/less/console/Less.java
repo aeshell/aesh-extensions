@@ -11,6 +11,7 @@ import org.jboss.aesh.console.Console;
 import org.jboss.aesh.console.man.FileParser;
 import org.jboss.aesh.extensions.page.FileDisplayer;
 import org.jboss.aesh.extensions.page.SimpleFileParser;
+import org.jboss.aesh.io.FileResource;
 import org.jboss.aesh.util.ANSI;
 import org.jboss.aesh.util.FileLister;
 import org.jboss.aesh.parser.Parser;
@@ -61,7 +62,7 @@ public class Less extends FileDisplayer {
             String word = Parser.findWordClosestToCursor(completeOperation.getBuffer(),
                     completeOperation.getCursor());
             completeOperation.setOffset(completeOperation.getCursor());
-            new FileLister(word, new File(System.getProperty("user.dir"))).findMatchingDirectories(completeOperation);
+            new FileLister(word, new FileResource(System.getProperty("user.dir"))).findMatchingDirectories(completeOperation);
         }
     }
 

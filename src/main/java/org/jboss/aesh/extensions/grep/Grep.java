@@ -10,7 +10,6 @@ import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.completer.CompleterInvocation;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
-import org.jboss.aesh.filters.Filter;
 import org.jboss.aesh.terminal.Shell;
 import org.jboss.aesh.util.FileLister;
 
@@ -173,11 +172,11 @@ public class Grep implements Command<CommandInvocation> {
                 CompleteOperation completeOperation =
                         new CompleteOperation(completerData.getAeshContext(), completerData.getGivenCompleteValue(), 0);
                 if (completerData.getGivenCompleteValue() == null)
-                    new FileLister("", completerData.getAeshContext().getCurrentWorkingDirectory(),
-                            Filter.ALL).findMatchingDirectories(completeOperation);
+                    new FileLister("", completerData.getAeshContext().getCurrentWorkingDirectory()).
+                            findMatchingDirectories(completeOperation);
                 else
-                    new FileLister(completerData.getGivenCompleteValue(), completerData.getAeshContext().getCurrentWorkingDirectory(),
-                            Filter.ALL).findMatchingDirectories(completeOperation);
+                    new FileLister(completerData.getGivenCompleteValue(), completerData.getAeshContext().getCurrentWorkingDirectory()).
+                            findMatchingDirectories(completeOperation);
 
                 if (completeOperation.getCompletionCandidates().size() > 1) {
                     completeOperation.removeEscapedSpacesFromCompletionCandidates();
