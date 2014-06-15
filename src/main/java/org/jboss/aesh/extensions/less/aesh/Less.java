@@ -17,6 +17,7 @@ import java.util.List;
 import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.cl.Option;
+import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.console.man.AeshFileDisplayer;
@@ -144,7 +145,7 @@ public class Less extends AeshFileDisplayer {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         while ((line = reader.readLine()) != null) {
-            builder.append(line);
+            builder.append(line).append(Config.getLineSeparator());
         }
 
         inputStream.close();
