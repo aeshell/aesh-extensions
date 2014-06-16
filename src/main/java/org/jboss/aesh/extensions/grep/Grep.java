@@ -10,13 +10,13 @@ import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.completer.CompleterInvocation;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.io.Resource;
 import org.jboss.aesh.terminal.Shell;
 import org.jboss.aesh.util.FileLister;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +60,7 @@ public class Grep implements Command<CommandInvocation> {
 
     @Option(shortName = 'f', name = "file", argument = "FILE",
             description = "obtain PATTERN from FILE")
-    private File file;
+    private Resource file;
 
     @Option(shortName = 'i', name = "ignore-case", hasValue = false,
             description = "ignore case distinctions")
@@ -108,7 +108,8 @@ public class Grep implements Command<CommandInvocation> {
         else {
             if(arguments != null && arguments.size() > 0) {
                 for(String s : arguments)
-                    doGrep(new File(s), commandInvocation.getShell());
+                    doGrep(commandInvocation.getAeshContext().getCurrentWorkingDirectory().newInstance(s),
+                            commandInvocation.getShell());
             }
             //posix starts an interactive shell and read from the input here
             //atm, we'll just quit
@@ -121,14 +122,13 @@ public class Grep implements Command<CommandInvocation> {
         return null;
     }
 
-    private void doGrep(File file, Shell shell) {
+    private void doGrep(Resource file, Shell shell) {
         if(!file.exists()) {
             shell.out().println("grep: "+file.toString()+": No such file or directory");
         }
-        else if(file.isFile()) {
+        else if(file.isLeaf()) {
             try {
-                FileReader fileReader = new FileReader(file);
-                BufferedReader br = new BufferedReader(fileReader);
+                BufferedReader br = new BufferedReader(new InputStreamReader(file.read()));
                 List<String> inputLines = new ArrayList<>();
 
                 String line;

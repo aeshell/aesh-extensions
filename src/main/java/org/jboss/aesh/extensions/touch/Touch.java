@@ -6,8 +6,8 @@
  */
 package org.jboss.aesh.extensions.touch;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.jboss.aesh.cl.Arguments;
@@ -16,6 +16,7 @@ import org.jboss.aesh.cl.Option;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.io.Resource;
 
 /**
  * @author <a href="mailto:danielsoro@gmail.com">Daniel Cunha (soro)</a>
@@ -28,7 +29,7 @@ public class Touch implements Command<CommandInvocation> {
     private boolean help;
 
     @Arguments
-    private List<File> arguments;
+    private List<Resource> arguments;
 
     @Override
     public CommandResult execute(CommandInvocation commandInvocation)
@@ -45,11 +46,14 @@ public class Touch implements Command<CommandInvocation> {
         }
 
         try {
-            for (File file : arguments) {
+            for (Resource file : arguments) {
                 if (file.exists()) {
                     file.setLastModified(System.currentTimeMillis());
                 }
-                file.createNewFile();
+                OutputStream out  = file.write(false);
+                out.write("".getBytes());
+                out.flush();
+                out.close();
             }
         }
         catch (IOException ioe) {

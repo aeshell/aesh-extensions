@@ -6,10 +6,8 @@
  */
 package org.jboss.aesh.extensions.ls;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.RoundingMode;
-import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
@@ -18,7 +16,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
