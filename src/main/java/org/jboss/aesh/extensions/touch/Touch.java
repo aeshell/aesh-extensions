@@ -53,6 +53,8 @@ public class Touch implements Command<CommandInvocation> {
                 }
                 try (OutputStream out  = file.resolve(currentWorkingDirectory).get(0).write(false)) {
                     out.write("".getBytes());
+                    out.flush();
+                    out.close();
                 }
             }
         }
