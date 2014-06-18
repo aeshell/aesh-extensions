@@ -46,14 +46,14 @@ public class Touch implements Command<CommandInvocation> {
         }
 
         try {
+            Resource currentWorkingDirectory = commandInvocation.getAeshContext().getCurrentWorkingDirectory();
             for (Resource file : arguments) {
                 if (file.exists()) {
                     file.setLastModified(System.currentTimeMillis());
                 }
-                OutputStream out  = file.write(false);
-                out.write("".getBytes());
-                out.flush();
-                out.close();
+                try (OutputStream out  = file.resolve(currentWorkingDirectory).get(0).write(false)) {
+                    out.write("".getBytes());
+                }
             }
         }
         catch (IOException ioe) {
