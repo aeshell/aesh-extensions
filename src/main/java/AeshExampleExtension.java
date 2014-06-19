@@ -20,6 +20,7 @@ import org.jboss.aesh.console.settings.SettingsBuilder;
 import org.jboss.aesh.extensions.cat.Cat;
 import org.jboss.aesh.extensions.cd.Cd;
 import org.jboss.aesh.extensions.clear.Clear;
+import org.jboss.aesh.extensions.echo.Echo;
 import org.jboss.aesh.extensions.grep.Grep;
 import org.jboss.aesh.extensions.groovy.GroovyCommand;
 import org.jboss.aesh.extensions.harlem.aesh.Harlem;
@@ -60,6 +61,7 @@ public class AeshExampleExtension {
                 .command(Pushd.class)
                 .command(Popd.class)
                 .command(Mkdir.class)
+                .command(Echo.class)
                 .create();
 
         AeshConsole aeshConsole = new AeshConsoleBuilder()
