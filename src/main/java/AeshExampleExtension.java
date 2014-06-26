@@ -32,6 +32,7 @@ import org.jboss.aesh.extensions.more.aesh.More;
 import org.jboss.aesh.extensions.pushdpopd.Popd;
 import org.jboss.aesh.extensions.pushdpopd.Pushd;
 import org.jboss.aesh.extensions.pwd.Pwd;
+import org.jboss.aesh.extensions.rm.Rm;
 import org.jboss.aesh.extensions.touch.Touch;
 
 /**
@@ -62,6 +63,7 @@ public class AeshExampleExtension {
                 .command(Popd.class)
                 .command(Mkdir.class)
                 .command(Echo.class)
+                .command(Rm.class)
                 .create();
 
         AeshConsole aeshConsole = new AeshConsoleBuilder()
