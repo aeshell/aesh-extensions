@@ -6,36 +6,27 @@
  */
 package org.jboss.aesh.extensions.mkdir;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
 
+import org.jboss.aesh.extensions.common.AeshTestCommons;
+import org.jboss.aesh.extensions.ls.Ls;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.jboss.aesh.cl.exception.CommandLineParserException;
-import org.jboss.aesh.console.AeshConsole;
-import org.jboss.aesh.console.AeshConsoleBuilder;
 import org.jboss.aesh.console.Config;
-import org.jboss.aesh.console.command.registry.AeshCommandRegistryBuilder;
-import org.jboss.aesh.console.command.registry.CommandRegistry;
-import org.jboss.aesh.console.settings.Settings;
-import org.jboss.aesh.console.settings.SettingsBuilder;
-import org.jboss.aesh.extensions.console.BaseConsoleTest;
-import org.jboss.aesh.terminal.TestTerminal;
 
 /**
  * @author <a href="mailto:00hf11@gmail.com">Helio Frota</a>
  */
-public class MkdirTest extends BaseConsoleTest {
+public class MkdirTest extends AeshTestCommons {
 
     private Path tempDir;
     private String aeshRocksDir;
@@ -70,41 +61,19 @@ public class MkdirTest extends BaseConsoleTest {
 
     @Test
     public void testMkdir() throws IOException, InterruptedException, CommandLineParserException {
-        PipedOutputStream pos = new PipedOutputStream();
-        PipedInputStream pis = new PipedInputStream(pos);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        Settings settings = new SettingsBuilder()
-                .terminal(new TestTerminal())
-                .inputStream(pis)
-                .outputStream(new PrintStream(baos))
-                .logging(true)
-                .create();
+        prepare(Mkdir.class, Ls.class);
+        pushToOutput("mkdir -v " + aeshRocksDir);
+        pushToOutput("ls " + aeshRocksDir);
 
-        CommandRegistry registry = new AeshCommandRegistryBuilder()
-                .command(Mkdir.class)
-                .create();
+        Assert.assertFalse(getStream().toString().contains("No such file or directory"));
 
-        AeshConsoleBuilder consoleBuilder = new AeshConsoleBuilder()
-                .settings(settings)
-                .commandRegistry(registry);
+        pushToOutput("mkdir -p " + aeshRocksSubDir);
+        pushToOutput("ls " + aeshRocksSubDir);
 
-        AeshConsole aeshConsole = consoleBuilder.create();
-        aeshConsole.start();
+        Assert.assertFalse(getStream().toString().contains("No such file or directory"));
 
-        baos.flush();
-        pos.write(("mkdir -v " + aeshRocksDir).getBytes());
-        pos.write(Config.getLineSeparator().getBytes());
-        pos.flush();
-
-        pos.write(("mkdir -p " + aeshRocksSubDir).getBytes());
-        pos.write(Config.getLineSeparator().getBytes());
-        pos.flush();
-
-        System.out.println("Got out: " + baos.toString());
-
-        Thread.sleep(100);
-        aeshConsole.stop();
+        finish();
     }
 
     @After

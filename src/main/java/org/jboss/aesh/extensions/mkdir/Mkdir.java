@@ -54,20 +54,14 @@ public class Mkdir implements Command<CommandInvocation> {
 
             Resource pathResolved = f.resolve(currentWorkingDirectory).get(0);
 
-            String argumentDirName = getArgumentFileName(currentWorkingDirectory.getAbsolutePath(), pathResolved.getAbsolutePath());
-
             if (parents || f.getName().contains(Config.getPathSeparator())) {
-                makeDirs(argumentDirName, pathResolved, shell);
+                makeDirs(arguments, pathResolved, shell);
             } else {
                 makeDir(pathResolved, shell);
             }
         }
 
         return CommandResult.SUCCESS;
-    }
-
-    private String getArgumentFileName(String currentWorkingDirectory, String absoluteFileName) {
-        return absoluteFileName.substring(currentWorkingDirectory.length() + 1);
     }
 
     private void makeDir(Resource dir, Shell shell) {
@@ -81,15 +75,12 @@ public class Mkdir implements Command<CommandInvocation> {
         }
     }
 
-    private void makeDirs(String argumentFileName, Resource dir, Shell shell) {
+    private void makeDirs(List<Resource> resources, Resource dir, Shell shell) {
         if (!dir.exists()) {
             dir.mkdirs();
             if (verbose) {
-                String[] dirs = argumentFileName.split(Config.getPathSeparator());
-                String dirName = "";
-                for (int i = 0; i < dirs.length; i++) {
-                    dirName += dirs[i] + Config.getPathSeparator();
-                    shell.out().println("created directory '" + dirName + "'");
+                for (Resource r : resources) {
+                    shell.out().println("created directory '" + r.getName() + "'");
                 }
             }
         }
