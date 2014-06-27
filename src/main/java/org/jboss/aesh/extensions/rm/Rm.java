@@ -72,7 +72,7 @@ public class Rm implements Command<CommandInvocation> {
             if (r.isLeaf()) {
                 if (interactive) {
                     shell.out().println("remove regular file '" + r.getName() + "' ? (y/n)");
-                    CommandOperation operation = commandInvocation.getInput();;
+                    CommandOperation operation = commandInvocation.getInput();
                     if (operation.getInputKey() == Key.y) {
                         r.delete();
                     }
