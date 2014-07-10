@@ -9,3 +9,7 @@ How to build:
   * When you start a Gradle build via the wrapper [gradlew], Gradle will be automatically downloaded and used to run the build
     * Windows: gradlew.bat 
     * Linux: gradlew
+
+Æsh Developer List:
+------------------
+https://groups.google.com/forum/#!forum/aesh-dev
