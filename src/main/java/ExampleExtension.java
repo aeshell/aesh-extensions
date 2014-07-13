@@ -42,7 +42,7 @@ public class ExampleExtension {
         PrintWriter out = new PrintWriter(System.out);
 
         final Man man = new Man(exampleConsole);
-        //man.addPage(new File("/tmp/README.md"), "test");
+        //man.addPage(new File("/tmp/README.asciidoc"), "test");
 
         final Harlem harlem = new Harlem(exampleConsole);
 
