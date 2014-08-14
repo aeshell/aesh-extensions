@@ -25,7 +25,7 @@ public class Popd implements Command<CommandInvocation> {
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException, InterruptedException {
 
         try {
-            Pushd pushd = (Pushd) commandInvocation.getCommandRegistry().getCommand("pushd", "").getCommand();
+            Pushd pushd = (Pushd) commandInvocation.getCommandRegistry().getCommand("pushd", "").getParser().getCommand();
             Resource popFile = pushd.popDirectory();
             if(popFile != null) {
                 commandInvocation.getAeshContext().setCurrentWorkingDirectory(popFile);
