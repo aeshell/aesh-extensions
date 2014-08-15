@@ -19,11 +19,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:00hf11@gmail.com">Helio Frota</a>
@@ -55,32 +59,28 @@ public class RmTest extends AeshTestCommons {
         String tempPath = tempDir.toFile().getAbsolutePath() + Config.getPathSeparator();
 
         pushToOutput("touch " + tempPath + "file01.txt");
+        assertTrue(new File(tempPath+"file01.txt").exists());
         pushToOutput("rm " + tempPath + "file01.txt");
-        pushToOutput("cat " + tempPath + "file01.txt");
-
-        Assert.assertTrue(getStream().toString().contains("No such file or directory"));
+        assertFalse(new File(tempPath + "file01.txt").exists());
 
         pushToOutput("cd " + tempPath);
         pushToOutput("mkdir " + tempPath + "aesh_rocks");
+        assertTrue(new File(tempPath+"aesh_rocks").exists());
         pushToOutput("rm -d " + tempPath + "aesh_rocks");
-        pushToOutput("ls " + tempPath + "aesh_rocks");
-
-        Assert.assertTrue(getStream().toString().contains("No such file or directory"));
+        assertFalse(new File(tempPath+"aesh_rocks").exists());
 
         pushToOutput("touch " + tempPath + "file03.txt");
+        assertTrue(new File(tempPath+"file03.txt").exists());
         pushToOutput("rm -i " + tempPath + "file03.txt");
         pushToOutput("y");
-        pushToOutput("cat " + tempPath + "file03.txt");
-
-        Assert.assertTrue(getStream().toString().contains("No such file or directory"));
+        assertFalse(new File(tempPath+"file03.txt").exists());
 
         pushToOutput("cd " + tempPath);
         pushToOutput("mkdir " + tempPath + "aesh_rocks2");
+        assertTrue(new File(tempPath+"aesh_rocks2").exists());
         pushToOutput("rm -di " + tempPath + "aesh_rocks2");
         pushToOutput("y");
-        pushToOutput("ls " + tempPath + "aesh_rocks2");
-
-        Assert.assertTrue(getStream().toString().contains("No such file or directory"));
+        assertFalse(new File(tempPath+"aesh_rocks2").exists());
 
         getStream().reset();
         pushToOutput("touch " + tempPath + "file04.txt");
@@ -88,7 +88,7 @@ public class RmTest extends AeshTestCommons {
         output(String.valueOf(Key.CTRL_C));
         pushToOutput("cat " + tempPath + "file04.txt");
 
-        Assert.assertFalse(getStream().toString().contains("No such file or directory"));
+        assertFalse(getStream().toString().contains("No such file or directory"));
 
         finish();
     }
