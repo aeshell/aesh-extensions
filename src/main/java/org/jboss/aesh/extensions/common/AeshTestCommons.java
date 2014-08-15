@@ -8,6 +8,7 @@ package org.jboss.aesh.extensions.common;
 
 import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.AeshConsoleBuilder;
+import org.jboss.aesh.console.AeshContext;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.registry.AeshCommandRegistryBuilder;
@@ -100,6 +101,10 @@ public class AeshTestCommons {
     protected void output(String literalCommand) throws IOException {
         getPipedOutputStream().write((literalCommand).getBytes());
         smallPause();
+    }
+
+    protected AeshContext getAeshContext() {
+        return aeshConsole.getAeshContext();
     }
 
 }
