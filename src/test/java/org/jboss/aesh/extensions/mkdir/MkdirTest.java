@@ -23,6 +23,9 @@ import org.junit.Test;
 import org.jboss.aesh.cl.exception.CommandLineParserException;
 import org.jboss.aesh.console.Config;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author <a href="mailto:00hf11@gmail.com">Helio Frota</a>
  */
@@ -63,15 +66,13 @@ public class MkdirTest extends AeshTestCommons {
     public void testMkdir() throws IOException, InterruptedException, CommandLineParserException {
 
         prepare(Mkdir.class, Ls.class);
+        assertFalse(new File(aeshRocksDir).exists());
         pushToOutput("mkdir -v " + aeshRocksDir);
-        pushToOutput("ls " + aeshRocksDir);
+        assertTrue(new File(aeshRocksDir).exists());
 
-        Assert.assertFalse(getStream().toString().contains("No such file or directory"));
-
+        assertFalse(new File(aeshRocksSubDir).exists());
         pushToOutput("mkdir -p " + aeshRocksSubDir);
-        pushToOutput("ls " + aeshRocksSubDir);
-
-        Assert.assertFalse(getStream().toString().contains("No such file or directory"));
+        assertTrue(new File(aeshRocksSubDir).exists());
 
         finish();
     }
