@@ -16,7 +16,6 @@ import java.nio.file.attribute.PosixFilePermissions;
 import org.jboss.aesh.extensions.common.AeshTestCommons;
 import org.jboss.aesh.extensions.ls.Ls;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
