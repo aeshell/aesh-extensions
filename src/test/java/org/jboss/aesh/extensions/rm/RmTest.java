@@ -15,7 +15,6 @@ import org.jboss.aesh.extensions.ls.Ls;
 import org.jboss.aesh.extensions.mkdir.Mkdir;
 import org.jboss.aesh.extensions.touch.Touch;
 import org.jboss.aesh.terminal.Key;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

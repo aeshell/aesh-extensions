@@ -7,13 +7,9 @@
 
 import java.io.IOException;
 
-import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.console.AeshConsole;
 import org.jboss.aesh.console.AeshConsoleBuilder;
 import org.jboss.aesh.console.Prompt;
-import org.jboss.aesh.console.command.Command;
-import org.jboss.aesh.console.command.CommandResult;
-import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.console.command.registry.AeshCommandRegistryBuilder;
 import org.jboss.aesh.console.command.registry.CommandRegistry;
 import org.jboss.aesh.console.settings.SettingsBuilder;
@@ -21,6 +17,7 @@ import org.jboss.aesh.extensions.cat.Cat;
 import org.jboss.aesh.extensions.cd.Cd;
 import org.jboss.aesh.extensions.clear.Clear;
 import org.jboss.aesh.extensions.echo.Echo;
+import org.jboss.aesh.extensions.exit.Exit;
 import org.jboss.aesh.extensions.grep.Grep;
 import org.jboss.aesh.extensions.groovy.GroovyCommand;
 import org.jboss.aesh.extensions.harlem.aesh.Harlem;
@@ -46,7 +43,7 @@ public class AeshExampleExtension {
         settingsBuilder.logging(true);
 
         CommandRegistry registry = new AeshCommandRegistryBuilder()
-                .command(ExitCommand.class)
+                .command(Exit.class)
                 .command(Less.class)
                 .command(More.class)
                 .command(Harlem.class)
@@ -75,13 +72,4 @@ public class AeshExampleExtension {
         aeshConsole.start();
     }
 
-    @CommandDefinition(name="exit", description = "exit the program")
-    public static class ExitCommand implements Command {
-
-        @Override
-        public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
-            commandInvocation.stop();
-            return CommandResult.SUCCESS;
-        }
-    }
 }
