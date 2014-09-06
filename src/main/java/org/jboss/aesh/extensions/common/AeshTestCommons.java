@@ -33,6 +33,10 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermissions;
 
 /**
  * @author <a href="mailto:00hf11@gmail.com">Helio Frota</a>
@@ -45,6 +49,8 @@ public class AeshTestCommons {
     private Settings settings;
     private AeshConsole aeshConsole;
     private CommandRegistry registry;
+
+    private FileAttribute fileAttribute = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxrwxrwx"));
 
     public AeshTestCommons() {
         pos = new PipedOutputStream();
@@ -116,6 +122,16 @@ public class AeshTestCommons {
 
     protected AeshContext getAeshContext() {
         return aeshConsole.getAeshContext();
+    }
+
+    protected Path createTempDirectory() throws IOException {
+        final Path tmp;
+        if (Config.isOSPOSIXCompatible()) {
+            tmp = Files.createTempDirectory("temp", fileAttribute);
+        } else {
+            tmp = Files.createTempDirectory("temp");
+        }
+        return tmp;
     }
 
 }
