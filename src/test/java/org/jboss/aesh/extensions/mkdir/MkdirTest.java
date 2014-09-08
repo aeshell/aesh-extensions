@@ -21,8 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermissions;
 
 import org.jboss.aesh.extensions.common.AeshTestCommons;
 import org.jboss.aesh.extensions.ls.Ls;
@@ -44,7 +42,6 @@ public class MkdirTest extends AeshTestCommons {
     private Path tempDir;
     private String aeshRocksDir;
     private String aeshRocksSubDir;
-    private FileAttribute fileAttribute = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxrwxrwx"));
 
     @Before
     public void before() throws IOException {
@@ -60,16 +57,6 @@ public class MkdirTest extends AeshTestCommons {
                 + Config.getPathSeparator()
                 + "subdir2";
 
-    }
-
-    public Path createTempDirectory() throws IOException {
-        final Path tmp;
-        if (Config.isOSPOSIXCompatible()) {
-            tmp = Files.createTempDirectory("temp", fileAttribute);
-        } else {
-            tmp = Files.createTempDirectory("temp");
-        }
-        return tmp;
     }
 
     @Test

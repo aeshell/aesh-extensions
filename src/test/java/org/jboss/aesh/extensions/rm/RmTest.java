@@ -31,10 +31,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermissions;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -45,21 +42,10 @@ import static org.junit.Assert.assertTrue;
 public class RmTest extends AeshTestCommons {
 
     private Path tempDir;
-    private FileAttribute fileAttribute = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxrwxrwx"));
 
     @Before
     public void before() throws IOException {
         tempDir = createTempDirectory();
-    }
-
-    public Path createTempDirectory() throws IOException {
-        final Path tmp;
-        if (Config.isOSPOSIXCompatible()) {
-            tmp = Files.createTempDirectory("temp", fileAttribute);
-        } else {
-            tmp = Files.createTempDirectory("temp");
-        }
-        return tmp;
     }
 
     @Test
