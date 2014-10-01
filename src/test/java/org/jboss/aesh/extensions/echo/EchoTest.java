@@ -19,11 +19,10 @@ package org.jboss.aesh.extensions.echo;
 
 import java.io.IOException;
 
+import org.jboss.aesh.cl.parser.CommandLineParserException;
 import org.jboss.aesh.extensions.common.AeshTestCommons;
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.jboss.aesh.cl.exception.CommandLineParserException;
 
 /**
  * @author <a href="mailto:00hf11@gmail.com">Helio Frota</a>

@@ -17,7 +17,14 @@
  */
 package org.jboss.aesh.extensions.rm;
 
-import org.jboss.aesh.cl.exception.CommandLineParserException;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+
+import org.jboss.aesh.cl.parser.CommandLineParserException;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.extensions.cat.Cat;
 import org.jboss.aesh.extensions.cd.Cd;
@@ -28,13 +35,6 @@ import org.jboss.aesh.extensions.touch.Touch;
 import org.jboss.aesh.terminal.Key;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:00hf11@gmail.com">Helio Frota</a>
