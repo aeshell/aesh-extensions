@@ -65,7 +65,7 @@ public class MultipleChoice implements Completion {
     protected void afterAttach() throws IOException {
         rows = console.getTerminalSize().getHeight();
 
-        console.getShell().out().print(ANSI.getAlternateBufferScreen());
+        console.getShell().out().print(ANSI.ALTERNATE_BUFFER);
         logger.info("printed out alternateBufferScreen");
         displayChoices();
     }
@@ -90,7 +90,7 @@ public class MultipleChoice implements Completion {
     }
 
     protected void afterDetach() throws IOException {
-        console.getShell().out().print(ANSI.getMainBufferScreen());
+        console.getShell().out().print(ANSI.MAIN_BUFFER);
         attached = false;
     }
 

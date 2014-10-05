@@ -85,16 +85,16 @@ public class Less extends FileDisplayer {
         }
         else if(getSearchStatus() == Search.NOT_FOUND) {
             clearBottomLine();
-            writeToConsole(ANSI.getInvertedBackground()+
+            writeToConsole(ANSI.INVERT_BACKGROUND+
                     "Pattern not found (press RETURN)"+
-                    ANSI.defaultText());
+                    ANSI.DEFAULT_TEXT);
         }
         else if(getSearchStatus() == Search.RESULT) {
             writeToConsole(":");
         }
         else if(getSearchStatus() == Search.NO_SEARCH) {
             if(isAtBottom())
-                writeToConsole(ANSI.getInvertedBackground()+"(END)"+ANSI.defaultText());
+                writeToConsole(ANSI.INVERT_BACKGROUND+"(END)"+ANSI.DEFAULT_TEXT);
             else
                 writeToConsole(":");
         }

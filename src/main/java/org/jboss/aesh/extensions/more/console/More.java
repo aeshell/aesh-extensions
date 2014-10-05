@@ -188,11 +188,11 @@ public class More implements Completion {
 
     private void displayBottom(Background background) throws IOException {
         if(background == Background.INVERSE) {
-            console.getShell().out().print(ANSI.getInvertedBackground());
+            console.getShell().out().print(ANSI.INVERT_BACKGROUND);
             console.getShell().out().print("--More--(");
             console.getShell().out().print(getPercentDisplayed()+"%)");
 
-            console.getShell().out().print(ANSI.getNormalBackground());
+            console.getShell().out().print(ANSI.NORMAL_BACKGROUND);
             console.getShell().out().flush();
         }
     }

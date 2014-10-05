@@ -63,7 +63,7 @@ public class Harlem implements Completion {
         columns = console.getTerminalSize().getWidth();
         terminalCharacters = new TerminalCharacter[rows][columns];
 
-        console.getShell().out().print(ANSI.getAlternateBufferScreen());
+        console.getShell().out().print(ANSI.ALTERNATE_BUFFER);
         if(!harlemWav.isFile())
             displayQuestion();
         else
@@ -71,28 +71,28 @@ public class Harlem implements Completion {
     }
 
     private void displayQuestion() throws IOException {
-        console.getShell().out().print(ANSI.getStart()+rows+";1H");
+        console.getShell().out().print(ANSI.START+rows+";1H");
         console.getShell().out().print("Allow harlem to save file to \""+Config.getTmpDir()+"? (y or n)");
         console.getShell().out().flush();
         //processInvocation(..)
     }
 
     protected void afterDetach() throws IOException {
-        console.getShell().out().print(ANSI.getMainBufferScreen());
-        console.getShell().out().print(ANSI.getStart()+"?25h");
+        console.getShell().out().print(ANSI.MAIN_BUFFER);
+        console.getShell().out().print(ANSI.START+"?25h");
         console.getShell().out().flush();
         attached = false;
     }
 
     private void displayWait() throws IOException {
-        console.getShell().out().print(ANSI.getStart()+"?25l");
-        console.getShell().out().print(ANSI.getStart()+rows/2+";1H");
+        console.getShell().out().print(ANSI.START+"?25l");
+        console.getShell().out().print(ANSI.START+rows/2+";1H");
         console.getShell().out().print("Buffering....  please wait.....");
         console.getShell().out().flush();
     }
 
     private void displayIntro() throws IOException {
-        console.getShell().out().print(ANSI.getStart() + "1;1H");
+        console.getShell().out().print(ANSI.START + "1;1H");
         TerminalCharacter startChar = new TerminalCharacter('|');
         for (int i = 0; i < terminalCharacters.length; i++) {
             for (int j = 0; j < terminalCharacters[i].length; j++) {
@@ -122,7 +122,7 @@ public class Harlem implements Completion {
             } catch (InterruptedException e) {
                 //ignored
             }
-            console.getShell().out().print(ANSI.getStart()+middleRow+";"+middleColumn+"H");
+            console.getShell().out().print(ANSI.START+middleRow+";"+middleColumn+"H");
             console.getShell().out().print(middleChar.toString());
             console.getShell().out().flush();
             middleChar = new TerminalCharacter(getNextChar(middleChar.getCharacter()));
@@ -162,7 +162,7 @@ public class Harlem implements Completion {
     }
 
     private void displayCorus() throws IOException {
-        console.getShell().out().print(ANSI.getStart()+"1;1H");
+        console.getShell().out().print(ANSI.START+"1;1H");
         StringBuilder sb = new StringBuilder();
         for(int i=0; i < terminalCharacters.length; i++) {
             for(int j=0; j < terminalCharacters[i].length;j++) {

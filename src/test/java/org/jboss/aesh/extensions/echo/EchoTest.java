@@ -23,15 +23,13 @@ import org.jboss.aesh.extensions.common.AeshTestCommons;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.jboss.aesh.cl.exception.CommandLineParserException;
-
 /**
  * @author <a href="mailto:00hf11@gmail.com">Helio Frota</a>
  */
 public class EchoTest extends AeshTestCommons {
 
     @Test
-    public void testEcho() throws IOException, InterruptedException, CommandLineParserException {
+    public void testEcho() throws IOException, InterruptedException {
         prepare(Echo.class);
         pushToOutput("aaa");
         Assert.assertTrue(getStream().toString().contains("aaa"));
