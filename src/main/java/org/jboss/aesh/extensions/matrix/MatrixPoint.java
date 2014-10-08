@@ -52,7 +52,7 @@ public class MatrixPoint {
         this.rows = rows;
         this.columns = columns;
 
-        String cursorPosition = ANSI.getStart()+ y +";"+ x +"H"; //   moveCursor(rows, columns);
+        String cursorPosition = ANSI.START+ y +";"+ x +"H"; //   moveCursor(rows, columns);
         out = new byte[cursorPosition.getBytes().length+2];
         int counter = 0;
         for(byte b : cursorPosition.getBytes()) {

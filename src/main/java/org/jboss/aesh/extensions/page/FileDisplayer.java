@@ -98,7 +98,7 @@ public abstract class FileDisplayer implements Completion {
                 afterDetach();
             }
             else {
-                console.getShell().out().print(ANSI.getAlternateBufferScreen());
+                console.getShell().out().print(ANSI.ALTERNATE_BUFFER);
 
                 if(this.page.getFileName() != null)
                     display();
@@ -111,7 +111,7 @@ public abstract class FileDisplayer implements Completion {
 
     protected void afterDetach() throws IOException {
         if(!controlOperator.isRedirectionOut())
-            console.getShell().out().print(ANSI.getMainBufferScreen());
+            console.getShell().out().print(ANSI.MAIN_BUFFER);
 
         page.clear();
         topVisibleRow = 0;
@@ -329,9 +329,9 @@ public abstract class FileDisplayer implements Completion {
     private void displaySearchLine(String line, String searchWord) throws IOException {
         int start = line.indexOf(searchWord);
         console.getShell().out().print(line.substring(0,start));
-        console.getShell().out().print(ANSI.getInvertedBackground());
+        console.getShell().out().print(ANSI.INVERT_BACKGROUND);
         console.getShell().out().print(searchWord);
-        console.getShell().out().print(ANSI.reset());
+        console.getShell().out().print(ANSI.RESET);
         console.getShell().out().print(line.substring(start + searchWord.length(), line.length()));
         console.getShell().out().flush();
     }

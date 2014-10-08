@@ -109,8 +109,8 @@ public class Matrix implements Command<CommandInvocation> {
         else {
             shell = commandInvocation.getShell();
             this.commandInvocation = commandInvocation;
-            shell.out().print(ANSI.saveCursor());
-            shell.out().print(ANSI.hideCursor());
+            shell.out().print(ANSI.CURSOR_SAVE);
+            shell.out().print(ANSI.CURSOR_HIDE);
             shell.enableAlternateBuffer();
             shell.out().flush();
             startMatrix(shell);
@@ -162,8 +162,8 @@ public class Matrix implements Command<CommandInvocation> {
         inputStream = null;
 
         shell.clear();
-        shell.out().print(ANSI.restoreCursor());
-        shell.out().print(ANSI.showCursor());
+        shell.out().print(ANSI.CURSOR_RESTORE);
+        shell.out().print(ANSI.CURSOR_SHOW);
         shell.enableMainBuffer();
         shell.out().flush();
     }

@@ -67,7 +67,7 @@ public class ManPageLoaderTester {
             assertEquals("NAME", parser.getSections().get(0).getName());
 
             List<String> out = parser.getAsList();
-            assertEquals(ANSI.getBold()+"NAME"+ANSI.defaultText(), out.get(0));
+            assertEquals(ANSI.BOLD+"NAME"+ANSI.DEFAULT_TEXT, out.get(0));
 
             for(String s : parser.getAsList())
                 System.out.println(s);

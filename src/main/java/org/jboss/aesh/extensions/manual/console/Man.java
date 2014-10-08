@@ -85,8 +85,8 @@ public class Man extends FileDisplayer {
 
     @Override
     public void displayBottom() throws IOException {
-        writeToConsole(ANSI.getInvertedBackground());
+        writeToConsole(ANSI.INVERT_BACKGROUND);
         writeToConsole("Manual page "+loader.getName()+" line "+getTopVisibleRow()+
-        " (press h for help or q to quit)"+ANSI.defaultText());
+        " (press h for help or q to quit)"+ANSI.DEFAULT_TEXT);
     }
 }

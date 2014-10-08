@@ -145,13 +145,13 @@ public class MatrixRunner implements Runnable {
 
     private void knockKnock(List<String> knockStrings) {
         try {
-            shell.out().print(ANSI.showCursor());
+            shell.out().print(ANSI.CURSOR_SHOW);
             for(String knock : knockStrings) {
                 showKnock(knock);
                 Thread.sleep(2000);
                 shell.clear();
             }
-            shell.out().print(ANSI.hideCursor());
+            shell.out().print(ANSI.CURSOR_HIDE);
         }
         catch (InterruptedException | IOException e) {
             e.printStackTrace();
@@ -160,7 +160,7 @@ public class MatrixRunner implements Runnable {
     }
 
     private void showKnock(String knock) throws InterruptedException {
-        shell.out().print( ANSI.getStart()+ 1 +";"+ 1 +"H"); // moveCursor(rows, columns);
+        shell.out().print( ANSI.START+ 1 +";"+ 1 +"H"); // moveCursor(rows, columns);
         for(char c : knock.toCharArray()) {
             shell.out().print(c);
             shell.out().flush();
@@ -188,7 +188,7 @@ public class MatrixRunner implements Runnable {
         }
 
         int height = shell.getSize().getHeight();
-        shell.out().print( ANSI.getStart()+ height +";"+ 1 +"H"); //   moveCursor(rows, columns);
+        shell.out().print( ANSI.START+ height +";"+ 1 +"H"); //   moveCursor(rows, columns);
 
         if(lines.size() > 0) {
             int counter = 0;
@@ -208,7 +208,7 @@ public class MatrixRunner implements Runnable {
                     }
                 }
                 counter++;
-                shell.out().print( ANSI.getStart()+ (height - counter)+";"+ 1 +"H"); //   moveCursor(rows, columns);
+                shell.out().print( ANSI.START+ (height - counter)+";"+ 1 +"H"); //   moveCursor(rows, columns);
             }
 
             shell.out().flush();

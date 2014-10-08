@@ -17,18 +17,17 @@
  */
 package org.jboss.aesh.extensions.touch;
 
-import org.jboss.aesh.cl.exception.CommandLineParserException;
-import org.jboss.aesh.console.Config;
-import org.jboss.aesh.extensions.common.AeshTestCommons;
-import org.jboss.aesh.extensions.ls.Ls;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static org.junit.Assert.assertTrue;
+import org.jboss.aesh.console.Config;
+import org.jboss.aesh.extensions.common.AeshTestCommons;
+import org.jboss.aesh.extensions.ls.Ls;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author <a href="mailto:00hf11@gmail.com">Helio Frota</a>
@@ -43,7 +42,7 @@ public class TouchTest extends AeshTestCommons {
     }
 
     @Test
-    public void testTouch() throws IOException, InterruptedException, CommandLineParserException {
+    public void testTouch() throws IOException, InterruptedException {
 
         prepare(Touch.class, Ls.class);
 

@@ -90,16 +90,16 @@ public class Less extends AeshFileDisplayer {
         }
         else if(getSearchStatus() == TerminalPage.Search.NOT_FOUND) {
             clearBottomLine();
-            writeToConsole(ANSI.getInvertedBackground()+
+            writeToConsole(ANSI.INVERT_BACKGROUND+
                     "Pattern not found (press RETURN)"+
-                    ANSI.defaultText());
+                    ANSI.DEFAULT_TEXT);
         }
         else if(getSearchStatus() == TerminalPage.Search.RESULT) {
             writeToConsole(":");
         }
         else if(getSearchStatus() == TerminalPage.Search.NO_SEARCH) {
             if(isAtBottom())
-                writeToConsole(ANSI.getInvertedBackground()+"(END)"+ANSI.defaultText());
+                writeToConsole(ANSI.INVERT_BACKGROUND+"(END)"+ANSI.DEFAULT_TEXT);
             else
                 writeToConsole(":");
         }

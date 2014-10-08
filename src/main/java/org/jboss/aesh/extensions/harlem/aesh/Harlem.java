@@ -63,7 +63,7 @@ public class Harlem implements Command<CommandInvocation> {
         columns = getShell().getSize().getWidth();
         terminalCharacters = new TerminalCharacter[rows][columns];
 
-        getShell().out().print(ANSI.getAlternateBufferScreen());
+        getShell().out().print(ANSI.ALTERNATE_BUFFER);
         if(!harlemWav.isFile())
             displayQuestion();
         else
@@ -75,7 +75,7 @@ public class Harlem implements Command<CommandInvocation> {
     }
 
     private void displayQuestion() throws IOException {
-        getShell().out().print(ANSI.getStart()+rows+";1H");
+        getShell().out().print(ANSI.START +rows+";1H");
         getShell().out().print("Allow harlem to save file to \""+Config.getTmpDir()+"? (y or n)");
         getShell().out().flush();
         try {
@@ -87,20 +87,20 @@ public class Harlem implements Command<CommandInvocation> {
     }
 
     protected void afterDetach() throws IOException {
-        getShell().out().print(ANSI.getMainBufferScreen());
-        getShell().out().print(ANSI.getStart()+"?25h");
+        getShell().out().print(ANSI.MAIN_BUFFER);
+        getShell().out().print(ANSI.START+"?25h");
         getShell().out().flush();
     }
 
     private void displayWait() throws IOException {
-        getShell().out().print(ANSI.getStart()+"?25l");
-        getShell().out().print(ANSI.getStart()+rows/2+";1H");
+        getShell().out().print(ANSI.START+"?25l");
+        getShell().out().print(ANSI.START+rows/2+";1H");
         getShell().out().print("Buffering....  please wait.....");
         getShell().out().flush();
     }
 
     private void displayIntro() throws IOException {
-        getShell().out().print(ANSI.getStart() + "1;1H");
+        getShell().out().print(ANSI.START + "1;1H");
         TerminalCharacter startChar = new TerminalCharacter('|');
         for (int i = 0; i < terminalCharacters.length; i++) {
             for (int j = 0; j < terminalCharacters[i].length; j++) {
@@ -130,7 +130,7 @@ public class Harlem implements Command<CommandInvocation> {
             } catch (InterruptedException e) {
                 //ignored
             }
-            getShell().out().print(ANSI.getStart()+middleRow+";"+middleColumn+"H");
+            getShell().out().print(ANSI.START+middleRow+";"+middleColumn+"H");
             getShell().out().print(middleChar.toString());
             getShell().out().flush();
             middleChar = new TerminalCharacter(getNextChar(middleChar.getCharacter()));
@@ -170,7 +170,7 @@ public class Harlem implements Command<CommandInvocation> {
     }
 
     private void displayCorus() throws IOException {
-        getShell().out().print(ANSI.getStart()+"1;1H");
+        getShell().out().print(ANSI.START+"1;1H");
         StringBuilder sb = new StringBuilder();
         for(int i=0; i < terminalCharacters.length; i++) {
             for(int j=0; j < terminalCharacters[i].length;j++) {

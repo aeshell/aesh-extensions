@@ -205,11 +205,11 @@ public class More implements Command<CommandInvocation> {
 
     private void displayBottom(Background background) throws IOException {
         if(background == Background.INVERSE) {
-            commandInvocation.getShell().out().print(ANSI.getInvertedBackground());
+            commandInvocation.getShell().out().print(ANSI.INVERT_BACKGROUND);
             commandInvocation.getShell().out().print("--More--(");
             commandInvocation.getShell().out().print(getPercentDisplayed()+"%)");
 
-            commandInvocation.getShell().out().print(ANSI.getNormalBackground());
+            commandInvocation.getShell().out().print(ANSI.NORMAL_BACKGROUND);
             commandInvocation.getShell().out().flush();
         }
     }
