@@ -59,7 +59,6 @@ public abstract class BaseConsoleTest {
         builder.terminal(new TestTerminal());
         builder.inputStream(is);
         builder.outputStream(new PrintStream(new ByteArrayOutputStream()));
-        builder.readAhead(true);
 
         if(!Config.isOSPOSIXCompatible())
             builder.ansi(false);
