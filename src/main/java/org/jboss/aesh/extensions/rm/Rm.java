@@ -55,70 +55,61 @@ public class Rm implements Command<CommandInvocation> {
     private boolean verbose;
 
     @Arguments
-    private List<Resource> arguments;
+    private List<Resource> args;
 
     @Override
-    public CommandResult execute(CommandInvocation commandInvocation) throws IOException, InterruptedException {
-        if (help || arguments == null || arguments.isEmpty()) {
-            commandInvocation.getShell().out().println(commandInvocation.getHelpInfo("rm"));
+    public CommandResult execute(CommandInvocation ci) throws IOException, InterruptedException {
+        if (help || args == null || args.isEmpty()) {
+            ci.getShell().out().println(ci.getHelpInfo("rm"));
             return CommandResult.SUCCESS;
         }
 
-        Resource currentWorkingDirectory = commandInvocation.getAeshContext().getCurrentWorkingDirectory();
-        for (Resource r : arguments) {
-
-            Shell shell = commandInvocation.getShell();
-            Resource resource = r.resolve(currentWorkingDirectory).get(0);
+        Resource currentDir = ci.getAeshContext().getCurrentWorkingDirectory();
+        for (Resource r : args) {
+            Resource res = r.resolve(currentDir).get(0);
             if (dir) {
-                rmDir(resource, commandInvocation);
+                rmDir(res, ci);
             } else {
-                rmFile(resource, commandInvocation);
+                rmFile(res, ci);
             }
         }
 
         return CommandResult.SUCCESS;
     }
 
-    private void rmFile(Resource r, CommandInvocation commandInvocation) throws InterruptedException {
-        Shell shell = commandInvocation.getShell();
+    private void rmFile(Resource r, CommandInvocation ci) throws InterruptedException {
         if (r.exists()) {
             if (r.isLeaf()) {
                 if (interactive) {
-                    shell.out().println("remove regular file '" + r.getName() + "' ? (y/n)");
-                    CommandOperation operation = commandInvocation.getInput();
-                    if (operation.getInputKey() == Key.y) {
+                    ci.getShell().out().println("remove regular file '" + r.getName() + "' ? (y/n)");
+                    if (ci.getInput().getInputKey() == Key.y) {
                         r.delete();
                     }
                 } else {
                     r.delete();
                 }
                 if (verbose) {
-                    shell.out().println("removed '" + r.getName() + "'");
+                    ci.getShell().out().println("removed '" + r.getName() + "'");
                 }
             } else if (r.isDirectory()) {
-                shell.out().println("cannot remove '" + r.getName() + "': Is a directory");
+                ci.getShell().out().println("cannot remove '" + r.getName() + "': Is a directory");
             }
         }
     }
 
-
-    private void rmDir(Resource r, CommandInvocation commandInvocation) throws InterruptedException {
-        Shell shell = commandInvocation.getShell();
-        if (r.exists()) {
-            if (r.isDirectory()) {
-                if (interactive) {
-                    shell.out().println("remove directory '" + r.getName() + "' ? (y/n)");
-                    CommandOperation operation = commandInvocation.getInput();
-                    if (operation.getInputKey() == Key.y) {
-                        r.delete();
-                    }
-                } else {
+    private void rmDir(Resource r, CommandInvocation ci) throws InterruptedException {
+        if (r.exists() && r.isDirectory()) {
+            if (interactive) {
+                ci.getShell().out().println("remove directory '" + r.getName() + "' ? (y/n)");
+                if (ci.getInput().getInputKey() == Key.y) {
                     r.delete();
                 }
+            } else {
+                r.delete();
+            }
 
-                if (verbose) {
-                    shell.out().println("removed directory: '" + r.getName() + "'");
-                }
+            if (verbose) {
+                ci.getShell().out().println("removed directory: '" + r.getName() + "'");
             }
         }
     }
