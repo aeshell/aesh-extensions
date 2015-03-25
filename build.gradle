@@ -77,3 +77,9 @@ idea {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.2'
 }
+
+test {
+    testLogging {
+        events 'started','passed'
+    }
+}
