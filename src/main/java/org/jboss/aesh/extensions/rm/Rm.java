@@ -26,12 +26,10 @@ import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.cl.Option;
 import org.jboss.aesh.console.command.Command;
-import org.jboss.aesh.console.command.CommandOperation;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.io.Resource;
 import org.jboss.aesh.terminal.Key;
-import org.jboss.aesh.terminal.Shell;
 
 
 /**
