@@ -46,6 +46,9 @@ public class Mv implements Command<CommandInvocation> {
     @Option(shortName = 'v', name = "verbose", hasValue = false, description = "explain what is being done")
     private boolean verbose;
 
+    @Option(shortName = 'n', name = "no-clobber", hasValue = false, description = "do not overwrite an existing file")
+    private boolean noClobber;
+
     @Arguments
     private List<Resource> args;
 
@@ -71,7 +74,13 @@ public class Mv implements Command<CommandInvocation> {
 
     private void move(Resource from, Resource to, CommandInvocation ci) throws IOException, InterruptedException {
         if (from.exists()) {
-            from.move(to);
+            if (noClobber) {
+                if (!to.exists()) {
+                    from.move(to);
+                }
+            } else {
+                from.move(to);
+            }
             if (verbose) {
                 ci.getShell().out().println("'" + from.getName() + "' -> '" + to.getName() + "'");
             }

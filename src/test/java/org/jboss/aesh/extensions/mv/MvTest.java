@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import org.jboss.aesh.console.Config;
 import org.jboss.aesh.extensions.cat.Cat;
 import org.jboss.aesh.extensions.cd.Cd;
+import org.jboss.aesh.extensions.echo.Echo;
 import org.jboss.aesh.extensions.common.AeshTestCommons;
 import org.jboss.aesh.extensions.mkdir.Mkdir;
 import org.jboss.aesh.extensions.touch.Touch;
@@ -52,7 +53,7 @@ public class MvTest extends AeshTestCommons {
     @Test
     public void testMv() throws IOException, InterruptedException {
 
-        prepare(Touch.class, Mkdir.class, Cd.class, Cat.class, Mv.class);
+        prepare(Touch.class, Mkdir.class, Echo.class, Cd.class, Cat.class, Mv.class);
         String temp = tempDir.toFile().getAbsolutePath() + Config.getPathSeparator();
 
         pushToOutput("touch " + temp + "file01.txt");
@@ -65,6 +66,16 @@ public class MvTest extends AeshTestCommons {
         assertTrue(new File(temp + "aesh_rocks").exists());
         pushToOutput("mv -v " + temp + "aesh_rocks" + " " + temp + "aesh");
         assertTrue(new File(temp + "aesh").exists());
+
+        pushToOutput("touch " + temp + "file01.txt");
+        assertTrue(new File(temp + "file01.txt").exists());
+        pushToOutput("echo abc > " + temp + "file01.txt");
+        pushToOutput("cat " + temp + "file01.txt");
+        assertTrue(getStream().toString().contains("abc"));
+        pushToOutput("mv -n " + temp + "file02.txt" + " " + temp + "file01.txt");
+
+        pushToOutput("cat " + temp + "file01.txt");
+        assertTrue(getStream().toString().contains("abc"));
 
         finish();
     }
