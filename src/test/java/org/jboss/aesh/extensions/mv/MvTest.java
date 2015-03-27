@@ -19,7 +19,6 @@
  */
 package org.jboss.aesh.extensions.mv;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -33,8 +32,6 @@ import org.jboss.aesh.extensions.echo.Echo;
 import org.jboss.aesh.extensions.common.AeshTestCommons;
 import org.jboss.aesh.extensions.mkdir.Mkdir;
 import org.jboss.aesh.extensions.touch.Touch;
-import org.jboss.aesh.extensions.mv.Mv;
-import org.jboss.aesh.terminal.Key;
 import org.junit.Before;
 import org.junit.Test;
 
