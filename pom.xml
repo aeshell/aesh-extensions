@@ -34,7 +34,7 @@
     <groupId>org.jboss.aesh</groupId>
     <artifactId>aesh-extensions</artifactId>
     <packaging>jar</packaging>
-    <version>0.60-SNAPSHOT</version>
+    <version>0.60</version>
     <name>Æsh Extensions</name>
     <description>Commands that may be used as part of a Æsh program</description>
 
