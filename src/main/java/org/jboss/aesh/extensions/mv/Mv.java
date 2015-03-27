@@ -29,8 +29,6 @@ import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
 import org.jboss.aesh.io.Resource;
-import org.jboss.aesh.terminal.Key;
-
 
 /**
  * A simple mv command.
