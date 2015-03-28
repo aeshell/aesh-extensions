@@ -20,6 +20,7 @@
 package org.jboss.aesh.extensions.touch;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +53,15 @@ public class TouchTest extends AeshTestCommons {
 
         pushToOutput("touch " + tempPath + "file01.txt");
         assertTrue(new File(tempPath+"file01.txt").exists());
+
+        pushToOutput("touch -a " + tempPath + "file01.txt");
+        assertTrue(new File(tempPath+"file01.txt").exists());
+
+        pushToOutput("touch -c " + tempPath + "file02.txt");
+        assertFalse(new File(tempPath+"file02.txt").exists());
+
+        pushToOutput("touch -m " + tempPath + "file02.txt");
+        assertTrue(new File(tempPath+"file02.txt").exists());
 
     }
 

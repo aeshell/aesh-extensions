@@ -20,7 +20,6 @@
 package org.jboss.aesh.extensions.touch;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 
 import org.jboss.aesh.cl.Arguments;
@@ -33,7 +32,7 @@ import org.jboss.aesh.io.Resource;
 
 /**
  * @author <a href="mailto:danielsoro@gmail.com">Daniel Cunha (soro)</a>
- *
+ * @author <a href="mailto:00hf11@gmail.com">Helio Frota</a>
  */
 @CommandDefinition(name = "touch", description = "create and change file timestamps")
 public class Touch implements Command<CommandInvocation> {
@@ -41,39 +40,50 @@ public class Touch implements Command<CommandInvocation> {
     @Option(shortName = 'h', name = "help", hasValue = false, description = "display this help and exit")
     private boolean help;
 
+    @Option(shortName = 'a', name = "access time", hasValue = false, description = "change only the access time")
+    private boolean changeOnlyAccessTime;
+
+    @Option(shortName = 'm', name = "modification time", hasValue = false, description = "change only the modification time")
+    private boolean changeOnlyModificationTime;
+
+    @Option(shortName = 'c', name = "no create", hasValue = false, description = "do not create any files")
+    private boolean noCreate;
+
     @Arguments
-    private List<Resource> arguments;
+    private List<Resource> args;
 
     @Override
-    public CommandResult execute(CommandInvocation commandInvocation)
-        throws IOException {
-
-        if (help) {
-            commandInvocation.getShell().out().print(commandInvocation.getHelpInfo("touch"));
+    public CommandResult execute(CommandInvocation ci) throws IOException {
+        if (help || args == null || args.isEmpty()) {
+            ci.getShell().out().println(ci.getHelpInfo("touch"));
             return CommandResult.SUCCESS;
         }
 
-        if (arguments == null || arguments.size() < 1) {
-            commandInvocation.getShell().out().print("touch: Invalid arguments");
-            return CommandResult.FAILURE;
-        }
-
-        try {
-            Resource currentWorkingDirectory = commandInvocation.getAeshContext().getCurrentWorkingDirectory();
-            for (Resource file : arguments) {
-                if (file.exists()) {
-                    file.setLastModified(System.currentTimeMillis());
-                }
-                try (OutputStream out  = file.resolve(currentWorkingDirectory).get(0).write(false)) {
-                    out.write("".getBytes());
-                }
-            }
-        }
-        catch (IOException ioe) {
-            commandInvocation.getShell().out().print("touch: " + ioe.getMessage());
-            return CommandResult.FAILURE;
+        Resource currentDir = ci.getAeshContext().getCurrentWorkingDirectory();
+        for (Resource r : args) {
+            Resource res = r.resolve(currentDir).get(0);
+            touch(res, ci);
         }
         return CommandResult.SUCCESS;
     }
 
+    private void touch(Resource r, CommandInvocation ci) throws IOException {
+        if (r.exists()) {
+            if (changeOnlyAccessTime) {
+                r.setLastAccessed(System.currentTimeMillis());
+            }
+
+            if (changeOnlyModificationTime) {
+                r.setLastModified(System.currentTimeMillis());
+            }
+        } else {
+            if (!noCreate) {
+                create(r, ci);
+            }
+        }
+    }
+
+    private void create(Resource r, CommandInvocation ci) throws IOException {
+        r.resolve(ci.getAeshContext().getCurrentWorkingDirectory()).get(0).write(false);
+    }
 }
