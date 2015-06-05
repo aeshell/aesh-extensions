@@ -34,6 +34,7 @@ import org.jboss.aesh.extensions.ls.Ls;
 import org.jboss.aesh.extensions.mkdir.Mkdir;
 import org.jboss.aesh.extensions.touch.Touch;
 import org.jboss.aesh.terminal.Key;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,6 +48,11 @@ public class RmTest extends AeshTestCommons {
     @Before
     public void before() throws IOException {
         tempDir = createTempDirectory();
+    }
+
+    @After
+    public void after() throws IOException {
+        deleteRecursiveTempDirectory(tempDir);
     }
 
     @Test
