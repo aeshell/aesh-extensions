@@ -27,7 +27,7 @@ apply plugin: 'application'
 apply plugin: 'checkstyle'
 
 group = 'org.jboss.aesh'
-version = '0.61'
+version = '0.62-SNAPSHOT'
 
 mainClassName = "ExampleExtension"
 
