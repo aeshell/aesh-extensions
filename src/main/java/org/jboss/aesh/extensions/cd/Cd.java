@@ -26,6 +26,7 @@ import org.jboss.aesh.cl.Arguments;
 import org.jboss.aesh.cl.CommandDefinition;
 import org.jboss.aesh.cl.Option;
 import org.jboss.aesh.console.Config;
+import org.jboss.aesh.console.Prompt;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
@@ -68,5 +69,6 @@ public class Cd implements Command<CommandInvocation> {
 
     private void updatePrompt(CommandInvocation commandInvocation, Resource file) {
         commandInvocation.getAeshContext().setCurrentWorkingDirectory(file);
+        commandInvocation.setPrompt(new Prompt("[aesh@extensions:"+file.toString()+"]$ "));
     }
 }
