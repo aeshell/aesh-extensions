@@ -28,6 +28,7 @@ import org.jboss.aesh.cl.Option;
 import org.jboss.aesh.console.command.Command;
 import org.jboss.aesh.console.command.CommandResult;
 import org.jboss.aesh.console.command.invocation.CommandInvocation;
+import org.jboss.aesh.io.Resource;
 import org.jboss.aesh.terminal.Shell;
 
 /**
@@ -42,7 +43,7 @@ public class Echo implements Command<CommandInvocation> {
     private boolean help;
 
     @Arguments
-    private List<String> arguments;
+    private List<Resource> arguments;
 
     @Override
     public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
@@ -55,7 +56,7 @@ public class Echo implements Command<CommandInvocation> {
         }
 
         String stdout = "";
-        for (String s : arguments) {
+        for (Resource s : arguments) {
             stdout += s + " ";
         }
         stdout = stdout.trim();
