@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2014 Red Hat Inc. and/or its affiliates and other contributors
+ * Copyright 2017 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
  * See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -19,20 +19,6 @@
  */
 package org.jboss.aesh.extensions.grep;
 
-import org.jboss.aesh.cl.Arguments;
-import org.jboss.aesh.cl.CommandDefinition;
-import org.jboss.aesh.cl.Option;
-import org.jboss.aesh.cl.completer.OptionCompleter;
-import org.jboss.aesh.complete.CompleteOperation;
-import org.jboss.aesh.console.Config;
-import org.jboss.aesh.console.command.Command;
-import org.jboss.aesh.console.command.CommandResult;
-import org.jboss.aesh.console.command.completer.CompleterInvocation;
-import org.jboss.aesh.console.command.invocation.CommandInvocation;
-import org.jboss.aesh.io.Resource;
-import org.jboss.aesh.terminal.Shell;
-import org.jboss.aesh.util.FileLister;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -41,7 +27,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
+import org.aesh.command.Command;
+import org.aesh.command.CommandDefinition;
+import org.aesh.command.CommandException;
+import org.aesh.command.CommandResult;
+import org.aesh.command.completer.CompleterInvocation;
+import org.aesh.command.completer.OptionCompleter;
+import org.aesh.command.invocation.CommandInvocation;
+import org.aesh.command.option.Arguments;
+import org.aesh.command.option.Option;
+import org.aesh.complete.AeshCompleteOperation;
+import org.aesh.io.Resource;
+import org.aesh.readline.completion.CompleteOperation;
+import org.aesh.util.Config;
+import org.aesh.util.FileLister;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -95,10 +94,10 @@ public class Grep implements Command<CommandInvocation> {
     }
 
     @Override
-    public CommandResult execute(CommandInvocation commandInvocation) throws IOException {
+    public CommandResult execute(CommandInvocation commandInvocation) throws CommandException, InterruptedException {
         //just display help and return
         if(help || arguments == null || arguments.size() == 0) {
-            commandInvocation.getShell().out().println(commandInvocation.getHelpInfo("grep"));
+            commandInvocation.println(commandInvocation.getHelpInfo("grep"));
             return CommandResult.SUCCESS;
         }
 
@@ -110,40 +109,42 @@ public class Grep implements Command<CommandInvocation> {
                 pattern = Pattern.compile(arguments.remove(0));
         }
         catch(PatternSyntaxException pse) {
-            commandInvocation.getShell().out().println("grep: invalid pattern.");
+            commandInvocation.println("grep: invalid pattern.");
             return CommandResult.FAILURE;
         }
 
-        //do we have data from a pipe/redirect?
-        if(commandInvocation.getShell().in().getStdIn().available() > 0) {
-            java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
-            String input = s.hasNext() ? s.next() : "";
-            List<String> inputLines = new ArrayList<>();
-            Collections.addAll(inputLines, input.split(Config.getLineSeparator()));
+        try {
+            //do we have data from a pipe/redirect?
+            if (commandInvocation.getConfiguration().getPipedData().available() > 0) {
+                java.util.Scanner s = new java.util.Scanner(commandInvocation.getConfiguration().getPipedData()).useDelimiter("\\A");
+                String input = s.hasNext() ? s.next() : "";
+                List<String> inputLines = new ArrayList<>();
+                Collections.addAll(inputLines, input.split(Config.getLineSeparator()));
 
-            doGrep(inputLines, commandInvocation.getShell());
-        }
-        //find argument files and build regex..
-        else {
-            if(arguments != null && arguments.size() > 0) {
-                for(String s : arguments)
-                    doGrep(commandInvocation.getAeshContext().getCurrentWorkingDirectory().newInstance(s),
-                            commandInvocation.getShell());
-            }
-            //posix starts an interactive shell and read from the input here
+                doGrep(inputLines, commandInvocation);
+            } //find argument files and build regex..
+            else if (arguments != null && arguments.size() > 0) {
+                for (String s : arguments) {
+                    doGrep(commandInvocation.getConfiguration().getAeshContext().
+                            getCurrentWorkingDirectory().newInstance(s),
+                            commandInvocation);
+                }
+            } //posix starts an interactive shell and read from the input here
             //atm, we'll just quit
             else {
-                commandInvocation.getShell().out().print("grep: no file or input given.");
+                commandInvocation.println("grep: no file or input given.");
                 return CommandResult.SUCCESS;
             }
+        } catch (IOException ex) {
+            throw new CommandException(ex);
         }
 
         return null;
     }
 
-    private void doGrep(Resource file, Shell shell) {
+    private void doGrep(Resource file, CommandInvocation invocation) {
         if(!file.exists()) {
-            shell.out().println("grep: "+file.toString()+": No such file or directory");
+            invocation.println("grep: " + file.toString() + ": No such file or directory");
         }
         else if(file.isLeaf()) {
             try {
@@ -155,7 +156,7 @@ public class Grep implements Command<CommandInvocation> {
                     inputLines.add(line);
                 }
 
-                doGrep(inputLines, shell);
+                doGrep(inputLines, invocation);
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -164,16 +165,16 @@ public class Grep implements Command<CommandInvocation> {
         }
     }
 
-    private void doGrep(List<String> inputLines, Shell shell) {
+    private void doGrep(List<String> inputLines, CommandInvocation invocation) {
         if(pattern != null) {
             for(String line : inputLines) {
                 if(line != null && pattern.matcher(line).find()) {
-                    shell.out().println(line);
+                    invocation.println(line);
                 }
             }
         }
         else
-            shell.out().println("No pattern given");
+            invocation.println("No pattern given");
 
     }
 
@@ -187,15 +188,17 @@ public class Grep implements Command<CommandInvocation> {
         public void complete(CompleterInvocation completerData) {
             Grep grep = (Grep) completerData.getCommand();
             //the first argument is the pattern, do not autocomplete
-            if(grep.getArguments() != null && grep.getArguments().size() > 0) {
-                CompleteOperation completeOperation =
-                        new CompleteOperation(completerData.getAeshContext(), completerData.getGivenCompleteValue(), 0);
-                if (completerData.getGivenCompleteValue() == null)
+            if (grep.getArguments() != null && grep.getArguments().size() > 0) {
+                CompleteOperation completeOperation
+                        = new AeshCompleteOperation(completerData.getAeshContext(),
+                                completerData.getGivenCompleteValue(), 0);
+                if (completerData.getGivenCompleteValue() == null) {
                     new FileLister("", completerData.getAeshContext().getCurrentWorkingDirectory()).
                             findMatchingDirectories(completeOperation);
-                else
+                } else {
                     new FileLister(completerData.getGivenCompleteValue(), completerData.getAeshContext().getCurrentWorkingDirectory()).
                             findMatchingDirectories(completeOperation);
+                }
 
                 if (completeOperation.getCompletionCandidates().size() > 1) {
                     completeOperation.removeEscapedSpacesFromCompletionCandidates();
