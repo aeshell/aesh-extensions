@@ -39,7 +39,7 @@ import org.aesh.command.option.Option;
 import org.aesh.complete.AeshCompleteOperation;
 import org.aesh.io.Resource;
 import org.aesh.readline.completion.CompleteOperation;
-import org.aesh.util.Config;
+import org.aesh.utils.Config;
 import org.aesh.util.FileLister;
 
 /**
