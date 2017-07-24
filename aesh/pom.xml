@@ -30,7 +30,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.jboss.aesh</groupId>
+    <groupId>org.aesh</groupId>
     <artifactId>aesh-extensions</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
@@ -39,8 +39,8 @@
 
     <properties>
         <!-- jboss-parent override -->
-        <maven.compiler.argument.target>1.7</maven.compiler.argument.target>
-        <maven.compiler.argument.source>1.7</maven.compiler.argument.source>
+        <maven.compiler.argument.target>1.8</maven.compiler.argument.target>
+        <maven.compiler.argument.source>1.8</maven.compiler.argument.source>
     </properties>
 
     <scm>
@@ -60,7 +60,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jboss.aesh</groupId>
+            <groupId>org.aesh</groupId>
             <artifactId>aesh</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -82,33 +82,48 @@
         </dependency>
     </dependencies>
 
-       <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <trimStackTrace>false</trimStackTrace>
-                    <printSummary>true</printSummary>
-                    <includes>
-                        <include>**/*TestCase.java</include>
-                        <include>**/*Test.java</include>
-                    </includes>
-                    <useFile>true</useFile>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
+   <build>
+      <plugins>
+         <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+               <redirectTestOutputToFile>true</redirectTestOutputToFile>
+               <trimStackTrace>false</trimStackTrace>
+               <includes>
+                  <include>**/*TestCase.java</include>
+                  <include>**/*Test.java</include>
+               </includes>
+               <excludes>
+                  <exclude>**/ConsoleRedirectionTest.java</exclude>
+               </excludes>
+            </configuration>
+         </plugin>
+         <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifest>
+                     <addClasspath>true</addClasspath>
+                     <mainClass>AeshExample</mainClass>
+                  </manifest>
+               </archive>
+            </configuration>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>test-jar</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+         <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+               <source>1.8</source>
+               <target>1.8</target>
+            </configuration>
+         </plugin>
+       </plugins>
+   </build>
 
 </project>

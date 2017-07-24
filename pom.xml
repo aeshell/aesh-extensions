@@ -34,7 +34,7 @@
     <artifactId>aesh-extensions-all</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>Æsh extensions</name>
+    <name>Æsh Extensions All</name>
     <description>Æsh (Another Extendable SHell) extensions</description>
     <scm>
         <connection>scm:git:git://github.com/aeshell/aesh-extensions.git</connection>

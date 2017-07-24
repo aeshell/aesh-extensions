@@ -1,1 +1,1 @@
-org.jboss.aesh.extensions.grep.Grep
+org.aesh.extensions.grep.Grep

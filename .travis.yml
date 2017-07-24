@@ -1,14 +1,10 @@
 language: java
 
 jdk:
-  - openjdk7
-  - oraclejdk7
   - oraclejdk8
 
 env:
    - TERM=dumb
    
-before_install: ./gradlew clean
-
 notifications:
   irc: chat.freenode.net#aesh
