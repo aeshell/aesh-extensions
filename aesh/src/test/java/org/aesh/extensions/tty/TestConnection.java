@@ -255,4 +255,9 @@ public class TestConnection implements Connection {
         doRead(Parser.toCodePoints(data));
     }
 
+    @Override
+    public boolean supportsAnsi() {
+        return false;
+    }
+
 }
