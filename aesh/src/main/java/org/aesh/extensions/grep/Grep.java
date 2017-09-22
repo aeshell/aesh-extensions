@@ -38,7 +38,7 @@ import org.aesh.complete.AeshCompleteOperation;
 import org.aesh.io.Resource;
 import org.aesh.readline.completion.CompleteOperation;
 import org.aesh.utils.Config;
-import org.aesh.util.FileLister;
+import org.aesh.impl.util.FileLister;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -190,12 +190,15 @@ public class Grep implements Command<CommandInvocation> {
                 CompleteOperation completeOperation
                         = new AeshCompleteOperation(completerData.getAeshContext(),
                                 completerData.getGivenCompleteValue(), 0);
+                List<String> candidates = new ArrayList<>();
                 if (completerData.getGivenCompleteValue() == null) {
                     new FileLister("", completerData.getAeshContext().getCurrentWorkingDirectory()).
-                            findMatchingDirectories(completeOperation);
+                            findMatchingDirectories(candidates);
+                    completeOperation.addCompletionCandidates(candidates);
                 } else {
                     new FileLister(completerData.getGivenCompleteValue(), completerData.getAeshContext().getCurrentWorkingDirectory()).
-                            findMatchingDirectories(completeOperation);
+                            findMatchingDirectories(candidates);
+                    completeOperation.addCompletionCandidates(candidates);
                 }
 
                 if (completeOperation.getCompletionCandidates().size() > 1) {

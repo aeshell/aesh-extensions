@@ -17,7 +17,7 @@
  */
 package org.aesh.extensions.less;
 
-import org.aesh.console.man.FileParser;
+import org.aesh.command.man.FileParser;
 
 import java.io.BufferedReader;
 import java.io.File;
