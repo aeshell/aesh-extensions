@@ -113,7 +113,8 @@ public class Grep implements Command<CommandInvocation> {
 
         try {
             //do we have data from a pipe/redirect?
-            if (commandInvocation.getConfiguration().getPipedData().available() > 0) {
+            if (commandInvocation.getConfiguration().getPipedData() != null
+                    && commandInvocation.getConfiguration().getPipedData().available() > 0) {
                 java.util.Scanner s = new java.util.Scanner(commandInvocation.getConfiguration().getPipedData()).useDelimiter("\\A");
                 String input = s.hasNext() ? s.next() : "";
                 List<String> inputLines = new ArrayList<>();
