@@ -118,7 +118,7 @@ public class Grep implements Command<CommandInvocation> {
                 java.util.Scanner s = new java.util.Scanner(commandInvocation.getConfiguration().getPipedData()).useDelimiter("\\A");
                 String input = s.hasNext() ? s.next() : "";
                 List<String> inputLines = new ArrayList<>();
-                Collections.addAll(inputLines, input.split(Config.getLineSeparator()));
+                Collections.addAll(inputLines, input.split("\\R"));
 
                 doGrep(inputLines, commandInvocation);
             } //find argument files and build regex..
@@ -197,9 +197,10 @@ public class Grep implements Command<CommandInvocation> {
                             findMatchingDirectories(candidates);
                     completeOperation.addCompletionCandidates(candidates);
                 } else {
-                    new FileLister(completerData.getGivenCompleteValue(), completerData.getAeshContext().getCurrentWorkingDirectory()).
+                    int offset = new FileLister(completerData.getGivenCompleteValue(), completerData.getAeshContext().getCurrentWorkingDirectory()).
                             findMatchingDirectories(candidates);
                     completeOperation.addCompletionCandidates(candidates);
+                    completeOperation.setOffset(completerData.getGivenCompleteValue().length() - offset);
                 }
 
                 if (completeOperation.getCompletionCandidates().size() > 1) {
@@ -207,6 +208,7 @@ public class Grep implements Command<CommandInvocation> {
                 }
 
                 completerData.setCompleterValuesTerminalString(completeOperation.getCompletionCandidates());
+                completerData.setOffset(completeOperation.getOffset());
                 if (completerData.getGivenCompleteValue() != null && completerData.getCompleterValues().size() == 1) {
                     completerData.setAppendSpace(completeOperation.hasAppendSeparator());
                 }
