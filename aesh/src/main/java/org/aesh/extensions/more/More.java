@@ -36,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import org.aesh.command.CommandException;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>
@@ -227,18 +228,22 @@ public class More implements Command<CommandInvocation> {
     }
 
     @Override
-    public CommandResult execute(CommandInvocation commandInvocation) {
+    public CommandResult execute(CommandInvocation commandInvocation) throws CommandException {
         this.commandInvocation = commandInvocation;
         loader = new SimpleFileParser();
-
-        /*
-        if(commandInvocation.getShell().in().getStdIn().available() > 0) {
-            java.util.Scanner s = new java.util.Scanner(commandInvocation.getShell().in().getStdIn()).useDelimiter("\\A");
-            String fileContent = s.hasNext() ? s.next() : "";
-            setInput(fileContent);
-            afterAttach();
+        try {
+            if (commandInvocation.getConfiguration().getPipedData() != null
+                    && commandInvocation.getConfiguration().getPipedData().available() > 0) {
+                java.util.Scanner s = new java.util.Scanner(commandInvocation.getConfiguration().getPipedData()).useDelimiter("\\A");
+                String fileContent = s.hasNext() ? s.next() : "";
+                setInput(fileContent);
+                afterAttach();
+                return CommandResult.SUCCESS;
+            }
+        } catch (IOException ex) {
+            throw new CommandException(ex);
         }
-        */
+
         if(arguments != null && arguments.size() > 0) {
             Resource f = arguments.get(0);
             f = f.resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
