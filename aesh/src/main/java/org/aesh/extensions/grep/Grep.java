@@ -95,7 +95,7 @@ public class Grep implements Command<CommandInvocation> {
     public CommandResult execute(CommandInvocation commandInvocation) throws CommandException, InterruptedException {
         //just display help and return
         if(help || arguments == null || arguments.size() == 0) {
-            commandInvocation.println(commandInvocation.getHelpInfo("grep"));
+            commandInvocation.println(commandInvocation.getHelpInfo("grep"), true);
             return CommandResult.SUCCESS;
         }
 
@@ -141,26 +141,18 @@ public class Grep implements Command<CommandInvocation> {
         return null;
     }
 
-    private void doGrep(Resource file, CommandInvocation invocation) {
-        if(!file.exists()) {
+    private void doGrep(Resource file, CommandInvocation invocation) throws IOException {
+        if (!file.exists()) {
             invocation.println("grep: " + file.toString() + ": No such file or directory");
-        }
-        else if(file.isLeaf()) {
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(file.read()));
-                List<String> inputLines = new ArrayList<>();
+        } else if (file.isLeaf()) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(file.read()));
+            List<String> inputLines = new ArrayList<>();
 
-                String line;
-                while ((line = br.readLine()) != null) {
-                    inputLines.add(line);
-                }
-
-                doGrep(inputLines, invocation);
+            String line;
+            while ((line = br.readLine()) != null) {
+                inputLines.add(line);
             }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            doGrep(inputLines, invocation);
         }
     }
 
@@ -168,7 +160,7 @@ public class Grep implements Command<CommandInvocation> {
         if(pattern != null) {
             for(String line : inputLines) {
                 if(line != null && pattern.matcher(line).find()) {
-                    invocation.println(line);
+                    invocation.println(line, true);
                 }
             }
         }
