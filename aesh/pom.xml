@@ -62,7 +62,7 @@
         <dependency>
             <groupId>org.aesh</groupId>
             <artifactId>aesh</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0-Alpha1</version>
         </dependency>
 
         <dependency>
