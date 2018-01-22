@@ -33,7 +33,7 @@
     <groupId>org.aesh</groupId>
     <artifactId>aesh-extensions</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-Alpha1</version>
+    <version>1.0-Alpha2</version>
     <name>Æsh Extensions</name>
     <description>Commands that may be used as part of a Æsh program</description>
 
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>org.aesh</groupId>
             <artifactId>aesh</artifactId>
-            <version>1.0-Alpha1</version>
+            <version>1.0-Alpha4</version>
         </dependency>
 
         <dependency>
