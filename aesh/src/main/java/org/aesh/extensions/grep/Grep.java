@@ -37,7 +37,6 @@ import org.aesh.command.option.Option;
 import org.aesh.complete.AeshCompleteOperation;
 import org.aesh.io.Resource;
 import org.aesh.readline.completion.CompleteOperation;
-import org.aesh.utils.Config;
 import org.aesh.impl.util.FileLister;
 
 /**
@@ -54,35 +53,36 @@ public class Grep implements Command<CommandInvocation> {
             description = "display this help and exit")
     private boolean help;
 
-    @Option(shortName = 'E', name = "extended-regexp", hasValue = false,
-            description = "PATTERN is an extended regular expression (ERE)")
-    private boolean extendedRegex;
-
-    @Option(shortName = 'F', name = "fixed-strings", hasValue = false,
-            description = "PATTERN is a set of newline-separated fixed strings")
-    private boolean fixedStrings;
-
-    @Option(shortName = 'G', name = "basic-regexp", hasValue = false,
-            description = "PATTERN is a basic regular expression (BRE)")
-    private boolean basicRegexp;
-
-    @Option(shortName = 'P', name = "perl-regexp", hasValue = false,
-            description = "PATTERN is a Perl regular expression")
-    private boolean perlRegexp;
-
-    @Option(shortName = 'e', name = "regexp", argument = "PATTERN",
-            description = "use PATTERN for matching")
-    private String regexp;
-
-    @Option(shortName = 'f', name = "file", argument = "FILE",
-            description = "obtain PATTERN from FILE")
-    private Resource file;
+//    @Option(shortName = 'E', name = "extended-regexp", hasValue = false,
+//            description = "PATTERN is an extended regular expression (ERE)")
+//    private boolean extendedRegex;
+//
+//    @Option(shortName = 'F', name = "fixed-strings", hasValue = false,
+//            description = "PATTERN is a set of newline-separated fixed strings")
+//    private boolean fixedStrings;
+//
+//    @Option(shortName = 'G', name = "basic-regexp", hasValue = false,
+//            description = "PATTERN is a basic regular expression (BRE)")
+//    private boolean basicRegexp;
+//
+//    @Option(shortName = 'P', name = "perl-regexp", hasValue = false,
+//            description = "PATTERN is a Perl regular expression")
+//    private boolean perlRegexp;
+//
+//    @Option(shortName = 'e', name = "regexp", argument = "PATTERN",
+//            description = "use PATTERN for matching")
+//    private String regexp;
+//
+//    @Option(shortName = 'f', name = "file", argument = "FILE",
+//            description = "obtain PATTERN from FILE")
+//    private Resource file;
 
     @Option(shortName = 'i', name = "ignore-case", hasValue = false,
             description = "ignore case distinctions")
     private boolean ignoreCase;
 
-    @Arguments(completer = GrepCompletor.class)
+    @Arguments(completer = GrepCompletor.class,
+            description = "The pattern to grep followed by file paths.")
     private List<String> arguments;
 
     private Pattern pattern;
