@@ -46,7 +46,7 @@ import org.aesh.impl.util.FileLister;
 @CommandDefinition(name = "grep",
         description = "[OPTION]... PATTERN [FILE]...\n"+
                 "Search for PATTERN in each FILE or standard input.\n"+
-                "PATTERN is, by default, a basic regular expression (BRE).\n" +
+                "PATTERN is a regular expression.\n" +
                 "Example: grep -i 'hello world' menu.h main.c\n")
 public class Grep implements Command<CommandInvocation> {
 
