@@ -19,7 +19,8 @@ package org.aesh.extensions.grep;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +46,7 @@ import org.aesh.impl.util.FileLister;
 @CommandDefinition(name = "grep",
         description = "[OPTION]... PATTERN [FILE]...\n"+
                 "Search for PATTERN in each FILE or standard input.\n"+
-                "PATTERN is, by default, a basic regular expression (BRE).\n" +
+                "PATTERN is a regular expression.\n" +
                 "Example: grep -i 'hello world' menu.h main.c\n")
 public class Grep implements Command<CommandInvocation> {
 
@@ -145,12 +146,12 @@ public class Grep implements Command<CommandInvocation> {
         if (!file.exists()) {
             invocation.println("grep: " + file.toString() + ": No such file or directory");
         } else if (file.isLeaf()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(file.read()));
             List<String> inputLines = new ArrayList<>();
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                inputLines.add(line);
+            try (BufferedReader reader = Files.newBufferedReader(Paths.get(file.getAbsolutePath()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    inputLines.add(line);
+                }
             }
             doGrep(inputLines, invocation);
         }
