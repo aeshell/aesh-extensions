@@ -31,7 +31,7 @@ import org.aesh.io.filter.NoDotNamesFilter;
 import org.aesh.readline.terminal.formatting.Color;
 import org.aesh.readline.terminal.formatting.TerminalColor;
 import org.aesh.readline.terminal.formatting.TerminalString;
-import org.aesh.util.Parser;
+import org.aesh.readline.util.Parser;
 import org.aesh.utils.Config;
 
 import java.io.IOException;

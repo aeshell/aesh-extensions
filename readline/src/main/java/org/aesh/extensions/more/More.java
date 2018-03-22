@@ -26,7 +26,7 @@ import org.aesh.readline.completion.Completion;
 import org.aesh.readline.terminal.Key;
 import org.aesh.readline.terminal.formatting.TerminalString;
 import org.aesh.terminal.Connection;
-import org.aesh.util.Parser;
+import org.aesh.readline.util.Parser;
 import org.aesh.utils.ANSI;
 import org.aesh.utils.Config;
 

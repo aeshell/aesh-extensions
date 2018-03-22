@@ -17,7 +17,7 @@
  */
 package org.aesh.extensions.ls;
 
-import org.aesh.util.Parser;
+import org.aesh.readline.util.Parser;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>

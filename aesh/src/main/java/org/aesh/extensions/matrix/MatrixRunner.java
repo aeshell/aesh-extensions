@@ -20,7 +20,7 @@ package org.aesh.extensions.matrix;
 import org.aesh.command.shell.Shell;
 import org.aesh.readline.terminal.formatting.Color;
 import org.aesh.readline.terminal.formatting.TerminalColor;
-import org.aesh.util.LoggerUtil;
+import org.aesh.readline.util.LoggerUtil;
 import org.aesh.utils.ANSI;
 
 import java.io.BufferedReader;
