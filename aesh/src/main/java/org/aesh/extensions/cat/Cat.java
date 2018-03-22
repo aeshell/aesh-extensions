@@ -27,7 +27,7 @@ import org.aesh.command.shell.Shell;
 import org.aesh.io.Resource;
 import org.aesh.readline.action.KeyAction;
 import org.aesh.readline.terminal.Key;
-import org.aesh.util.Parser;
+import org.aesh.readline.util.Parser;
 import org.aesh.utils.Config;
 
 import java.io.BufferedReader;

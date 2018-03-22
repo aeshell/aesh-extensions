@@ -23,7 +23,7 @@ import org.aesh.extensions.util.FileParser;
 import org.aesh.extensions.util.SimpleFileParser;
 import org.aesh.readline.completion.CompleteOperation;
 import org.aesh.terminal.Connection;
-import org.aesh.util.Parser;
+import org.aesh.readline.util.Parser;
 import org.aesh.utils.ANSI;
 
 import java.io.File;
