@@ -18,6 +18,7 @@
 package org.aesh.extensions.less;
 
 import org.aesh.command.CommandDefinition;
+import org.aesh.command.CommandException;
 import org.aesh.command.CommandResult;
 import org.aesh.command.invocation.CommandInvocation;
 import org.aesh.command.option.Arguments;
@@ -106,10 +107,23 @@ public class Less extends AeshFileDisplayer {
     }
 
     @Override
-    public CommandResult execute(CommandInvocation commandInvocation) throws InterruptedException {
+    public CommandResult execute(CommandInvocation commandInvocation) throws InterruptedException, CommandException {
         setCommandInvocation(commandInvocation);
         //make sure to reset loader on each execute
         loader = new SimpleFileParser();
+
+        try {
+            if (commandInvocation.getConfiguration().hasPipedData() &&
+                    commandInvocation.getConfiguration().getPipedData().available() > 0) {
+                java.util.Scanner s = new java.util.Scanner(commandInvocation.getConfiguration().getPipedData()).useDelimiter("\\A");
+                String fileContent = s.hasNext() ? s.next() : "";
+                setInput(fileContent);
+                afterAttach();
+                return CommandResult.SUCCESS;
+            }
+        } catch (IOException ex) {
+            throw new CommandException(ex);
+        }
 
         if(arguments != null && arguments.size() > 0) {
             Resource f =

@@ -17,6 +17,7 @@
  */
 package org.aesh.extensions.more;
 
+import javafx.scene.layout.Background;
 import org.aesh.command.Command;
 import org.aesh.command.CommandDefinition;
 import org.aesh.command.CommandResult;
@@ -81,13 +82,28 @@ public class More implements Command<CommandInvocation> {
         try {
             page = new MorePage(loader, columns);
 
-            if(!page.hasData()) {
-                //display help
+            if(commandInvocation.getConfiguration().hasOutputRedirection()) {
+            int count=0;
+            for(String line : this.page.getLines()) {
+                commandInvocation.print(line);
+                count++;
+                if(count < this.page.size())
+                    commandInvocation.print(Config.getLineSeparator());
             }
-            else
-                display(Background.INVERSE);
 
-            processOperation();
+            page.clear();
+            loader = new SimpleFileParser();
+
+            }
+            else {
+
+                if (!page.hasData()) {
+                    //display help
+                } else
+                    display(Background.INVERSE);
+
+                processOperation();
+            }
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -232,8 +248,8 @@ public class More implements Command<CommandInvocation> {
         this.commandInvocation = commandInvocation;
         loader = new SimpleFileParser();
         try {
-            if (commandInvocation.getConfiguration().getPipedData() != null
-                    && commandInvocation.getConfiguration().getPipedData().available() > 0) {
+            if (commandInvocation.getConfiguration().hasPipedData() &&
+                    commandInvocation.getConfiguration().getPipedData().available() > 0) {
                 java.util.Scanner s = new java.util.Scanner(commandInvocation.getConfiguration().getPipedData()).useDelimiter("\\A");
                 String fileContent = s.hasNext() ? s.next() : "";
                 setInput(fileContent);
@@ -246,7 +262,7 @@ public class More implements Command<CommandInvocation> {
 
         if(arguments != null && arguments.size() > 0) {
             Resource f = arguments.get(0);
-            f = f.resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
+            f = f.resolve(commandInvocation.getConfiguration().getAeshContext().getCurrentWorkingDirectory()).get(0);
             try {
                 if(f.isLeaf()) {
                     setInput(f.read(), f.getName());
