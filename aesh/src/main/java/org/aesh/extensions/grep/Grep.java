@@ -82,6 +82,18 @@ public class Grep implements Command<CommandInvocation> {
             description = "ignore case distinctions")
     private boolean ignoreCase;
 
+     @Option(shortName = 'n', name = "line-number", hasValue = false,
+            description = "Prefix each line of output with the 1-based line number within its input file.")
+    private boolean lineNumber;
+
+     @Option(shortName = 'o', name = "only-matching", hasValue = false,
+            description = "Print only the matched (non-empty) parts of a matching line, with each such  part  on  a separate output line.")
+    private boolean onlyMatching;
+
+     @Option(shortName = 'c', name = "count", hasValue = false,
+            description = "Suppress normal output; instead print a count of matching lines for each input file.")
+    private boolean count;
+
     @Arguments(completer = GrepCompletor.class,
             description = "The pattern to grep followed by file paths.")
     private List<String> arguments;
