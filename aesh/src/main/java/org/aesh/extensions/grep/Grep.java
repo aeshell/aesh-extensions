@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.aesh.command.Command;
@@ -100,6 +100,10 @@ public class Grep implements Command<CommandInvocation> {
 
     private Pattern pattern;
 
+    private int numberOfLines;
+
+    private int numberOfMatchedLines;
+
     public List<String> getArguments() {
         return arguments;
     }
@@ -111,6 +115,10 @@ public class Grep implements Command<CommandInvocation> {
             commandInvocation.println(commandInvocation.getHelpInfo("grep"), true);
             return CommandResult.SUCCESS;
         }
+
+        //reset numberOfLines if we've used grep before
+        numberOfLines = 0;
+        numberOfMatchedLines = 0;
 
         //first create the pattern
         try {
@@ -130,10 +138,13 @@ public class Grep implements Command<CommandInvocation> {
                     && commandInvocation.getConfiguration().getPipedData().available() > 0) {
                 java.util.Scanner s = new java.util.Scanner(commandInvocation.getConfiguration().getPipedData()).useDelimiter("\\A");
                 String input = s.hasNext() ? s.next() : "";
-                List<String> inputLines = new ArrayList<>();
-                Collections.addAll(inputLines, input.split("\\R"));
+                for(String line : input.split("\\R")) {
+                    numberOfLines++;
+                    doGrep(line, commandInvocation);
+                }
+                if(count)
+                    commandInvocation.println(String.valueOf(numberOfMatchedLines), true);
 
-                doGrep(inputLines, commandInvocation);
             } //find argument files and build regex..
             else if (arguments != null && arguments.size() > 0) {
                 for (String s : arguments) {
@@ -157,29 +168,48 @@ public class Grep implements Command<CommandInvocation> {
     private void doGrep(Resource file, CommandInvocation invocation) throws IOException {
         if (!file.exists()) {
             invocation.println("grep: " + file.toString() + ": No such file or directory");
-        } else if (file.isLeaf()) {
-            List<String> inputLines = new ArrayList<>();
+        }
+        else if (file.isLeaf()) {
             try (BufferedReader reader = Files.newBufferedReader(Paths.get(file.getAbsolutePath()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    inputLines.add(line);
+                if (pattern != null) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        numberOfLines++;
+                        doGrep(line, invocation);
+                    }
+                    if(count)
+                        invocation.println(String.valueOf(numberOfMatchedLines), true);
                 }
+                else
+                    invocation.println("No pattern given");
             }
-            doGrep(inputLines, invocation);
+
         }
     }
 
-    private void doGrep(List<String> inputLines, CommandInvocation invocation) {
+    private void doGrep(String line, CommandInvocation invocation) {
         if(pattern != null) {
-            for(String line : inputLines) {
-                if(line != null && pattern.matcher(line).find()) {
-                    invocation.println(line, true);
+            Matcher matcher = pattern.matcher(line);
+            if(matcher.find()) {
+                numberOfMatchedLines++;
+                //check if count is set, if so it overrides the output
+                if(!count) {
+                    if(lineNumber) {
+                        if (onlyMatching) {
+                            invocation.println(numberOfLines + ": " + line.substring(matcher.start(), matcher.end()), true);
+                        }
+                        else
+                            invocation.println(numberOfLines +": "+line, true);
+                    }
+                    else {
+                        if(onlyMatching)
+                            invocation.println(line.substring(matcher.start(), matcher.end()), true);
+                        else
+                            invocation.println(line, true);
+                    }
                 }
             }
         }
-        else
-            invocation.println("No pattern given");
-
     }
 
     /**
