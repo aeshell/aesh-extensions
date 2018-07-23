@@ -17,7 +17,6 @@
  */
 package org.aesh.extensions.more;
 
-import javafx.scene.layout.Background;
 import org.aesh.command.Command;
 import org.aesh.command.CommandDefinition;
 import org.aesh.command.CommandResult;
