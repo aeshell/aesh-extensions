@@ -48,7 +48,7 @@ public class Mkdir implements Command<CommandInvocation> {
             description = "print a message for each created directory")
     private boolean verbose;
 
-    @Arguments
+    @Arguments(description = "directory(ies) to create")
     private List<Resource> arguments;
 
     @Override
