@@ -41,7 +41,7 @@ public class Cd implements Command<CommandInvocation> {
     @Option(shortName = 'h', name = "help", hasValue = false, description = "display this help and exit")
     private boolean help;
 
-    @Arguments
+    @Arguments(description = "directory to change to")
     private List<Resource> arguments;
 
     @Override

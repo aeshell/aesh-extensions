@@ -48,7 +48,7 @@ public class Rm implements Command<CommandInvocation> {
     @Option(shortName = 'v', name = "verbose", hasValue = false, description = "explain what is being done")
     private boolean verbose;
 
-    @Arguments
+    @Arguments(description = "files or directories to remove")
     private List<Resource> args;
 
     @Override
