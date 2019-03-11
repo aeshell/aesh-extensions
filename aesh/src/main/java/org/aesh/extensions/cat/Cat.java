@@ -101,7 +101,7 @@ public class Cat implements Command<CommandInvocation> {
             */
             if(files != null && files.size() > 0) {
                 for(Resource f : files)
-                    displayFile(f.resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0),
+                    displayFile(f.resolve(commandInvocation.getConfiguration().getAeshContext().getCurrentWorkingDirectory()).get(0),
                             //PathResolver.resolvePath(f, commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0),
                             commandInvocation.getShell());
 

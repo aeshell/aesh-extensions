@@ -17,7 +17,7 @@
  */
 package org.aesh.extensions.grep;
 
-import org.aesh.command.parser.CommandLineParserException;
+import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.extensions.common.AeshTestCommons;
 import org.junit.Test;
 
@@ -29,7 +29,7 @@ import java.io.IOException;
 public class GrepTest extends AeshTestCommons {
 
     @Test
-    public void testGrep() throws IOException, CommandLineParserException {
+    public void testGrep() throws IOException, CommandRegistryException {
         prepare(Grep.class);
         pushToOutput("grep -i 'foo' /tmp\n");
         finish();

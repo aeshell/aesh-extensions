@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.aesh.command.parser.CommandLineParserException;
+import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.extensions.cat.Cat;
 import org.aesh.extensions.cd.Cd;
 import org.aesh.extensions.common.AeshTestCommons;
@@ -57,7 +58,7 @@ public class RmTest extends AeshTestCommons {
     }
 
     @Test
-    public void testRm() throws IOException, InterruptedException, CommandLineParserException {
+    public void testRm() throws IOException, CommandRegistryException {
 
         prepare(Touch.class, Mkdir.class, Cd.class, Cat.class, Ls.class, Rm.class);
         String tempPath = tempDir.toFile().getAbsolutePath() + Config.getPathSeparator();

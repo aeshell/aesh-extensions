@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.aesh.command.parser.CommandLineParserException;
+import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.extensions.common.AeshTestCommons;
 import org.aesh.extensions.ls.Ls;
 import org.aesh.utils.Config;
@@ -50,7 +51,7 @@ public class TouchTest extends AeshTestCommons {
     }
 
     @Test
-    public void testTouch() throws IOException, InterruptedException, CommandLineParserException {
+    public void testTouch() throws IOException, CommandRegistryException {
 
         prepare(Touch.class, Ls.class);
 

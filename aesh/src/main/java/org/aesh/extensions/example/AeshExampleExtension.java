@@ -1,4 +1,4 @@
-package org.aesh.extensions.example;/*
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2014 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -15,12 +15,15 @@ package org.aesh.extensions.example;/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.aesh.extensions.example;
 
 import java.io.IOException;
 
 import org.aesh.command.impl.registry.AeshCommandRegistryBuilder;
+import org.aesh.command.invocation.CommandInvocation;
 import org.aesh.command.parser.CommandLineParserException;
 import org.aesh.command.registry.CommandRegistry;
+import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.command.settings.Settings;
 import org.aesh.command.settings.SettingsBuilder;
 import org.aesh.extensions.cat.Cat;
@@ -48,9 +51,9 @@ import org.aesh.readline.ReadlineConsole;
  */
 public class AeshExampleExtension {
 
-    public static void main(String[] args) throws IOException, CommandLineParserException {
+    public static void main(String[] args) throws IOException, CommandRegistryException {
 
-       CommandRegistry registry = new AeshCommandRegistryBuilder()
+       CommandRegistry registry = AeshCommandRegistryBuilder.builder()
                 .command(Exit.class)
                 .command(Less.class)
                 .command(More.class)

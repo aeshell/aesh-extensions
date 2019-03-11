@@ -61,7 +61,7 @@ public class Mv implements Command<CommandInvocation> {
             return CommandResult.SUCCESS;
         }
 
-        Resource currentDir = ci.getAeshContext().getCurrentWorkingDirectory();
+        Resource currentDir = ci.getConfiguration().getAeshContext().getCurrentWorkingDirectory();
         Resource from = args.get(0).resolve(currentDir).get(0);
         Resource to = args.get(1).resolve(currentDir).get(0);
         try {

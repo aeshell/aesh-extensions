@@ -58,7 +58,7 @@ public class Rm implements Command<CommandInvocation> {
             return CommandResult.SUCCESS;
         }
 
-        Resource currentDir = ci.getAeshContext().getCurrentWorkingDirectory();
+        Resource currentDir = ci.getConfiguration().getAeshContext().getCurrentWorkingDirectory();
         for (Resource r : args) {
             Resource res = r.resolve(currentDir).get(0);
             if (dir)

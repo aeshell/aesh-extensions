@@ -62,7 +62,7 @@
         <dependency>
             <groupId>org.aesh</groupId>
             <artifactId>aesh-readline</artifactId>
-            <version>1.10</version>
+            <version>1.14</version>
         </dependency>
 
         <dependency>

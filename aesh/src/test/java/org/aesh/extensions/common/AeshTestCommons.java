@@ -22,6 +22,7 @@ import org.aesh.command.Command;
 import org.aesh.command.impl.registry.AeshCommandRegistryBuilder;
 import org.aesh.command.parser.CommandLineParserException;
 import org.aesh.command.registry.CommandRegistry;
+import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.readline.AeshContext;
 import org.aesh.command.settings.Settings;
 import org.aesh.command.settings.SettingsBuilder;
@@ -60,10 +61,10 @@ public class AeshTestCommons {
         return connection;
     }
 
-    protected void prepare(Class<? extends Command>... commands) throws IOException, CommandLineParserException {
+    protected void prepare(Class<? extends Command>... commands) throws IOException, CommandRegistryException {
         connection = new TestConnection(false);
 
-        registry = new AeshCommandRegistryBuilder()
+        registry = AeshCommandRegistryBuilder.builder()
                 .commands(commands)
                 .create();
 

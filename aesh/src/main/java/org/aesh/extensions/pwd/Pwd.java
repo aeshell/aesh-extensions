@@ -39,7 +39,7 @@ public class Pwd implements Command<CommandInvocation> {
             commandInvocation.getShell().write(commandInvocation.getHelpInfo("pwd"));
             return CommandResult.SUCCESS;
         }
-        commandInvocation.getShell().writeln(commandInvocation.getAeshContext().getCurrentWorkingDirectory().getAbsolutePath());
+        commandInvocation.getShell().writeln(commandInvocation.getConfiguration().getAeshContext().getCurrentWorkingDirectory().getAbsolutePath());
         return CommandResult.SUCCESS;
     }
 }

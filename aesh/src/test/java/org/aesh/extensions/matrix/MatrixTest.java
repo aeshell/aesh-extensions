@@ -22,6 +22,7 @@ import java.io.IOException;
 import org.aesh.command.impl.registry.AeshCommandRegistryBuilder;
 import org.aesh.command.parser.CommandLineParserException;
 import org.aesh.command.registry.CommandRegistry;
+import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.command.settings.Settings;
 import org.aesh.command.settings.SettingsBuilder;
 import org.aesh.extensions.tty.TestConnection;
@@ -35,11 +36,11 @@ import org.junit.Test;
 public class MatrixTest {
 
     @Test
-    public void testMatrix() throws IOException, InterruptedException, CommandLineParserException {
+    public void testMatrix() throws CommandRegistryException {
 
        Matrix matrix = new Matrix();
 
-        CommandRegistry registry = new AeshCommandRegistryBuilder()
+        CommandRegistry registry = AeshCommandRegistryBuilder.builder()
                 .command(matrix)
                 .create();
 

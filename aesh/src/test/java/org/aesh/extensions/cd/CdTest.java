@@ -20,6 +20,7 @@ package org.aesh.extensions.cd;
 import java.io.IOException;
 
 import org.aesh.command.parser.CommandLineParserException;
+import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.extensions.common.AeshTestCommons;
 import org.aesh.extensions.ls.Ls;
 import org.aesh.utils.Config;
@@ -33,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 public class CdTest extends AeshTestCommons {
 
     @Test
-    public void testCd() throws IOException, CommandLineParserException {
+    public void testCd() throws IOException, CommandRegistryException {
         prepare(Cd.class, Ls.class);
         if(Config.isOSPOSIXCompatible()) {
             pushToOutput("cd /tmp");

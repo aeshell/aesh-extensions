@@ -22,6 +22,7 @@ package org.aesh.extensions.echo;
 import java.io.IOException;
 
 import org.aesh.command.parser.CommandLineParserException;
+import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.extensions.common.AeshTestCommons;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,7 +33,7 @@ import org.junit.Test;
 public class EchoTest extends AeshTestCommons {
 
     @Test
-    public void testEcho() throws IOException, InterruptedException, CommandLineParserException {
+    public void testEcho() throws IOException, CommandRegistryException {
         prepare(Echo.class);
         pushToOutput("aaa");
         Assert.assertTrue(getStream().contains("aaa"));

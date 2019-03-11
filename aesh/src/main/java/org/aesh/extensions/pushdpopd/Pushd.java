@@ -57,7 +57,7 @@ public class Pushd implements Command<CommandInvocation> {
         }
         else if(arguments != null && arguments.size() > 0) {
 
-            List<Resource> files = arguments.get(0).resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory());
+            List<Resource> files = arguments.get(0).resolve(commandInvocation.getConfiguration().getAeshContext().getCurrentWorkingDirectory());
 
             if(files.get(0).isDirectory()) {
                 Resource oldCwd = commandInvocation.getConfiguration().getAeshContext().getCurrentWorkingDirectory();

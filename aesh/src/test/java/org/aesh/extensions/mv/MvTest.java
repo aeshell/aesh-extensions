@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.aesh.command.parser.CommandLineParserException;
+import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.extensions.cat.Cat;
 import org.aesh.extensions.cd.Cd;
 import org.aesh.extensions.common.AeshTestCommons;
@@ -53,7 +54,7 @@ public class MvTest extends AeshTestCommons {
     }
 
     @Test
-    public void testMv() throws IOException, InterruptedException, CommandLineParserException {
+    public void testMv() throws IOException, CommandRegistryException {
 
         prepare(Touch.class, Mkdir.class, Echo.class, Cd.class, Cat.class, Mv.class);
         String temp = tempDir.toFile().getAbsolutePath() + Config.getPathSeparator();

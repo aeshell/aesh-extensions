@@ -110,7 +110,7 @@ public class Ls implements Command<CommandInvocation> {
 
         if(arguments == null) {
             arguments = new ArrayList<>(1);
-            arguments.add(commandInvocation.getAeshContext().getCurrentWorkingDirectory());
+            arguments.add(commandInvocation.getConfiguration().getAeshContext().getCurrentWorkingDirectory());
         }
 
         int counter = 0;
@@ -119,7 +119,7 @@ public class Ls implements Command<CommandInvocation> {
                 commandInvocation.getShell().writeln(Config.getLineSeparator()+file.getName()+":");
             }
 
-            for(Resource f : file.resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory())) {
+            for(Resource f : file.resolve(commandInvocation.getConfiguration().getAeshContext().getCurrentWorkingDirectory())) {
                 if(f.isDirectory())
                     displayDirectory(f, commandInvocation.getShell());
                 else if(f.isLeaf())

@@ -24,6 +24,7 @@ import org.aesh.command.CommandResult;
 import org.aesh.command.invocation.CommandInvocation;
 import org.aesh.command.option.Arguments;
 import org.aesh.command.parser.CommandLineParserException;
+import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.command.registry.MutableCommandRegistry;
 import org.aesh.io.Resource;
 
@@ -53,7 +54,7 @@ public class GroovyCommand implements Command<CommandInvocation> {
 
         if(files != null && files.size() > 0) {
             if(files.get(0).isLeaf()) {
-                Resource f = files.get(0).resolve(commandInvocation.getAeshContext().getCurrentWorkingDirectory()).get(0);
+                Resource f = files.get(0).resolve(commandInvocation.getConfiguration().getAeshContext().getCurrentWorkingDirectory()).get(0);
                 loadCommand(f);
             }
         }
@@ -87,7 +88,7 @@ public class GroovyCommand implements Command<CommandInvocation> {
             else
                 commandInvocation.getShell().writeln("Groovy command do not contain CommandDefinition annotation");
 
-        } catch (IOException | CommandLineParserException e) {
+        } catch (IOException | CommandRegistryException e) {
             e.printStackTrace();
         }
 
