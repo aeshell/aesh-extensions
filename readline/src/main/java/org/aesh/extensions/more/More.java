@@ -27,8 +27,8 @@ import org.aesh.readline.terminal.Key;
 import org.aesh.readline.terminal.formatting.TerminalString;
 import org.aesh.terminal.Connection;
 import org.aesh.readline.util.Parser;
-import org.aesh.utils.ANSI;
-import org.aesh.utils.Config;
+import org.aesh.terminal.utils.ANSI;
+import org.aesh.terminal.utils.Config;
 
 import java.io.File;
 import java.io.IOException;

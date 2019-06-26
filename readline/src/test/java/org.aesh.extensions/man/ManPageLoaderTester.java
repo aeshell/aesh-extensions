@@ -18,7 +18,7 @@
 package org.aesh.extensions.man;
 
 import org.aesh.extensions.manual.parser.ManPageLoader;
-import org.aesh.utils.ANSI;
+import org.aesh.terminal.utils.ANSI;
 import org.junit.Test;
 
 import java.io.IOException;

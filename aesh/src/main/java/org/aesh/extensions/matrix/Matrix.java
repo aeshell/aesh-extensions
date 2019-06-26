@@ -25,12 +25,11 @@ import org.aesh.command.option.Option;
 import org.aesh.command.shell.Shell;
 import org.aesh.readline.action.KeyAction;
 import org.aesh.readline.terminal.Key;
-import org.aesh.utils.ANSI;
+import org.aesh.terminal.utils.ANSI;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;

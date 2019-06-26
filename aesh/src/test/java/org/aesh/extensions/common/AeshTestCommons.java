@@ -20,7 +20,6 @@ package org.aesh.extensions.common;
 
 import org.aesh.command.Command;
 import org.aesh.command.impl.registry.AeshCommandRegistryBuilder;
-import org.aesh.command.parser.CommandLineParserException;
 import org.aesh.command.registry.CommandRegistry;
 import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.readline.AeshContext;
@@ -28,7 +27,7 @@ import org.aesh.command.settings.Settings;
 import org.aesh.command.settings.SettingsBuilder;
 import org.aesh.extensions.tty.TestConnection;
 import org.aesh.readline.ReadlineConsole;
-import org.aesh.utils.Config;
+import org.aesh.terminal.utils.Config;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;

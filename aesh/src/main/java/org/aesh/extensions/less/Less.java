@@ -30,8 +30,8 @@ import org.aesh.extensions.highlight.Encoder;
 import org.aesh.extensions.highlight.Scanner;
 import org.aesh.extensions.highlight.Syntax;
 import org.aesh.io.Resource;
-import org.aesh.utils.ANSI;
-import org.aesh.utils.Config;
+import org.aesh.terminal.utils.ANSI;
+import org.aesh.terminal.utils.Config;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

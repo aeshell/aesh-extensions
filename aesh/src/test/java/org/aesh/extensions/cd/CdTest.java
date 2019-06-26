@@ -19,11 +19,10 @@ package org.aesh.extensions.cd;
 
 import java.io.IOException;
 
-import org.aesh.command.parser.CommandLineParserException;
 import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.extensions.common.AeshTestCommons;
 import org.aesh.extensions.ls.Ls;
-import org.aesh.utils.Config;
+import org.aesh.terminal.utils.Config;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

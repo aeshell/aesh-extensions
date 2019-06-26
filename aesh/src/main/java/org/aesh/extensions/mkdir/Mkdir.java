@@ -25,7 +25,7 @@ import org.aesh.command.option.Arguments;
 import org.aesh.command.option.Option;
 import org.aesh.command.shell.Shell;
 import org.aesh.io.Resource;
-import org.aesh.utils.Config;
+import org.aesh.terminal.utils.Config;
 
 import java.util.List;
 

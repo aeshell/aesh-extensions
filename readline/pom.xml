@@ -24,7 +24,7 @@
     <!-- Parent -->
      <parent>
         <groupId>org.aesh</groupId>
-        <artifactId>aesh-extensions-all</artifactId>
+        <artifactId>extensions-all</artifactId>
         <version>1.8-SNAPSHOT</version>
     </parent>
 
@@ -38,9 +38,7 @@
     <description>Commands that may be used as part of a Æsh readline program</description>
 
     <properties>
-        <!-- jboss-parent override -->
-        <maven.compiler.argument.target>1.8</maven.compiler.argument.target>
-        <maven.compiler.argument.source>1.8</maven.compiler.argument.source>
+        <javaModuleName>org.aesh.readline.extensions</javaModuleName>
     </properties>
 
     <scm>
@@ -61,8 +59,8 @@
     <dependencies>
         <dependency>
             <groupId>org.aesh</groupId>
-            <artifactId>aesh-readline</artifactId>
-            <version>1.15</version>
+            <artifactId>readline</artifactId>
+            <version>${readline.version}</version>
         </dependency>
 
         <dependency>
@@ -73,41 +71,57 @@
         </dependency>
     </dependencies>
 
-       <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <trimStackTrace>false</trimStackTrace>
-                    <printSummary>true</printSummary>
-                    <includes>
-                        <include>**/*TestCase.java</include>
-                        <include>**/*Test.java</include>
-                    </includes>
-                    <useFile>true</useFile>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
+   <build>
+      <plugins>
+         <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+         </plugin>
+         <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+               <redirectTestOutputToFile>true</redirectTestOutputToFile>
+               <trimStackTrace>false</trimStackTrace>
+               <includes>
+                  <include>**/*TestCase.java</include>
+                  <include>**/*Test.java</include>
+               </includes>
+            </configuration>
+         </plugin>
+         <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+               <archive>
+                 <manifest>
+                   <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                 </manifest>
+                 <manifestEntries>
+                   <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+                 </manifestEntries>
+                 <index>true</index>
+               </archive>
+            </configuration>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>test-jar</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+	 <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-source-plugin</artifactId>
+           <executions>
+             <execution>
+               <id>attach-sources</id>
+               <phase>verify</phase>
+               <goals>
+                 <goal>jar-no-fork</goal>
+               </goals>
+             </execution>
+           </executions>
+         </plugin>
+       </plugins>
+   </build>
 
 </project>

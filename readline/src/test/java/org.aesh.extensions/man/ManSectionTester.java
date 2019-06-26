@@ -18,8 +18,8 @@
 package org.aesh.extensions.man;
 
 import org.aesh.extensions.manual.parser.ManSection;
-import org.aesh.utils.ANSI;
-import org.aesh.utils.Config;
+import org.aesh.terminal.utils.ANSI;
+import org.aesh.terminal.utils.Config;
 import org.junit.Test;
 
 import java.util.ArrayList;

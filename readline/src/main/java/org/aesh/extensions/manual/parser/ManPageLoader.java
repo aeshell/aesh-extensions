@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import org.aesh.extensions.manual.page.PageLoader;
-import org.aesh.utils.Config;
+import org.aesh.terminal.utils.Config;
 
 /**
  * Read a asciidoc file and parse it to something that can be

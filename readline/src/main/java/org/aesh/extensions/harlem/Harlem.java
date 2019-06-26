@@ -24,8 +24,8 @@ import org.aesh.readline.terminal.formatting.Color;
 import org.aesh.readline.terminal.formatting.TerminalCharacter;
 import org.aesh.readline.terminal.formatting.TerminalColor;
 import org.aesh.terminal.Connection;
-import org.aesh.utils.ANSI;
-import org.aesh.utils.Config;
+import org.aesh.terminal.utils.ANSI;
+import org.aesh.terminal.utils.Config;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;

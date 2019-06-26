@@ -31,7 +31,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.aesh</groupId>
-    <artifactId>aesh-extensions-all</artifactId>
+    <artifactId>extensions-all</artifactId>
     <packaging>pom</packaging>
     <version>1.8-SNAPSHOT</version>
     <name>Æsh Extensions All</name>
@@ -54,5 +54,61 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
-   
+
+    <properties>
+      <!-- maven-compiler-plugin -->
+      <maven.compiler.target>1.8</maven.compiler.target>
+      <maven.compiler.source>1.8</maven.compiler.source>
+      <readline.version>1.18-SNAPSHOT</readline.version>
+      <aesh.version>2.4-SNAPSHOT</aesh.version>
+    </properties>
+ 
+    <developers>
+        <developer>
+            <name>Jean-Francois Denise</name>
+            <email>jdenise@redhat.com</email>
+            <organization>Red Hat</organization>
+            <organizationUrl>http://www.redhat.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Ståle Pedersen</name>
+            <email>spederse@redhat.com</email>
+            <organization>Red Hat</organization>
+            <organizationUrl>http://www.redhat.com</organizationUrl>
+        </developer>
+    </developers>
+
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-enforcer-plugin</artifactId>
+              <version>3.0.0-M2</version>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-jar-plugin</artifactId>
+              <version>3.0.0</version>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-source-plugin</artifactId>
+              <version>3.0.0</version>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-shade-plugin</artifactId>
+              <version>3.2.0</version>
+	    </plugin>            
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-checkstyle-plugin</artifactId>
+              <version>3.0.0</version>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+
+  
 </project>

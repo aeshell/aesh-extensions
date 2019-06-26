@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import org.aesh.command.parser.CommandLineParserException;
 import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.extensions.cat.Cat;
 import org.aesh.extensions.cd.Cd;
@@ -31,7 +30,7 @@ import org.aesh.extensions.common.AeshTestCommons;
 import org.aesh.extensions.echo.Echo;
 import org.aesh.extensions.mkdir.Mkdir;
 import org.aesh.extensions.touch.Touch;
-import org.aesh.utils.Config;
+import org.aesh.terminal.utils.Config;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

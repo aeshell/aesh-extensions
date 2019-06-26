@@ -29,7 +29,7 @@ import org.aesh.extensions.util.SimpleFileParser;
 import org.aesh.readline.completion.CompleteOperation;
 import org.aesh.readline.terminal.formatting.TerminalString;
 import org.aesh.terminal.Connection;
-import org.aesh.utils.ANSI;
+import org.aesh.terminal.utils.ANSI;
 
 /**
  * A Man implementation for Aesh. ref: http://en.wikipedia.org/wiki/Man_page
@@ -39,7 +39,7 @@ import org.aesh.utils.ANSI;
  */
 public class Man extends FileDisplayer {
 
-    private List<ManPage> manPages = new ArrayList<ManPage>();
+    private List<ManPage> manPages;
     private SimpleFileParser loader;
 
     public Man(Connection connection) {
