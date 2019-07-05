@@ -33,7 +33,7 @@
     <groupId>org.aesh</groupId>
     <artifactId>extensions-all</artifactId>
     <packaging>pom</packaging>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.8</version>
     <name>Æsh Extensions All</name>
     <description>Æsh (Another Extendable SHell) extensions</description>
     <scm>
@@ -59,8 +59,8 @@
       <!-- maven-compiler-plugin -->
       <maven.compiler.target>1.8</maven.compiler.target>
       <maven.compiler.source>1.8</maven.compiler.source>
-      <readline.version>1.18-SNAPSHOT</readline.version>
-      <aesh.version>2.4-SNAPSHOT</aesh.version>
+      <readline.version>2.0</readline.version>
+      <aesh.version>2.4</aesh.version>
     </properties>
  
     <developers>
