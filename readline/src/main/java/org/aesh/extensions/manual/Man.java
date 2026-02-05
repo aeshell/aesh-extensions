@@ -27,7 +27,7 @@ import org.aesh.extensions.util.FileParser;
 import org.aesh.extensions.manual.page.FileDisplayer;
 import org.aesh.extensions.util.SimpleFileParser;
 import org.aesh.readline.completion.CompleteOperation;
-import org.aesh.readline.terminal.formatting.TerminalString;
+import org.aesh.terminal.formatting.TerminalString;
 import org.aesh.terminal.Connection;
 import org.aesh.terminal.utils.ANSI;
 

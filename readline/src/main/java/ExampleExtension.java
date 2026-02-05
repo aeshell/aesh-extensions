@@ -25,7 +25,7 @@ import org.aesh.extensions.more.More;
 import org.aesh.readline.Readline;
 import org.aesh.readline.completion.CompleteOperation;
 import org.aesh.readline.completion.Completion;
-import org.aesh.readline.tty.terminal.TerminalConnection;
+import org.aesh.terminal.tty.TerminalConnection;
 import org.aesh.terminal.Connection;
 
 import java.io.IOException;

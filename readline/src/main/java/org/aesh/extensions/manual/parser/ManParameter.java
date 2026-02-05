@@ -17,7 +17,7 @@
  */
 package org.aesh.extensions.manual.parser;
 
-import org.aesh.readline.util.Parser;
+import org.aesh.terminal.utils.Parser;
 import org.aesh.terminal.utils.Config;
 
 import java.util.ArrayList;

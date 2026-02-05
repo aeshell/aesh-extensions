@@ -26,6 +26,7 @@ import org.aesh.command.registry.CommandRegistry;
 import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.command.settings.Settings;
 import org.aesh.command.settings.SettingsBuilder;
+import org.aesh.console.ReadlineConsole;
 import org.aesh.extensions.cat.Cat;
 import org.aesh.extensions.cd.Cd;
 import org.aesh.extensions.clear.Clear;
@@ -44,7 +45,6 @@ import org.aesh.extensions.pwd.Pwd;
 import org.aesh.extensions.rm.Rm;
 import org.aesh.extensions.touch.Touch;
 import org.aesh.readline.Prompt;
-import org.aesh.readline.ReadlineConsole;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>

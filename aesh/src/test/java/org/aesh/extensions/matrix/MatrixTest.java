@@ -25,9 +25,9 @@ import org.aesh.command.registry.CommandRegistry;
 import org.aesh.command.registry.CommandRegistryException;
 import org.aesh.command.settings.Settings;
 import org.aesh.command.settings.SettingsBuilder;
+import org.aesh.console.ReadlineConsole;
 import org.aesh.extensions.tty.TestConnection;
 import org.aesh.readline.Prompt;
-import org.aesh.readline.ReadlineConsole;
 import org.junit.Test;
 
 /**

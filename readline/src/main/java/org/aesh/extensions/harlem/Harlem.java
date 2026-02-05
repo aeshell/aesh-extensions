@@ -17,12 +17,12 @@
  */
 package org.aesh.extensions.harlem;
 
-import org.aesh.readline.action.KeyAction;
+import org.aesh.terminal.KeyAction;
 import org.aesh.readline.completion.CompleteOperation;
 import org.aesh.readline.completion.Completion;
-import org.aesh.readline.terminal.formatting.Color;
-import org.aesh.readline.terminal.formatting.TerminalCharacter;
-import org.aesh.readline.terminal.formatting.TerminalColor;
+import org.aesh.terminal.formatting.Color;
+import org.aesh.terminal.formatting.TerminalCharacter;
+import org.aesh.terminal.formatting.TerminalColor;
 import org.aesh.terminal.Connection;
 import org.aesh.terminal.utils.ANSI;
 import org.aesh.terminal.utils.Config;
