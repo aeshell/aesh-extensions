@@ -19,8 +19,8 @@ package org.aesh.extensions.matrix;
 
 
 import org.aesh.command.shell.Shell;
-import org.aesh.readline.terminal.formatting.Color;
-import org.aesh.readline.terminal.formatting.TerminalColor;
+import org.aesh.terminal.formatting.Color;
+import org.aesh.terminal.formatting.TerminalColor;
 import org.aesh.terminal.utils.ANSI;
 
 import java.io.IOException;

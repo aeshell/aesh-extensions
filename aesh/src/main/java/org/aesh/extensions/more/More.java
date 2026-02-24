@@ -26,8 +26,8 @@ import org.aesh.command.man.FileParser;
 import org.aesh.command.man.TerminalPage;
 import org.aesh.extensions.less.SimpleFileParser;
 import org.aesh.io.Resource;
-import org.aesh.readline.action.KeyAction;
-import org.aesh.readline.terminal.Key;
+import org.aesh.terminal.KeyAction;
+import org.aesh.terminal.Key;
 import org.aesh.terminal.utils.ANSI;
 import org.aesh.terminal.utils.Config;
 

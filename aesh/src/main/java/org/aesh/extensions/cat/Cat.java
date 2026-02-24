@@ -25,9 +25,9 @@ import org.aesh.command.option.Arguments;
 import org.aesh.command.option.Option;
 import org.aesh.command.shell.Shell;
 import org.aesh.io.Resource;
-import org.aesh.readline.action.KeyAction;
-import org.aesh.readline.terminal.Key;
-import org.aesh.readline.util.Parser;
+import org.aesh.terminal.KeyAction;
+import org.aesh.terminal.Key;
+import org.aesh.terminal.utils.Parser;
 import org.aesh.terminal.utils.Config;
 
 import java.io.BufferedReader;

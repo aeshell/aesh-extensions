@@ -31,7 +31,7 @@ import org.aesh.extensions.common.AeshTestCommons;
 import org.aesh.extensions.ls.Ls;
 import org.aesh.extensions.mkdir.Mkdir;
 import org.aesh.extensions.touch.Touch;
-import org.aesh.readline.terminal.Key;
+import org.aesh.terminal.Key;
 import org.aesh.terminal.utils.Config;
 import org.junit.After;
 import org.junit.Before;

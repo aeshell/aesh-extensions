@@ -20,7 +20,7 @@ package org.aesh.extensions.choice;
 import org.aesh.console.Console;
 import org.aesh.readline.completion.CompleteOperation;
 import org.aesh.readline.completion.Completion;
-import org.aesh.readline.util.LoggerUtil;
+import org.aesh.terminal.utils.LoggerUtil;
 
 import java.util.List;
 import java.util.logging.Logger;

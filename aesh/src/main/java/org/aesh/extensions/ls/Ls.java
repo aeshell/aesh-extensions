@@ -28,10 +28,10 @@ import org.aesh.comparators.PosixFileNameComparator;
 import org.aesh.extensions.tty.AeshPosixFilePermissions;
 import org.aesh.io.Resource;
 import org.aesh.io.filter.NoDotNamesFilter;
-import org.aesh.readline.terminal.formatting.Color;
-import org.aesh.readline.terminal.formatting.TerminalColor;
-import org.aesh.readline.terminal.formatting.TerminalString;
-import org.aesh.readline.util.Parser;
+import org.aesh.terminal.formatting.Color;
+import org.aesh.terminal.formatting.TerminalColor;
+import org.aesh.terminal.formatting.TerminalString;
+import org.aesh.terminal.utils.Parser;
 import org.aesh.terminal.utils.Config;
 
 import java.io.IOException;

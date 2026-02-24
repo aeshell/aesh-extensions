@@ -23,8 +23,8 @@ import org.aesh.command.CommandResult;
 import org.aesh.command.invocation.CommandInvocation;
 import org.aesh.command.option.Option;
 import org.aesh.command.shell.Shell;
-import org.aesh.readline.action.KeyAction;
-import org.aesh.readline.terminal.Key;
+import org.aesh.terminal.KeyAction;
+import org.aesh.terminal.Key;
 import org.aesh.terminal.utils.ANSI;
 
 import java.io.File;
