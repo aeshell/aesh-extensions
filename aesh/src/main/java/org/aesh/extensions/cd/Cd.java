@@ -24,7 +24,7 @@ import org.aesh.command.invocation.CommandInvocation;
 import org.aesh.command.option.Arguments;
 import org.aesh.command.option.Option;
 import org.aesh.io.Resource;
-import org.aesh.readline.Prompt;
+import org.aesh.readline.prompt.Prompt;
 import org.aesh.terminal.utils.Config;
 
 import java.util.List;

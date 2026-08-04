@@ -44,7 +44,7 @@ import org.aesh.extensions.pushdpopd.Pushd;
 import org.aesh.extensions.pwd.Pwd;
 import org.aesh.extensions.rm.Rm;
 import org.aesh.extensions.touch.Touch;
-import org.aesh.readline.Prompt;
+import org.aesh.readline.prompt.Prompt;
 
 /**
  * @author <a href="mailto:stale.pedersen@jboss.org">Ståle W. Pedersen</a>

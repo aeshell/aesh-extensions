@@ -20,3 +20,4 @@ out
 # ignore vim tmp files
 *.swp
 /bin/
+.cachebro/

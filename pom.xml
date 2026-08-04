@@ -59,8 +59,8 @@
       <!-- maven-compiler-plugin -->
       <maven.compiler.target>1.8</maven.compiler.target>
       <maven.compiler.source>1.8</maven.compiler.source>
-      <readline.version>3.2</readline.version>
-      <aesh.version>3.2</aesh.version>
+      <readline.version>3.16.3</readline.version>
+      <aesh.version>3.16.6</aesh.version>
     </properties>
  
     <developers>

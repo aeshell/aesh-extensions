@@ -245,7 +245,7 @@ public class Grep implements Command<CommandInvocation> {
                 completerData.setCompleterValuesTerminalString(completeOperation.getCompletionCandidates());
                 completerData.setOffset(completeOperation.getOffset());
                 if (completerData.getGivenCompleteValue() != null && completerData.getCompleterValues().size() == 1) {
-                    completerData.setAppendSpace(completeOperation.hasAppendSeparator());
+                    completerData.setAppendSpace(completeOperation.isAppendSeparator());
                 }
             }
         }
